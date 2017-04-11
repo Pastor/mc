@@ -76,7 +76,7 @@ public interface Session {
         public final String reason;
         public final Throwable cause;
 
-        public DisconnectEvent(Session session, String reason, Throwable cause) {
+        protected DisconnectEvent(Session session, String reason, Throwable cause) {
             super(session);
             this.reason = reason;
             this.cause = cause;

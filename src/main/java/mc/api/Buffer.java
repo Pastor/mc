@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 public interface Buffer {
+
     interface Input {
         boolean readBoolean() throws IOException;
 
