@@ -9,7 +9,7 @@ public final class TitleMenu extends Menu {
     public final ConsoleMenu consoleMenu = new ConsoleMenu(this);
     private int selected = 0;
 
-    private static final String[] options = {"Start game", "Console", "How to play", "About", "Quit"};
+    private static final String[] options = {"Start game", "Console", "Color", "How to play", "About", "Quit"};
 
     public TitleMenu() {
     }
@@ -31,10 +31,12 @@ public final class TitleMenu extends Menu {
             if (selected == 1)
                 game.setMenu(consoleMenu);
             if (selected == 2)
-                game.setMenu(new InstructionsMenu(this));
+                game.setMenu(new ColorMenu(this));
             if (selected == 3)
-                game.setMenu(new AboutMenu(this));
+                game.setMenu(new InstructionsMenu(this));
             if (selected == 4)
+                game.setMenu(new AboutMenu(this));
+            if (selected == 5)
                 game.stop();
         }
     }

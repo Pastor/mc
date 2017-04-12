@@ -12,7 +12,7 @@ public class LevelGen {
     public double[] values;
     private int w, h;
 
-    public LevelGen(int w, int h, int featureSize) {
+    private LevelGen(int w, int h, int featureSize) {
         this.w = w;
         this.h = h;
 

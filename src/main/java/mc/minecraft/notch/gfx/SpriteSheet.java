@@ -2,9 +2,10 @@ package mc.minecraft.notch.gfx;
 
 import java.awt.image.BufferedImage;
 
-public class SpriteSheet {
-    public int width, height;
-    public int[] pixels;
+public final class SpriteSheet {
+    final int width;
+    final int height;
+    final int[] pixels;
 
     public SpriteSheet(BufferedImage image) {
         width = image.getWidth();
