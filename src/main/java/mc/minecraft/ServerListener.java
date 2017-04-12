@@ -125,12 +125,12 @@ final class ServerListener extends Session.ListenerAdapter {
                 }
             }
         }
-        logger.info("Server recv: " + event.packet());
+//        logger.info("Server recv: " + event.packet());
     }
 
     @Override
     public void packetSent(Session.Event event) {
-        logger.info("Server sent: " + event.packet());
+//        logger.info("Server sent: " + event.packet());
     }
 
     @Override

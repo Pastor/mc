@@ -22,6 +22,8 @@ public interface Server {
 
     Server bind();
 
+    void sendBroadcast(Packet packet, Session exclude);
+
     abstract class Event extends mc.api.Event<Server.Listener> {
         public final Server server;
         public final Session session;

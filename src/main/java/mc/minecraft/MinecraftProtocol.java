@@ -1,6 +1,7 @@
 package mc.minecraft;
 
 import mc.api.*;
+import mc.engine.DefaultPacket;
 import mc.minecraft.packet.HandshakePacket;
 import mc.minecraft.packet.ingame.client.*;
 import mc.minecraft.packet.ingame.client.player.*;
@@ -26,7 +27,6 @@ import mc.minecraft.packet.status.client.StatusPingPacket;
 import mc.minecraft.packet.status.client.StatusQueryPacket;
 import mc.minecraft.packet.status.server.StatusPongPacket;
 import mc.minecraft.packet.status.server.StatusResponsePacket;
-import mc.engine.DefaultPacket;
 
 import java.net.Proxy;
 import java.security.GeneralSecurityException;

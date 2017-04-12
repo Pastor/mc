@@ -12,7 +12,7 @@ public class AttributeModifier {
     private ModifierOperation operation;
 
     public AttributeModifier(ModifierType type, double amount, ModifierOperation operation) {
-        if(type == ModifierType.DYNAMIC) {
+        if (type == ModifierType.DYNAMIC) {
             throw new IllegalArgumentException("Cannot create a dynamic-typed modifier without a UUID.");
         }
 
@@ -25,7 +25,7 @@ public class AttributeModifier {
     public AttributeModifier(UUID uuid, double amount, ModifierOperation operation) {
         try {
             this.type = Magic.key(ModifierType.class, uuid);
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             this.type = ModifierType.DYNAMIC;
         }
 
@@ -52,14 +52,14 @@ public class AttributeModifier {
 
     @Override
     public boolean equals(Object o) {
-        if(this == o) return true;
-        if(o == null || getClass() != o.getClass()) return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
         AttributeModifier that = (AttributeModifier) o;
 
-        if(Double.compare(that.amount, amount) != 0) return false;
-        if(operation != that.operation) return false;
-        if(!type.equals(that.type)) return false;
+        if (Double.compare(that.amount, amount) != 0) return false;
+        if (operation != that.operation) return false;
+        if (!type.equals(that.type)) return false;
 
         return true;
     }

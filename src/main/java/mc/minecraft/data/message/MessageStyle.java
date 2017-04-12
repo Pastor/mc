@@ -82,7 +82,7 @@ public class MessageStyle implements Cloneable {
     }
 
     protected MessageStyle setParent(MessageStyle parent) {
-        if(parent == null) {
+        if (parent == null) {
             parent = DEFAULT;
         }
 

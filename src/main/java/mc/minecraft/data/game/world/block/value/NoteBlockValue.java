@@ -4,7 +4,7 @@ public class NoteBlockValue implements BlockValue {
     private int pitch;
 
     public NoteBlockValue(int pitch) {
-        if(pitch < 0 || pitch > 24) {
+        if (pitch < 0 || pitch > 24) {
             throw new IllegalArgumentException("Pitch must be between 0 and 24.");
         }
 

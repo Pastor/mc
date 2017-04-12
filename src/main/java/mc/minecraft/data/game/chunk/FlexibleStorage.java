@@ -13,7 +13,7 @@ public class FlexibleStorage {
     }
 
     public FlexibleStorage(int bitsPerEntry, long[] data) {
-        if(bitsPerEntry < 1 || bitsPerEntry > 32) {
+        if (bitsPerEntry < 1 || bitsPerEntry > 32) {
             throw new IllegalArgumentException("BitsPerEntry \"" + bitsPerEntry + "\" is outside of accepted range.");
         }
 
@@ -37,7 +37,7 @@ public class FlexibleStorage {
     }
 
     public int get(int index) {
-        if(index < 0 || index > this.size - 1) {
+        if (index < 0 || index > this.size - 1) {
             throw new IndexOutOfBoundsException();
         }
 
@@ -45,7 +45,7 @@ public class FlexibleStorage {
         int startIndex = bitIndex / 64;
         int endIndex = ((index + 1) * this.bitsPerEntry - 1) / 64;
         int startBitSubIndex = bitIndex % 64;
-        if(startIndex == endIndex) {
+        if (startIndex == endIndex) {
             return (int) (this.data[startIndex] >>> startBitSubIndex & this.maxEntryValue);
         } else {
             int endBitSubIndex = 64 - startBitSubIndex;
@@ -54,11 +54,11 @@ public class FlexibleStorage {
     }
 
     public void set(int index, int value) {
-        if(index < 0 || index > this.size - 1) {
+        if (index < 0 || index > this.size - 1) {
             throw new IndexOutOfBoundsException();
         }
 
-        if(value < 0 || value > this.maxEntryValue) {
+        if (value < 0 || value > this.maxEntryValue) {
             throw new IllegalArgumentException("Value cannot be outside of accepted range.");
         }
 
@@ -67,19 +67,19 @@ public class FlexibleStorage {
         int endIndex = ((index + 1) * this.bitsPerEntry - 1) / 64;
         int startBitSubIndex = bitIndex % 64;
         this.data[startIndex] = this.data[startIndex] & ~(this.maxEntryValue << startBitSubIndex) | ((long) value & this.maxEntryValue) << startBitSubIndex;
-        if(startIndex != endIndex) {
+        if (startIndex != endIndex) {
             int endBitSubIndex = 64 - startBitSubIndex;
             this.data[endIndex] = this.data[endIndex] >>> endBitSubIndex << endBitSubIndex | ((long) value & this.maxEntryValue) >> endBitSubIndex;
         }
     }
 
     private static int roundToNearest(int value, int roundTo) {
-        if(roundTo == 0) {
+        if (roundTo == 0) {
             return 0;
-        } else if(value == 0) {
+        } else if (value == 0) {
             return roundTo;
         } else {
-            if(value < 0) {
+            if (value < 0) {
                 roundTo *= -1;
             }
 

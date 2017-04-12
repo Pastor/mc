@@ -15,7 +15,7 @@ public final class Util {
             KeyGenerator gen = KeyGenerator.getInstance("AES");
             gen.init(128);
             return gen.generateKey();
-        } catch(NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException e) {
             throw new Error("Failed to generate shared key.", e);
         }
     }
@@ -25,7 +25,7 @@ public final class Util {
             KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA");
             gen.initialize(1024);
             return gen.generateKeyPair();
-        } catch(NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException e) {
             throw new Error("Failed to generate key pair.", e);
         }
     }
@@ -33,7 +33,7 @@ public final class Util {
     public static PublicKey decodePublicKey(byte bytes[]) throws IOException {
         try {
             return KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(bytes));
-        } catch(GeneralSecurityException e) {
+        } catch (GeneralSecurityException e) {
             throw new IOException("Could not decrypt public key.", e);
         }
     }
@@ -55,15 +55,15 @@ public final class Util {
             Cipher cipher = Cipher.getInstance(key.getAlgorithm());
             cipher.init(mode, key);
             return cipher.doFinal(data);
-        } catch(GeneralSecurityException e) {
+        } catch (GeneralSecurityException e) {
             throw new Error("Failed to run encryption.", e);
         }
     }
 
     public static byte[] getServerIdHash(String serverId, PublicKey publicKey, SecretKey secretKey) {
         try {
-            return encrypt("SHA-1", new byte[][] { serverId.getBytes("ISO_8859_1"), secretKey.getEncoded(), publicKey.getEncoded() });
-        } catch(UnsupportedEncodingException e) {
+            return encrypt("SHA-1", serverId.getBytes("ISO_8859_1"), secretKey.getEncoded(), publicKey.getEncoded());
+        } catch (UnsupportedEncodingException e) {
             throw new Error("Failed to generate server id hash.", e);
         }
     }
@@ -71,12 +71,12 @@ public final class Util {
     private static byte[] encrypt(String encryption, byte[]... data) {
         try {
             MessageDigest digest = MessageDigest.getInstance(encryption);
-            for(byte array[] : data) {
+            for (byte array[] : data) {
                 digest.update(array);
             }
 
             return digest.digest();
-        } catch(NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException e) {
             throw new Error("Failed to encrypt data.", e);
         }
     }

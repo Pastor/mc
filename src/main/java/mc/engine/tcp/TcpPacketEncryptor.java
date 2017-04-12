@@ -17,11 +17,11 @@ final class TcpPacketEncryptor extends ByteToMessageCodec<ByteBuf> {
     }
 
     public void encode(ChannelHandlerContext ctx, ByteBuf in, ByteBuf out) throws Exception {
-        if(this.session.protocol().encrypt() != null) {
+        if (this.session.protocol().encrypt() != null) {
             int length = in.readableBytes();
             byte[] bytes = this.getBytes(in);
             int outLength = this.session.protocol().encrypt().getEncryptOutputSize(length);
-            if(this.encryptedArray.length < outLength) {
+            if (this.encryptedArray.length < outLength) {
                 this.encryptedArray = new byte[outLength];
             }
 
@@ -32,7 +32,7 @@ final class TcpPacketEncryptor extends ByteToMessageCodec<ByteBuf> {
     }
 
     public void decode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> out) throws Exception {
-        if(this.session.protocol().encrypt() != null) {
+        if (this.session.protocol().encrypt() != null) {
             int length = buf.readableBytes();
             byte[] bytes = this.getBytes(buf);
             ByteBuf result = ctx.alloc().heapBuffer(this.session.protocol().encrypt().getDecryptOutputSize(length));
@@ -45,7 +45,7 @@ final class TcpPacketEncryptor extends ByteToMessageCodec<ByteBuf> {
 
     private byte[] getBytes(ByteBuf buf) {
         int length = buf.readableBytes();
-        if(this.decryptedArray.length < length) {
+        if (this.decryptedArray.length < length) {
             this.decryptedArray = new byte[length];
         }
 

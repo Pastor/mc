@@ -31,16 +31,16 @@ final class TcpPacketCodec extends ByteToMessageCodec<Packet> {
         int initial = buf.readerIndex();
         Buffer.Input in = buffer.newInput(buf);
         int id = this.session.protocol().header().readPacketId(in);
-        if(id == -1) {
+        if (id == -1) {
             buf.readerIndex(initial);
             return;
         }
         Packet packet = this.session.protocol().createIncomingPacket(id);
         packet.read(in);
-        if(buf.readableBytes() > 0) {
+        if (buf.readableBytes() > 0) {
             throw new IllegalStateException("Packet \"" + packet.getClass().getSimpleName() + "\" not fully read.");
         }
-        if(packet.isPriority()) {
+        if (packet.isPriority()) {
             this.session.callEvent(eventFactory.newPacketReceivedEvent(this.session, packet));
         }
         out.add(packet);

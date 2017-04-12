@@ -61,19 +61,19 @@ public class ClientWindowActionPacket implements Packet {
         this.actionId = in.readShort();
         this.action = mc.minecraft.Magic.key(WindowAction.class, in.readByte());
         this.clicked = mc.minecraft.Util.readItem(in);
-        if(this.action == WindowAction.CLICK_ITEM) {
+        if (this.action == WindowAction.CLICK_ITEM) {
             this.param = mc.minecraft.Magic.key(ClickItemParam.class, param);
-        } else if(this.action == WindowAction.SHIFT_CLICK_ITEM) {
+        } else if (this.action == WindowAction.SHIFT_CLICK_ITEM) {
             this.param = mc.minecraft.Magic.key(ShiftClickItemParam.class, param);
-        } else if(this.action == WindowAction.MOVE_TO_HOTBAR_SLOT) {
+        } else if (this.action == WindowAction.MOVE_TO_HOTBAR_SLOT) {
             this.param = mc.minecraft.Magic.key(MoveToHotbarParam.class, param);
-        } else if(this.action == WindowAction.CREATIVE_GRAB_MAX_STACK) {
+        } else if (this.action == WindowAction.CREATIVE_GRAB_MAX_STACK) {
             this.param = mc.minecraft.Magic.key(CreativeGrabParam.class, param);
-        } else if(this.action == WindowAction.DROP_ITEM) {
+        } else if (this.action == WindowAction.DROP_ITEM) {
             this.param = mc.minecraft.Magic.key(DropItemParam.class, param + (this.slot != -999 ? 2 : 0));
-        } else if(this.action == WindowAction.SPREAD_ITEM) {
+        } else if (this.action == WindowAction.SPREAD_ITEM) {
             this.param = mc.minecraft.Magic.key(SpreadItemParam.class, param);
-        } else if(this.action == WindowAction.FILL_STACK) {
+        } else if (this.action == WindowAction.FILL_STACK) {
             this.param = mc.minecraft.Magic.key(FillStackParam.class, param);
         }
     }
@@ -83,19 +83,19 @@ public class ClientWindowActionPacket implements Packet {
         out.writeByte(this.windowId);
         out.writeShort(this.slot);
         int param = 0;
-        if(this.action == WindowAction.CLICK_ITEM) {
+        if (this.action == WindowAction.CLICK_ITEM) {
             param = mc.minecraft.Magic.value(Integer.class, (Enum<?>) this.param);
-        } else if(this.action == WindowAction.SHIFT_CLICK_ITEM) {
+        } else if (this.action == WindowAction.SHIFT_CLICK_ITEM) {
             param = mc.minecraft.Magic.value(Integer.class, (Enum<?>) this.param);
-        } else if(this.action == WindowAction.MOVE_TO_HOTBAR_SLOT) {
+        } else if (this.action == WindowAction.MOVE_TO_HOTBAR_SLOT) {
             param = mc.minecraft.Magic.value(Integer.class, (Enum<?>) this.param);
-        } else if(this.action == WindowAction.CREATIVE_GRAB_MAX_STACK) {
+        } else if (this.action == WindowAction.CREATIVE_GRAB_MAX_STACK) {
             param = mc.minecraft.Magic.value(Integer.class, (Enum<?>) this.param);
-        } else if(this.action == WindowAction.DROP_ITEM) {
+        } else if (this.action == WindowAction.DROP_ITEM) {
             param = mc.minecraft.Magic.value(Integer.class, (Enum<?>) this.param) + (this.slot != -999 ? 2 : 0);
-        } else if(this.action == WindowAction.SPREAD_ITEM) {
+        } else if (this.action == WindowAction.SPREAD_ITEM) {
             param = mc.minecraft.Magic.value(Integer.class, (Enum<?>) this.param);
-        } else if(this.action == WindowAction.FILL_STACK) {
+        } else if (this.action == WindowAction.FILL_STACK) {
             param = mc.minecraft.Magic.value(Integer.class, (Enum<?>) this.param);
         }
 

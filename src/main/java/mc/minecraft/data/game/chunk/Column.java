@@ -15,19 +15,19 @@ public class Column {
     }
 
     public Column(int x, int z, Chunk chunks[], byte biomeData[], Object[] tileEntities) {
-        if(chunks.length != 16) {
+        if (chunks.length != 16) {
             throw new IllegalArgumentException("Chunk array length must be 16.");
         }
 
-        if(biomeData != null && biomeData.length != 256) {
+        if (biomeData != null && biomeData.length != 256) {
             throw new IllegalArgumentException("Biome data array length must be 256.");
         }
 
         this.skylight = false;
         boolean noSkylight = false;
-        for(Chunk chunk : chunks) {
-            if(chunk != null) {
-                if(chunk.getSkyLight() == null) {
+        for (Chunk chunk : chunks) {
+            if (chunk != null) {
+                if (chunk.getSkyLight() == null) {
                     noSkylight = true;
                 } else {
                     this.skylight = true;
@@ -35,7 +35,7 @@ public class Column {
             }
         }
 
-        if(noSkylight && this.skylight) {
+        if (noSkylight && this.skylight) {
             throw new IllegalArgumentException("Either all chunks must have skylight values or none must have them.");
         }
 

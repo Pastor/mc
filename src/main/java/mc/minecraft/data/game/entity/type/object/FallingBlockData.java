@@ -20,13 +20,13 @@ public class FallingBlockData implements ObjectData {
 
     @Override
     public boolean equals(Object o) {
-        if(this == o) return true;
-        if(o == null || getClass() != o.getClass()) return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
         FallingBlockData that = (FallingBlockData) o;
 
-        if(id != that.id) return false;
-        if(metadata != that.metadata) return false;
+        if (id != that.id) return false;
+        if (metadata != that.metadata) return false;
 
         return true;
     }

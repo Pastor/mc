@@ -1,6 +1,7 @@
 package mc.minecraft;
 
 import mc.api.Buffer;
+import mc.engine.DefaultBuffer;
 import mc.minecraft.data.game.chunk.BlockStorage;
 import mc.minecraft.data.game.chunk.Chunk;
 import mc.minecraft.data.game.chunk.Column;
@@ -9,7 +10,6 @@ import mc.minecraft.data.game.entity.metadata.*;
 import mc.minecraft.data.game.world.block.BlockFace;
 import mc.minecraft.data.game.world.block.BlockState;
 import mc.minecraft.data.message.Message;
-import mc.engine.DefaultBuffer;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

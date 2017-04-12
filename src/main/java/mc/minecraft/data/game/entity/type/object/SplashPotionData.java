@@ -14,12 +14,12 @@ public class SplashPotionData implements ObjectData {
 
     @Override
     public boolean equals(Object o) {
-        if(this == o) return true;
-        if(o == null || getClass() != o.getClass()) return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
         SplashPotionData that = (SplashPotionData) o;
 
-        if(potionData != that.potionData) return false;
+        if (potionData != that.potionData) return false;
 
         return true;
     }

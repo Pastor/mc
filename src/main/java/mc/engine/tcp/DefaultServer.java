@@ -9,6 +9,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
+import mc.api.Packet;
 import mc.api.Protocol;
 import mc.api.Server;
 import mc.api.Session;
@@ -45,6 +46,11 @@ public final class DefaultServer implements Server {
 
     public Server bind() {
         return this.bind(true);
+    }
+
+    @Override
+    public void sendBroadcast(Packet packet, Session exclude) {
+        sessions.stream().filter(session -> session != exclude).forEach(session -> session.send(packet));
     }
 
     private Server bind(boolean wait) {

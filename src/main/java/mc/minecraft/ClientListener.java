@@ -29,6 +29,7 @@ import java.net.Proxy;
 
 final class ClientListener extends Session.ListenerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(ClientListener.class);
+
     @Override
     public void packetReceived(Session.Event event) {
         MinecraftProtocol protocol = (MinecraftProtocol) event.session.protocol();
@@ -97,12 +98,12 @@ final class ClientListener extends Session.ListenerAdapter {
                 event.session.setCompressionThreshold(event.<ServerSetCompressionPacket>asPacket().getThreshold());
             }
         }
-        logger.info("Client recv: " + event.packet());
+//        logger.info("Client recv: " + event.packet());
     }
 
     @Override
     public void packetSent(Session.Event event) {
-        logger.info("Client sent: " + event.packet());
+//        logger.info("Client sent: " + event.packet());
     }
 
     public void connected(Session.Event event) {

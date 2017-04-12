@@ -27,7 +27,7 @@ public abstract class Protocol {
         this.incoming.put(id, packet);
         try {
             this.createIncomingPacket(id);
-        } catch(IllegalStateException e) {
+        } catch (IllegalStateException e) {
             this.incoming.remove(id);
             throw new IllegalArgumentException(e.getMessage(), e.getCause());
         }
@@ -38,27 +38,27 @@ public abstract class Protocol {
     }
 
     public final Packet createIncomingPacket(int id) {
-        if(id < 0 || !this.incoming.containsKey(id) || this.incoming.get(id) == null) {
+        if (id < 0 || !this.incoming.containsKey(id) || this.incoming.get(id) == null) {
             throw new IllegalArgumentException("Invalid packet id: " + id);
         }
 
         Class<? extends Packet> packet = this.incoming.get(id);
         try {
             Constructor<? extends Packet> constructor = packet.getDeclaredConstructor();
-            if(!constructor.isAccessible()) {
+            if (!constructor.isAccessible()) {
                 constructor.setAccessible(true);
             }
 
             return constructor.newInstance();
-        } catch(NoSuchMethodError e) {
+        } catch (NoSuchMethodError e) {
             throw new IllegalStateException("Packet \"" + id + ", " + packet.getName() + "\" does not have a no-params constructor for instantiation.");
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new IllegalStateException("Failed to instantiate packet \"" + id + ", " + packet.getName() + "\".", e);
         }
     }
 
     public final int getOutgoingId(Class<? extends Packet> packet) {
-        if(!this.outgoing.containsKey(packet) || this.outgoing.get(packet) == null) {
+        if (!this.outgoing.containsKey(packet) || this.outgoing.get(packet) == null) {
             throw new IllegalArgumentException("Unregistered outgoing packet class: " + packet.getName());
         }
 

@@ -29,9 +29,11 @@ public interface Packet {
 
     interface Encrypt {
         int getDecryptOutputSize(int length);
+
         int getEncryptOutputSize(int length);
 
         int decrypt(byte input[], int inputOffset, int inputLength, byte output[], int outputOffset) throws Exception;
+
         int encrypt(byte input[], int inputOffset, int inputLength, byte output[], int outputOffset) throws Exception;
     }
 }
