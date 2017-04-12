@@ -5,16 +5,18 @@ import com.mojang.ld22.gfx.Font;
 import com.mojang.ld22.gfx.Screen;
 
 public class WonMenu extends Menu {
+	private final Menu resetMenu;
 	private int inputDelay = 60;
 
-	public WonMenu() {
+	public WonMenu(Menu resetMenu) {
+		this.resetMenu = resetMenu;
 	}
 
 	public void tick() {
 		if (inputDelay > 0)
 			inputDelay--;
 		else if (input.attack.clicked || input.menu.clicked) {
-			game.setMenu(new TitleMenu());
+			game.setMenu(resetMenu);
 		}
 	}
 
