@@ -32,8 +32,8 @@ final class ClientListener extends Session.ListenerAdapter {
 
     @Override
     public void packetReceived(Session.Event event) {
-        MinecraftProtocol protocol = (MinecraftProtocol) event.session.protocol().get();
-        if (protocol.getSub() == MinecraftProtocol.Sub.LOGIN) {
+        MinicraftProtocol protocol = (MinicraftProtocol) event.session.protocol();
+        if (protocol.getSub() == MinicraftProtocol.Sub.LOGIN) {
             if (event.packet() instanceof EncryptionRequestPacket) {
                 EncryptionRequestPacket packet = event.asPacket();
                 SecretKey key = Util.generateSharedKey();
@@ -64,14 +64,14 @@ final class ClientListener extends Session.ListenerAdapter {
             } else if (event.packet() instanceof LoginSuccessPacket) {
                 LoginSuccessPacket packet = event.asPacket();
                 event.session.setFlag(Constants.PROFILE_KEY, packet.getProfile());
-                protocol.setSub(MinecraftProtocol.Sub.GAME, true, event.session);
+                protocol.setSub(MinicraftProtocol.Sub.GAME, true, event.session);
             } else if (event.packet() instanceof LoginDisconnectPacket) {
                 LoginDisconnectPacket packet = event.asPacket();
                 event.session.disconnect(packet.getReason().getFullText());
             } else if (event.packet() instanceof LoginSetCompressionPacket) {
                 event.session.setCompressionThreshold(event.<LoginSetCompressionPacket>asPacket().getThreshold());
             }
-        } else if (protocol.getSub() == MinecraftProtocol.Sub.STATUS) {
+        } else if (protocol.getSub() == MinicraftProtocol.Sub.STATUS) {
             if (event.packet() instanceof StatusResponsePacket) {
                 ServerStatusInfo info = event.<StatusResponsePacket>asPacket().getInfo();
                 ServerInfoHandler handler = event.session.flag(Constants.SERVER_INFO_HANDLER_KEY);
@@ -89,7 +89,7 @@ final class ClientListener extends Session.ListenerAdapter {
 
                 event.session.disconnect("Finished");
             }
-        } else if (protocol.getSub() == MinecraftProtocol.Sub.GAME) {
+        } else if (protocol.getSub() == MinicraftProtocol.Sub.GAME) {
             if (event.packet() instanceof ServerKeepAlivePacket) {
                 event.session.send(new ClientKeepAlivePacket(event.<ServerKeepAlivePacket>asPacket().getPingId()));
             } else if (event.packet() instanceof ServerDisconnectPacket) {
@@ -107,25 +107,25 @@ final class ClientListener extends Session.ListenerAdapter {
     }
 
     public void connected(Session.Event event) {
-        MinecraftProtocol protocol = (MinecraftProtocol) event.session.protocol().get();
-        if (protocol.getSub() == MinecraftProtocol.Sub.LOGIN) {
+        MinicraftProtocol protocol = (MinicraftProtocol) event.session.protocol();
+        if (protocol.getSub() == MinicraftProtocol.Sub.LOGIN) {
             Profile profile = event.session.flag(Constants.PROFILE_KEY);
-            protocol.setSub(MinecraftProtocol.Sub.HANDSHAKE, true, event.session);
+            protocol.setSub(MinicraftProtocol.Sub.HANDSHAKE, true, event.session);
             event.session.send(new HandshakePacket(
                     Constants.PROTOCOL_VERSION,
                     event.session.host(),
                     event.session.port(),
-                    MinecraftProtocol.HandshakeIntent.LOGIN));
-            protocol.setSub(MinecraftProtocol.Sub.LOGIN, true, event.session);
+                    MinicraftProtocol.HandshakeIntent.LOGIN));
+            protocol.setSub(MinicraftProtocol.Sub.LOGIN, true, event.session);
             event.session.send(new LoginStartPacket(profile != null ? profile.name : ""));
-        } else if (protocol.getSub() == MinecraftProtocol.Sub.STATUS) {
-            protocol.setSub(MinecraftProtocol.Sub.HANDSHAKE, true, event.session);
+        } else if (protocol.getSub() == MinicraftProtocol.Sub.STATUS) {
+            protocol.setSub(MinicraftProtocol.Sub.HANDSHAKE, true, event.session);
             event.session.send(new HandshakePacket(
                     Constants.PROTOCOL_VERSION,
                     event.session.host(),
                     event.session.port(),
-                    MinecraftProtocol.HandshakeIntent.STATUS));
-            protocol.setSub(MinecraftProtocol.Sub.STATUS, true, event.session);
+                    MinicraftProtocol.HandshakeIntent.STATUS));
+            protocol.setSub(MinicraftProtocol.Sub.STATUS, true, event.session);
             event.session.send(new StatusQueryPacket());
         }
     }

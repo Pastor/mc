@@ -33,6 +33,15 @@ public final class DefaultPropertyContainer implements PropertyContainer {
         register(new DefaultProperty(
                 PropertyReadonly.Type.INTEGER, PropertyConstants.SERVER_PORT, PropertyConstants.SERVER_PORT_DEFAULT,
                 "Порт сервера"));
+
+
+
+        register(new DefaultProperty(
+                PropertyReadonly.Type.INTEGER, PropertyConstants.PLAYER_STAMINA, 10,
+                "Выносливость пользователя"));
+        register(new DefaultProperty(
+                PropertyReadonly.Type.INTEGER, PropertyConstants.PLAYER_HEALTH, 10,
+                "Жизнь пользователя"));
     }
 
     @Override

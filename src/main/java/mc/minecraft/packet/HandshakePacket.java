@@ -3,7 +3,7 @@ package mc.minecraft.packet;
 import mc.api.Buffer;
 import mc.api.Packet;
 import mc.minecraft.Magic;
-import mc.minecraft.MinecraftProtocol;
+import mc.minecraft.MinicraftProtocol;
 import mc.minecraft.Util;
 
 import java.io.IOException;
@@ -12,13 +12,13 @@ public final class HandshakePacket implements Packet {
     private int protocolVersion;
     private String hostname;
     private int port;
-    private MinecraftProtocol.HandshakeIntent intent;
+    private MinicraftProtocol.HandshakeIntent intent;
 
     @SuppressWarnings("unused")
     private HandshakePacket() {
     }
 
-    public HandshakePacket(int protocolVersion, String hostname, int port, MinecraftProtocol.HandshakeIntent intent) {
+    public HandshakePacket(int protocolVersion, String hostname, int port, MinicraftProtocol.HandshakeIntent intent) {
         this.protocolVersion = protocolVersion;
         this.hostname = hostname;
         this.port = port;
@@ -37,7 +37,7 @@ public final class HandshakePacket implements Packet {
         return this.port;
     }
 
-    public MinecraftProtocol.HandshakeIntent getIntent() {
+    public MinicraftProtocol.HandshakeIntent getIntent() {
         return this.intent;
     }
 
@@ -45,7 +45,7 @@ public final class HandshakePacket implements Packet {
         this.protocolVersion = in.readVarInt();
         this.hostname = in.readString();
         this.port = in.readUnsignedShort();
-        this.intent = Magic.key(MinecraftProtocol.HandshakeIntent.class, in.readVarInt());
+        this.intent = Magic.key(MinicraftProtocol.HandshakeIntent.class, in.readVarInt());
     }
 
     public void write(Buffer.Output out) throws IOException {

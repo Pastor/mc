@@ -5,7 +5,7 @@ import mc.api.Session;
 import mc.engine.tcp.DefaultFactory;
 import mc.engine.tcp.DefaultServer;
 import mc.minecraft.Constants;
-import mc.minecraft.MinecraftProtocol;
+import mc.minecraft.MinicraftProtocol;
 import mc.minecraft.Profile;
 import mc.minecraft.ServerLoginHandler;
 import mc.minecraft.data.game.MessageType;
@@ -20,7 +20,7 @@ import mc.minecraft.data.status.PlayerInfo;
 import mc.minecraft.data.status.ServerStatusInfo;
 import mc.minecraft.data.status.VersionInfo;
 import mc.minecraft.data.status.handler.ServerInfoBuilder;
-import mc.minecraft.notch.MinecraftGame;
+import mc.minecraft.notch.MinicraftGame;
 import mc.minecraft.notch.property.PropertyConstants;
 import mc.minecraft.packet.ingame.client.ClientChatPacket;
 import mc.minecraft.packet.ingame.server.ServerChatPacket;
@@ -44,7 +44,7 @@ public final class App {
             Server server = new DefaultServer(
                     PropertyConstants.SERVER_HOSTNAME_DEFAULT,
                     PropertyConstants.SERVER_PORT_DEFAULT,
-                    MinecraftProtocol.class, FACTORY.newSessionFactory(PROXY));
+                    MinicraftProtocol.class, FACTORY.newSessionFactory(PROXY));
             server.setGlobalFlag(Constants.AUTH_PROXY_KEY, AUTH_PROXY);
             server.setGlobalFlag(Constants.VERIFY_USERS_KEY, VERIFY_USERS);
             server.setGlobalFlag(Constants.SERVER_INFO_BUILDER_KEY, (ServerInfoBuilder) session ->
@@ -84,8 +84,8 @@ public final class App {
 
                 @Override
                 public void sessionRemoved(Server.Event event) {
-                    MinecraftProtocol protocol = (MinecraftProtocol) event.session.protocol().get();
-                    if (protocol.getSub() == MinecraftProtocol.Sub.GAME) {
+                    MinicraftProtocol protocol = (MinicraftProtocol) event.session.protocol();
+                    if (protocol.getSub() == MinicraftProtocol.Sub.GAME) {
                         Profile profile = event.session.flag(Constants.PROFILE_KEY);
 
                         Message message = new TextMessage("[NOTIFY] ").setStyle(
@@ -99,11 +99,11 @@ public final class App {
             server.bind(false);
         }
         startGame();
-//        startGame();
+        startGame();
 //        startGame("Maine", "Password2");
     }
 
     private static void startGame() {
-        MinecraftGame.startGame(PROXY, true);
+        MinicraftGame.startGame(PROXY, true);
     }
 }

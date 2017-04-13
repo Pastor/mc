@@ -10,13 +10,16 @@ import mc.minecraft.notch.item.Item;
 import mc.minecraft.notch.item.PowerGloveItem;
 import mc.minecraft.notch.level.Level;
 import mc.minecraft.notch.level.tile.Tile;
+import mc.minecraft.notch.property.PropertyConstants;
+import mc.minecraft.notch.property.PropertyContainer;
 import mc.minecraft.notch.property.PropertyReader;
+import mc.minecraft.notch.property.PropertyReadonly;
 import mc.minecraft.notch.screen.InventoryMenu;
 import mc.minecraft.notch.sound.Sound;
 
 import java.util.List;
 
-public class Player extends Mob {
+public class Player extends Mob implements PropertyContainer.Listener {
     private final InputHandler input;
     public final PropertyReader propertyReader;
     private int attackTime, attackDir;
@@ -39,10 +42,12 @@ public class Player extends Mob {
         this.input = input;
         x = 24;
         y = 24;
-        stamina = maxStamina;
+        stamina = maxStamina = propertyReader.property(PropertyConstants.PLAYER_STAMINA).asValue();
+        health = maxHealth = propertyReader.property(PropertyConstants.PLAYER_HEALTH).asValue();
 
         inventory.add(new FurnitureItem(new Workbench()));
         inventory.add(new PowerGloveItem());
+        propertyReader.addListener(this);
     }
 
     public void tick() {
@@ -390,5 +395,15 @@ public class Player extends Mob {
     public void gameWon() {
         level.player.invulnerableTime = 60 * 5;
         game.won();
+    }
+
+    @Override
+    public void update(PropertyReadonly value) {
+        if (PropertyConstants.PLAYER_STAMINA.equals(value.key())) {
+            stamina = maxStamina = value.asValue();
+        } else if (PropertyConstants.PLAYER_HEALTH.equals(value.key())) {
+            health = maxHealth = value.asValue();
+        }
+
     }
 }

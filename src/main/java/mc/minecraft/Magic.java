@@ -100,8 +100,8 @@ public final class Magic {
         register(MetadataType.OPTIONAL_UUID, 11);
         register(MetadataType.BLOCK_STATE, 12);
 
-        register(MinecraftProtocol.HandshakeIntent.STATUS, 1);
-        register(MinecraftProtocol.HandshakeIntent.LOGIN, 2);
+        register(MinicraftProtocol.HandshakeIntent.STATUS, 1);
+        register(MinicraftProtocol.HandshakeIntent.LOGIN, 2);
 
         register(ClientRequest.RESPAWN, 0);
         register(ClientRequest.STATS, 1);

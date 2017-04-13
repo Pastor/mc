@@ -52,16 +52,16 @@ final class ServerListener extends Session.ListenerAdapter {
 
     @Override
     public void packetReceived(Session.Event event) {
-        MinecraftProtocol protocol = (MinecraftProtocol) event.session.protocol().get();
-        if (protocol.getSub() == MinecraftProtocol.Sub.HANDSHAKE) {
+        MinicraftProtocol protocol = (MinicraftProtocol) event.session.protocol();
+        if (protocol.getSub() == MinicraftProtocol.Sub.HANDSHAKE) {
             if (event.packet() instanceof HandshakePacket) {
                 HandshakePacket packet = event.asPacket();
                 switch (packet.getIntent()) {
                     case STATUS:
-                        protocol.setSub(MinecraftProtocol.Sub.STATUS, false, event.session);
+                        protocol.setSub(MinicraftProtocol.Sub.STATUS, false, event.session);
                         break;
                     case LOGIN:
-                        protocol.setSub(MinecraftProtocol.Sub.LOGIN, false, event.session);
+                        protocol.setSub(MinicraftProtocol.Sub.LOGIN, false, event.session);
                         if (packet.getProtocolVersion() > Constants.PROTOCOL_VERSION) {
                             event.session.disconnect("Outdated server! I'm still on " + Constants.GAME_VERSION + ".");
                         } else if (packet.getProtocolVersion() < Constants.PROTOCOL_VERSION) {
@@ -75,7 +75,7 @@ final class ServerListener extends Session.ListenerAdapter {
             }
         }
 
-        if (protocol.getSub() == MinecraftProtocol.Sub.LOGIN) {
+        if (protocol.getSub() == MinicraftProtocol.Sub.LOGIN) {
             if (event.packet() instanceof LoginStartPacket) {
                 String username = event.<LoginStartPacket>asPacket().getUsername();
                 event.session.setFlag(Constants.USERNAME_KEY, username);
@@ -100,7 +100,7 @@ final class ServerListener extends Session.ListenerAdapter {
             }
         }
 
-        if (protocol.getSub() == MinecraftProtocol.Sub.STATUS) {
+        if (protocol.getSub() == MinicraftProtocol.Sub.STATUS) {
             if (event.packet() instanceof StatusQueryPacket) {
                 ServerInfoBuilder builder = event.session.flag(Constants.SERVER_INFO_BUILDER_KEY);
                 if (builder == null) {
@@ -116,7 +116,7 @@ final class ServerListener extends Session.ListenerAdapter {
             }
         }
 
-        if (protocol.getSub() == MinecraftProtocol.Sub.GAME) {
+        if (protocol.getSub() == MinicraftProtocol.Sub.GAME) {
             if (event.packet() instanceof ClientKeepAlivePacket) {
                 ClientKeepAlivePacket packet = event.asPacket();
                 if (packet.getPingId() == this.lastPingId) {
@@ -135,10 +135,10 @@ final class ServerListener extends Session.ListenerAdapter {
 
     @Override
     public void disconnecting(Session.DisconnectEvent event) {
-        MinecraftProtocol protocol = (MinecraftProtocol) event.session.protocol().get();
-        if (protocol.getSub() == MinecraftProtocol.Sub.LOGIN) {
+        MinicraftProtocol protocol = (MinicraftProtocol) event.session.protocol();
+        if (protocol.getSub() == MinicraftProtocol.Sub.LOGIN) {
             event.session.send(new LoginDisconnectPacket(event.reason));
-        } else if (protocol.getSub() == MinecraftProtocol.Sub.GAME) {
+        } else if (protocol.getSub() == MinicraftProtocol.Sub.GAME) {
             event.session.send(new ServerDisconnectPacket(event.reason));
         }
     }
@@ -189,7 +189,8 @@ final class ServerListener extends Session.ListenerAdapter {
             this.session.setCompressionThreshold(threshold);
             this.session.send(new LoginSuccessPacket(profile));
             this.session.setFlag(Constants.PROFILE_KEY, profile);
-            ((MinecraftProtocol) this.session.protocol().get()).setSub(MinecraftProtocol.Sub.GAME, false, this.session);
+            ((MinicraftProtocol) this.session.protocol())
+                    .setSub(MinicraftProtocol.Sub.GAME, false, this.session);
             ServerLoginHandler handler = this.session.flag(Constants.SERVER_LOGIN_HANDLER_KEY);
             if (handler != null) {
                 handler.loggedIn(this.session);

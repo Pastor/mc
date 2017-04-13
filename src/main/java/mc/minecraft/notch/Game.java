@@ -41,4 +41,6 @@ public interface Game {
     void won();
 
     boolean connect(String username, String password);
+
+    boolean isConnected();
 }

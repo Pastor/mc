@@ -5,7 +5,10 @@ import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutException;
 import io.netty.handler.timeout.WriteTimeoutHandler;
-import mc.api.*;
+import mc.api.Client;
+import mc.api.Packet;
+import mc.api.Protocol;
+import mc.api.Session;
 import mc.engine.EventFactory;
 
 import java.net.ConnectException;
@@ -23,7 +26,7 @@ abstract class TcpSession extends SimpleChannelInboundHandler<Packet> implements
     private final EventFactory eventFactory = EventFactory.instance();
     private final String host;
     private final int port;
-    private Provider<Protocol> protocol;
+    private Protocol protocol;
 
     private int compressionThreshold = -1;
     private int connectTimeout = 30;
@@ -39,7 +42,7 @@ abstract class TcpSession extends SimpleChannelInboundHandler<Packet> implements
     private BlockingQueue<Packet> packets = new LinkedBlockingQueue<>();
     private Thread packetHandleThread;
 
-    TcpSession(String host, int port, Provider<Protocol> protocol) {
+    TcpSession(String host, int port, Protocol protocol) {
         this.host = host;
         this.port = port;
         this.protocol = protocol;
@@ -68,7 +71,7 @@ abstract class TcpSession extends SimpleChannelInboundHandler<Packet> implements
         return this.channel != null ? this.channel.remoteAddress() : null;
     }
 
-    public Provider<Protocol> protocol() {
+    public Protocol protocol() {
         return this.protocol;
     }
 
@@ -311,6 +314,7 @@ abstract class TcpSession extends SimpleChannelInboundHandler<Packet> implements
             message = cause.toString();
         }
         this.disconnect(message, cause);
+        cause.printStackTrace();
     }
 
     @Override

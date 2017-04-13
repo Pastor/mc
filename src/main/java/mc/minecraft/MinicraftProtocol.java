@@ -33,45 +33,54 @@ import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.util.UUID;
 
-public final class MinecraftProtocol extends Protocol {
+public final class MinicraftProtocol extends Protocol {
 
     private Sub sub = Sub.HANDSHAKE;
     private final Packet.Header header = new DefaultPacket.Header();
     private Packet.Encrypt encrypt;
-    private Profile profile;
+    public Profile profile;
     private String accessToken;
 
-    public MinecraftProtocol() {
+    public MinicraftProtocol() {
     }
 
-    public MinecraftProtocol(Sub sub) {
+    public MinicraftProtocol(Sub sub) {
         if (sub != Sub.LOGIN && sub != Sub.STATUS) {
             throw new IllegalArgumentException("Only login and status modes are permitted.");
         }
         this.sub = sub;
-        if (sub == Sub.LOGIN) {
+        /*if (sub == Sub.LOGIN) {
             this.profile = new Profile((UUID) null, "Player");
-        }
+        }*/
     }
 
-    public MinecraftProtocol(String username) {
+    public MinicraftProtocol(String username) {
         this(Sub.LOGIN);
-        this.profile = new Profile((UUID) null, username);
+        //this.profile = new Profile((UUID) null, username);
     }
 
-    public MinecraftProtocol(String username, String password) {
+    public MinicraftProtocol(String username, String password) {
         this(username, password, false);
     }
 
-    public MinecraftProtocol(String username, String passwordOrToken, boolean token) {
+    public MinicraftProtocol(String username, String passwordOrToken, boolean token) {
         this(username, passwordOrToken, token, Proxy.NO_PROXY);
     }
 
-    private MinecraftProtocol(String username, String passwordOrToken, boolean token, Proxy authProxy) {
+    private MinicraftProtocol(String username, String passwordOrToken, boolean token, Proxy authProxy) {
         this(Sub.LOGIN);
+    }
+
+    public MinicraftProtocol(Profile profile, String accessToken) {
+        this(Sub.LOGIN);
+        this.profile = profile;
+        this.accessToken = accessToken;
+    }
+
+    @Override
+    public boolean authorize(String username, String password) {
         String clientToken = UUID.randomUUID().toString();
         this.profile = new Profile(clientToken, username);
-
         /*AuthenticationService auth = new AuthenticationService(clientToken, authProxy);
         auth.setUsername(username);
         if (token) {
@@ -83,12 +92,12 @@ public final class MinecraftProtocol extends Protocol {
         auth.login();
         this.profile = auth.getSelectedProfile();
         this.accessToken = auth.getAccessToken();*/
+        return isAuthorized();
     }
 
-    public MinecraftProtocol(Profile profile, String accessToken) {
-        this(Sub.LOGIN);
-        this.profile = profile;
-        this.accessToken = accessToken;
+    @Override
+    public boolean isAuthorized() {
+        return profile != null;
     }
 
     public String prefix() {
@@ -103,7 +112,7 @@ public final class MinecraftProtocol extends Protocol {
         return encrypt;
     }
 
-    MinecraftProtocol enableEncryption(Key key) {
+    MinicraftProtocol enableEncryption(Key key) {
         try {
             this.encrypt = new DefaultPacket.Encrypt(key);
         } catch (GeneralSecurityException e) {
@@ -127,7 +136,7 @@ public final class MinecraftProtocol extends Protocol {
         session.addListener(new ServerListener());
     }
 
-    void setSub(Sub sub, boolean client, Session session) {
+    MinicraftProtocol setSub(Sub sub, boolean client, Session session) {
         this.clear();
         switch (sub) {
             case HANDSHAKE:
@@ -160,6 +169,7 @@ public final class MinecraftProtocol extends Protocol {
                 break;
         }
         this.sub = sub;
+        return this;
     }
 
     private void initServerGame(Session session) {

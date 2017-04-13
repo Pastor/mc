@@ -5,7 +5,7 @@ public interface Client {
 
     int port();
 
-    Provider<Protocol> protocol();
+    Protocol protocol();
 
     Session session();
 

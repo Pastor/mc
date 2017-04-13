@@ -21,6 +21,7 @@ public class Menu {
     public void init(Game game, InputHandler input) {
         this.input = input;
         this.game = game;
+        refresh();
     }
 
     public void tick() {
@@ -53,5 +54,9 @@ public class Menu {
             Font.draw(">", screen, (xo + 0) * 8, yy * 8, Color.get(5, 555, 555, 555));
             Font.draw("<", screen, (xo + w) * 8, yy * 8, Color.get(5, 555, 555, 555));
         }
+    }
+
+    public void refresh() {
+
     }
 }

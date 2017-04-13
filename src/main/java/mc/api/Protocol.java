@@ -8,6 +8,10 @@ public abstract class Protocol {
     private final Map<Integer, Class<? extends Packet>> incoming = new HashMap<>();
     private final Map<Class<? extends Packet>, Integer> outgoing = new HashMap<>();
 
+    public abstract boolean authorize(String username, String password);
+
+    public abstract boolean isAuthorized();
+
     public abstract String prefix();
 
     public abstract Packet.Header header();

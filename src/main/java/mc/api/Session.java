@@ -18,7 +18,7 @@ public interface Session {
 
     SocketAddress remoteAddress();
 
-    Provider<Protocol> protocol();
+    Protocol protocol();
 
     Map<String, Object> flags();
 

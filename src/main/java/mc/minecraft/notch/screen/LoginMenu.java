@@ -15,6 +15,7 @@ final class LoginMenu extends Menu {
                     LoginMenu.this.game.connect(
                             ((InputText) lines[0]).value.toString(),
                             ((InputText) lines[1]).value.toString());
+                    LoginMenu.this.parent.refresh();
                     LoginMenu.this.game.setMenu(LoginMenu.this.parent);
                 }
             })

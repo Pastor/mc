@@ -10,6 +10,9 @@ public interface PropertyConstants {
     String SERVER_HOSTNAME = "server_hostname";
     String SERVER_PORT = "server_port";
 
+    String PLAYER_STAMINA = "player_stamina";
+    String PLAYER_HEALTH = "player_health";
+
     String SERVER_HOSTNAME_DEFAULT = "127.0.0.1";
     int SERVER_PORT_DEFAULT = 25565;
 }

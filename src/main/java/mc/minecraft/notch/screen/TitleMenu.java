@@ -4,7 +4,6 @@ import mc.minecraft.notch.console.ConsoleMenu;
 import mc.minecraft.notch.gfx.Color;
 import mc.minecraft.notch.gfx.Font;
 import mc.minecraft.notch.gfx.Screen;
-import mc.minecraft.notch.property.PropertyConstants;
 import mc.minecraft.notch.property.PropertyReader;
 import mc.minecraft.notch.sound.Sound;
 
@@ -13,42 +12,49 @@ import java.util.List;
 import java.util.function.Function;
 
 public final class TitleMenu extends Menu {
+
+    private static final int OPTION_START_GAME = 0;
+    private static final int OPTION_LOGIN = 1;
+    private static final int OPTION_CONSOLE = 2;
+    private static final int OPTION_COLOR = 3;
+    private static final int OPTION_HOW_PLAY = 4;
+    private static final int OPTION_ABOUT = 5;
+    private static final int OPTION_QUIT = 6;
+
     public final ConsoleMenu consoleMenu;
     private int selected = 0;
-    private static final List<Option<TitleMenu>> defaultOptions = new ArrayList<Option<TitleMenu>>() {
+    private static final List<Option<TitleMenu>> defaultOptions = new ArrayList<Option<TitleMenu>>(20) {
         {
-            add(new Option<>("Start game", "Запуск игры", titleMenu -> {
+            add(OPTION_START_GAME, new Option<>("Start game", "Запуск игры", titleMenu -> {
                 Sound.test.play();
                 titleMenu.game.resetGame();
                 titleMenu.game.setMenu(null);
                 return null;
-            }));
-            add(new Option<>("Login", "Авторизация", titleMenu -> {
+            }, false));
+            add(OPTION_LOGIN, new Option<>("Login", "Авторизация", titleMenu -> {
                 titleMenu.game.setMenu(new LoginMenu(titleMenu));
                 return null;
             }));
-            add(new Option<>("How to play", "Описание", titleMenu -> {
+
+            add(OPTION_CONSOLE, new Option<>("Console", "Консоль разработчика", titleMenu -> {
+                titleMenu.game.setMenu(titleMenu.consoleMenu);
+                return null;
+            }, false));
+            add(OPTION_COLOR, new Option<>("Color", "Визуальное отображение цвета", titleMenu -> {
+                titleMenu.game.setMenu(new ColorMenu(titleMenu));
+                return null;
+            }, false));
+
+            add(OPTION_HOW_PLAY, new Option<>("How to play", "Описание", titleMenu -> {
                 titleMenu.game.setMenu(new InstructionsMenu(titleMenu));
                 return null;
             }));
-            add(new Option<>("About", "О игре", titleMenu -> {
+            add(OPTION_ABOUT, new Option<>("About", "О игре", titleMenu -> {
                 titleMenu.game.setMenu(new AboutMenu(titleMenu));
                 return null;
             }));
-            add(new Option<>("Quit", "Выход из игры", titleMenu -> {
+            add(OPTION_QUIT, new Option<>("Quit", "Выход из игры", titleMenu -> {
                 titleMenu.game.stop();
-                return null;
-            }));
-        }
-    };
-    private static final List<Option<TitleMenu>> developmentOptions = new ArrayList<Option<TitleMenu>>() {
-        {
-            add(new Option<>("Console", "Консоль разработчика", titleMenu -> {
-                titleMenu.game.setMenu(titleMenu.consoleMenu);
-                return null;
-            }));
-            add(new Option<>("Color", "Визуальное отображение цвета", titleMenu -> {
-                titleMenu.game.setMenu(new ColorMenu(titleMenu));
                 return null;
             }));
         }
@@ -59,10 +65,11 @@ public final class TitleMenu extends Menu {
     public TitleMenu(PropertyReader propertyReader) {
         super(propertyReader);
         consoleMenu = new ConsoleMenu(this);
-        buildOptions();
         propertyReader.addListener(value -> {
             if ("development".equals(value.key())) {
-                buildOptions();
+                defaultOptions.get(OPTION_COLOR).isVisible = value.asValue();
+                defaultOptions.get(OPTION_CONSOLE).isVisible = value.asValue();
+                refresh();
             }
         });
     }
@@ -83,11 +90,18 @@ public final class TitleMenu extends Menu {
         }
     }
 
-    private void buildOptions() {
+    public void refresh() {
         options.clear();
-        options.addAll(defaultOptions);
-        if (propertyReader.property(PropertyConstants.DEVELOPMENT).asValue()) {
-            options.addAll(developmentOptions);
+
+        if (game != null) {
+            defaultOptions.get(OPTION_LOGIN).isVisible = !game.isConnected();
+            defaultOptions.get(OPTION_START_GAME).isVisible = game.isConnected();
+        }
+
+        for (Option<TitleMenu> option : defaultOptions) {
+            if (option.isVisible) {
+                options.add(option);
+            }
         }
     }
 
@@ -129,11 +143,17 @@ public final class TitleMenu extends Menu {
         final String optionName;
         final String description;
         final Function<E, Void> action;
+        boolean isVisible;
 
         private Option(String optionName, String description, Function<E, Void> action) {
+            this(optionName, description, action, true);
+        }
+
+        private Option(String optionName, String description, Function<E, Void> action, boolean isVisible) {
             this.optionName = optionName;
             this.description = description;
             this.action = action;
+            this.isVisible = isVisible;
         }
     }
 }

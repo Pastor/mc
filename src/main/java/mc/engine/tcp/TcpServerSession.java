@@ -2,7 +2,6 @@ package mc.engine.tcp;
 
 import io.netty.channel.ChannelHandlerContext;
 import mc.api.Protocol;
-import mc.api.Provider;
 import mc.api.Server;
 
 import java.util.Map;
@@ -10,7 +9,7 @@ import java.util.Map;
 final class TcpServerSession extends TcpSession {
     private final Server server;
 
-    TcpServerSession(String host, int port, Provider<Protocol> protocol, Server server) {
+    TcpServerSession(String host, int port, Protocol protocol, Server server) {
         super(host, port, protocol);
         this.server = server;
     }
