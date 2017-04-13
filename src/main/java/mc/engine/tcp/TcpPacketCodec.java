@@ -23,19 +23,19 @@ final class TcpPacketCodec extends ByteToMessageCodec<Packet> {
     @Override
     public void encode(ChannelHandlerContext ctx, Packet packet, ByteBuf buf) throws Exception {
         Buffer.Output out = buffer.newOutput(buf);
-        this.session.protocol().header().writePacketId(out, this.session.protocol().getOutgoingId(packet.getClass()));
+        this.session.protocol().get().header().writePacketId(out, this.session.protocol().get().getOutgoingId(packet.getClass()));
         packet.write(out);
     }
 
     protected void decode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> out) throws Exception {
         int initial = buf.readerIndex();
         Buffer.Input in = buffer.newInput(buf);
-        int id = this.session.protocol().header().readPacketId(in);
+        int id = this.session.protocol().get().header().readPacketId(in);
         if (id == -1) {
             buf.readerIndex(initial);
             return;
         }
-        Packet packet = this.session.protocol().createIncomingPacket(id);
+        Packet packet = this.session.protocol().get().createIncomingPacket(id);
         packet.read(in);
         if (buf.readableBytes() > 0) {
             throw new IllegalStateException("Packet \"" + packet.getClass().getSimpleName() + "\" not fully read.");

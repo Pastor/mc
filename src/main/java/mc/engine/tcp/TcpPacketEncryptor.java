@@ -17,26 +17,26 @@ final class TcpPacketEncryptor extends ByteToMessageCodec<ByteBuf> {
     }
 
     public void encode(ChannelHandlerContext ctx, ByteBuf in, ByteBuf out) throws Exception {
-        if (this.session.protocol().encrypt() != null) {
+        if (this.session.protocol().get().encrypt() != null) {
             int length = in.readableBytes();
             byte[] bytes = this.getBytes(in);
-            int outLength = this.session.protocol().encrypt().getEncryptOutputSize(length);
+            int outLength = this.session.protocol().get().encrypt().getEncryptOutputSize(length);
             if (this.encryptedArray.length < outLength) {
                 this.encryptedArray = new byte[outLength];
             }
 
-            out.writeBytes(this.encryptedArray, 0, this.session.protocol().encrypt().encrypt(bytes, 0, length, this.encryptedArray, 0));
+            out.writeBytes(this.encryptedArray, 0, this.session.protocol().get().encrypt().encrypt(bytes, 0, length, this.encryptedArray, 0));
         } else {
             out.writeBytes(in);
         }
     }
 
     public void decode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> out) throws Exception {
-        if (this.session.protocol().encrypt() != null) {
+        if (this.session.protocol().get().encrypt() != null) {
             int length = buf.readableBytes();
             byte[] bytes = this.getBytes(buf);
-            ByteBuf result = ctx.alloc().heapBuffer(this.session.protocol().encrypt().getDecryptOutputSize(length));
-            result.writerIndex(this.session.protocol().encrypt().decrypt(bytes, 0, length, result.array(), result.arrayOffset()));
+            ByteBuf result = ctx.alloc().heapBuffer(this.session.protocol().get().encrypt().getDecryptOutputSize(length));
+            result.writerIndex(this.session.protocol().get().encrypt().decrypt(bytes, 0, length, result.array(), result.arrayOffset()));
             out.add(result);
         } else {
             out.add(buf.readBytes(buf.readableBytes()));

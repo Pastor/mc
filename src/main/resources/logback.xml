@@ -27,9 +27,9 @@
     </appender>
 
     <logger name="mc" level="INFO"/>
-    <logger name="io.netty.buffer" level="ERROR"/>
-    <logger name="io.netty.util" level="ERROR"/>
-    <logger name="io.netty.channel" level="ERROR"/>
+    <logger name="io.netty.buffer" level="DEBUG"/>
+    <logger name="io.netty.util" level="DEBUG"/>
+    <logger name="io.netty.channel" level="DEBUG"/>
     <logger name="ch.qos.logback" level="ERROR"/>
     <logger name="org.eclipse.jetty" level="ERROR"/>
 

@@ -53,7 +53,7 @@ public final class DefaultServer implements Server {
         sessions.stream().filter(session -> session != exclude).forEach(session -> session.send(packet));
     }
 
-    private Server bind(boolean wait) {
+    public Server bind(boolean wait) {
         this.listener = this.newConnectionListener();
         this.listener.bind(wait, () -> callEvent(eventFactory.newServerBoundEvent(DefaultServer.this)));
         return this;
@@ -213,10 +213,9 @@ public final class DefaultServer implements Server {
                         @Override
                         public void initChannel(Channel channel) throws Exception {
                             InetSocketAddress address = (InetSocketAddress) channel.remoteAddress();
-                            Protocol protocol = server.createProtocol();
-
-                            TcpSession session = new TcpServerSession(address.getHostName(), address.getPort(), protocol, server);
-                            session.protocol().newSession(server, session);
+                            TcpSession session = new TcpServerSession(
+                                    address.getHostName(), address.getPort(), server::createProtocol, server);
+                            session.protocol().get().newSession(server, session);
 
                             channel.config().setOption(ChannelOption.IP_TOS, 0x18);
                             channel.config().setOption(ChannelOption.TCP_NODELAY, false);

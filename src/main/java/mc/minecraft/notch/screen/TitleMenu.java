@@ -23,6 +23,10 @@ public final class TitleMenu extends Menu {
                 titleMenu.game.setMenu(null);
                 return null;
             }));
+            add(new Option<>("Login", "Авторизация", titleMenu -> {
+                titleMenu.game.setMenu(new LoginMenu(titleMenu));
+                return null;
+            }));
             add(new Option<>("How to play", "Описание", titleMenu -> {
                 titleMenu.game.setMenu(new InstructionsMenu(titleMenu));
                 return null;

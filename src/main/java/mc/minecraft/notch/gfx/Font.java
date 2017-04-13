@@ -4,7 +4,7 @@ import java.awt.*;
 
 public class Font {
     private static final String chars = "" + //
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ      " + //
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ*     " + //
             "0123456789.,!?'\"-+=/\\%()<>:;[] " + //
             "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
 

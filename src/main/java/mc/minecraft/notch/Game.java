@@ -39,4 +39,6 @@ public interface Game {
     void scheduleLevelChange(int dir);
 
     void won();
+
+    boolean connect(String username, String password);
 }

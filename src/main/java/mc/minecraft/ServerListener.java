@@ -52,7 +52,7 @@ final class ServerListener extends Session.ListenerAdapter {
 
     @Override
     public void packetReceived(Session.Event event) {
-        MinecraftProtocol protocol = (MinecraftProtocol) event.session.protocol();
+        MinecraftProtocol protocol = (MinecraftProtocol) event.session.protocol().get();
         if (protocol.getSub() == MinecraftProtocol.Sub.HANDSHAKE) {
             if (event.packet() instanceof HandshakePacket) {
                 HandshakePacket packet = event.asPacket();
@@ -125,17 +125,17 @@ final class ServerListener extends Session.ListenerAdapter {
                 }
             }
         }
-//        logger.info("Server recv: " + event.packet());
+        logger.info("Server recv: " + event.packet());
     }
 
     @Override
     public void packetSent(Session.Event event) {
-//        logger.info("Server sent: " + event.packet());
+        logger.info("Server sent: " + event.packet());
     }
 
     @Override
     public void disconnecting(Session.DisconnectEvent event) {
-        MinecraftProtocol protocol = (MinecraftProtocol) event.session.protocol();
+        MinecraftProtocol protocol = (MinecraftProtocol) event.session.protocol().get();
         if (protocol.getSub() == MinecraftProtocol.Sub.LOGIN) {
             event.session.send(new LoginDisconnectPacket(event.reason));
         } else if (protocol.getSub() == MinecraftProtocol.Sub.GAME) {
@@ -189,7 +189,7 @@ final class ServerListener extends Session.ListenerAdapter {
             this.session.setCompressionThreshold(threshold);
             this.session.send(new LoginSuccessPacket(profile));
             this.session.setFlag(Constants.PROFILE_KEY, profile);
-            ((MinecraftProtocol) this.session.protocol()).setSub(MinecraftProtocol.Sub.GAME, false, this.session);
+            ((MinecraftProtocol) this.session.protocol().get()).setSub(MinecraftProtocol.Sub.GAME, false, this.session);
             ServerLoginHandler handler = this.session.flag(Constants.SERVER_LOGIN_HANDLER_KEY);
             if (handler != null) {
                 handler.loggedIn(this.session);

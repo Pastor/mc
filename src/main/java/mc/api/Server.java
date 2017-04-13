@@ -22,6 +22,8 @@ public interface Server {
 
     Server bind();
 
+    Server bind(boolean wait);
+
     void sendBroadcast(Packet packet, Session exclude);
 
     abstract class Event extends mc.api.Event<Server.Listener> {

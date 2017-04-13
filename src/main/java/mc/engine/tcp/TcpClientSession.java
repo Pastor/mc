@@ -8,6 +8,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.Future;
 import mc.api.Client;
 import mc.api.Protocol;
+import mc.api.Provider;
 
 import javax.naming.directory.InitialDirContext;
 import java.net.Proxy;
@@ -20,7 +21,7 @@ final class TcpClientSession extends TcpSession {
 
     private EventLoopGroup group;
 
-    TcpClientSession(String host, int port, Protocol protocol, Client client, Proxy proxy, DefaultFactory factory) {
+    TcpClientSession(String host, int port, Provider<Protocol> protocol, Client client, Proxy proxy, DefaultFactory factory) {
         super(host, port, protocol);
         this.client = client;
         this.proxy = proxy;
@@ -49,7 +50,7 @@ final class TcpClientSession extends TcpSession {
             bootstrap.handler(new ChannelInitializer<Channel>() {
                 @Override
                 public void initChannel(Channel channel) throws Exception {
-                    protocol().newSession(client, TcpClientSession.this);
+                    protocol().get().newSession(client, TcpClientSession.this);
 
                     channel.config().setOption(ChannelOption.IP_TOS, 0x18);
                     channel.config().setOption(ChannelOption.TCP_NODELAY, false);
@@ -77,7 +78,7 @@ final class TcpClientSession extends TcpSession {
                         environment.put("java.naming.provider.url", "dns:");
 
                         String[] result = new InitialDirContext(environment)
-                                .getAttributes(protocol()
+                                .getAttributes(protocol().get()
                                         .prefix() + "._tcp." + host1, new String[]{"SRV"})
                                 .get("srv").get().toString().split(" ", 4);
                         host1 = result[3];

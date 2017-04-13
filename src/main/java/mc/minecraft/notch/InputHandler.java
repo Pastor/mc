@@ -5,16 +5,17 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InputHandler implements KeyListener {
+public final class InputHandler implements KeyListener {
     public class Key {
-        public int presses, absorbs;
-        public boolean down, clicked;
+        int presses, absorbs;
+        public boolean down;
+        public boolean clicked;
 
-        public Key() {
+        Key() {
             keys.add(this);
         }
 
-        public void toggle(boolean pressed) {
+        void toggle(boolean pressed) {
             if (pressed != down) {
                 down = pressed;
             }

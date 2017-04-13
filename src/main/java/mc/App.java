@@ -84,7 +84,7 @@ public final class App {
 
                 @Override
                 public void sessionRemoved(Server.Event event) {
-                    MinecraftProtocol protocol = (MinecraftProtocol) event.session.protocol();
+                    MinecraftProtocol protocol = (MinecraftProtocol) event.session.protocol().get();
                     if (protocol.getSub() == MinecraftProtocol.Sub.GAME) {
                         Profile profile = event.session.flag(Constants.PROFILE_KEY);
 
@@ -96,13 +96,14 @@ public final class App {
                     }
                 }
             });
-            server.bind();
+            server.bind(false);
         }
-        startGame("Pastor", "Password1");
-        startGame("Maine", "Password2");
+        startGame();
+//        startGame();
+//        startGame("Maine", "Password2");
     }
 
-    private static void startGame(String username, String password) {
-        MinecraftGame.startGame(PROXY, username, password, true);
+    private static void startGame() {
+        MinecraftGame.startGame(PROXY, true);
     }
 }

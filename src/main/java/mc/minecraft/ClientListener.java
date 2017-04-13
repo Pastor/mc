@@ -32,7 +32,7 @@ final class ClientListener extends Session.ListenerAdapter {
 
     @Override
     public void packetReceived(Session.Event event) {
-        MinecraftProtocol protocol = (MinecraftProtocol) event.session.protocol();
+        MinecraftProtocol protocol = (MinecraftProtocol) event.session.protocol().get();
         if (protocol.getSub() == MinecraftProtocol.Sub.LOGIN) {
             if (event.packet() instanceof EncryptionRequestPacket) {
                 EncryptionRequestPacket packet = event.asPacket();
@@ -98,16 +98,16 @@ final class ClientListener extends Session.ListenerAdapter {
                 event.session.setCompressionThreshold(event.<ServerSetCompressionPacket>asPacket().getThreshold());
             }
         }
-//        logger.info("Client recv: " + event.packet());
+        logger.info("Client recv: " + event.packet());
     }
 
     @Override
     public void packetSent(Session.Event event) {
-//        logger.info("Client sent: " + event.packet());
+        logger.info("Client sent: " + event.packet());
     }
 
     public void connected(Session.Event event) {
-        MinecraftProtocol protocol = (MinecraftProtocol) event.session.protocol();
+        MinecraftProtocol protocol = (MinecraftProtocol) event.session.protocol().get();
         if (protocol.getSub() == MinecraftProtocol.Sub.LOGIN) {
             Profile profile = event.session.flag(Constants.PROFILE_KEY);
             protocol.setSub(MinecraftProtocol.Sub.HANDSHAKE, true, event.session);

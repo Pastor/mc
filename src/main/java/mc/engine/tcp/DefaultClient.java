@@ -2,15 +2,16 @@ package mc.engine.tcp;
 
 import mc.api.Client;
 import mc.api.Protocol;
+import mc.api.Provider;
 import mc.api.Session;
 
 public final class DefaultClient implements Client {
     private final String host;
     private final int port;
-    private final Protocol protocol;
+    private final Provider<Protocol> protocol;
     private final Session session;
 
-    public DefaultClient(String host, int port, Protocol protocol, Session.Factory factory) {
+    public DefaultClient(String host, int port, Provider<Protocol> protocol, Session.Factory factory) {
         this.host = host;
         this.port = port;
         this.protocol = protocol;
@@ -28,7 +29,7 @@ public final class DefaultClient implements Client {
     }
 
     @Override
-    public Protocol protocol() {
+    public Provider<Protocol> protocol() {
         return protocol;
     }
 

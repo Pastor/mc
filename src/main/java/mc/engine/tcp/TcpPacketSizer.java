@@ -21,14 +21,14 @@ final class TcpPacketSizer extends ByteToMessageCodec<ByteBuf> {
     @Override
     public void encode(ChannelHandlerContext ctx, ByteBuf in, ByteBuf out) throws Exception {
         int length = in.readableBytes();
-        out.ensureWritable(this.session.protocol().header().getLengthSize(length) + length);
-        this.session.protocol().header().writeLength(buffer.newOutput(out), length);
+        out.ensureWritable(this.session.protocol().get().header().getLengthSize(length) + length);
+        this.session.protocol().get().header().writeLength(buffer.newOutput(out), length);
         out.writeBytes(in);
     }
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> out) throws Exception {
-        int size = this.session.protocol().header().getLengthSize();
+        int size = this.session.protocol().get().header().getLengthSize();
         if (size > 0) {
             buf.markReaderIndex();
             byte[] lengthBytes = new byte[size];
@@ -39,8 +39,8 @@ final class TcpPacketSizer extends ByteToMessageCodec<ByteBuf> {
                 }
 
                 lengthBytes[index] = buf.readByte();
-                if ((this.session.protocol().header().isLengthVariable() && lengthBytes[index] >= 0) || index == size - 1) {
-                    int length = this.session.protocol().header()
+                if ((this.session.protocol().get().header().isLengthVariable() && lengthBytes[index] >= 0) || index == size - 1) {
+                    int length = this.session.protocol().get().header()
                             .readLength(buffer.newInput(Unpooled.wrappedBuffer(lengthBytes)), buf.readableBytes());
                     if (buf.readableBytes() < length) {
                         buf.resetReaderIndex();
