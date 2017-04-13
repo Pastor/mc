@@ -1,12 +1,10 @@
-package mc.minecraft.notch.screen;
+package mc.minecraft.notch.console;
 
-import com.google.common.collect.EvictingQueue;
 import mc.api.Session;
 import mc.minecraft.data.message.ChatColor;
 import mc.minecraft.data.message.Message;
 import mc.minecraft.data.message.MessageStyle;
 import mc.minecraft.data.message.TextMessage;
-import mc.minecraft.notch.Game;
 import mc.minecraft.notch.gfx.Color;
 import mc.minecraft.notch.gfx.Font;
 import mc.minecraft.notch.gfx.Screen;
@@ -14,57 +12,86 @@ import mc.minecraft.notch.sound.Sound;
 import mc.minecraft.packet.ingame.client.ClientChatPacket;
 
 import java.awt.*;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
-public final class ConsoleMenu extends Menu {
+public final class ConsoleMenu extends mc.minecraft.notch.screen.Menu {
     private static final String MAINE_KEY = "Я";
-    private final Menu parent;
-    private final EvictingQueue<Message> messages = EvictingQueue.create(100);
+    private final mc.minecraft.notch.screen.Menu parent;
+
+    private final List<String> history = new LinkedList<>();
     private final StringBuilder buffer = new StringBuilder();
     private Session session;
     private int tickCount;
+    private int historySelected;
 
-    ConsoleMenu(Menu parent) {
+    public ConsoleMenu(mc.minecraft.notch.screen.Menu parent) {
+        super(parent.propertyReader);
         this.parent = parent;
     }
 
     public void tick() {
         if (input.escape.clicked) {
             game.setMenu(parent);
+        } else if (input.down.clicked && !input.character.clicked) {
+            --historySelected;
+            if (historySelected < 0)
+                historySelected = 0;
+            updateHistoryBuffer();
+        } else if (input.up.clicked && !input.character.clicked) {
+            ++historySelected;
+            if (historySelected >= history.size())
+                historySelected = history.size() - 1;
+            if (historySelected < 0)
+                historySelected = 0;
+            updateHistoryBuffer();
         } else if (input.enter.clicked) {
+            history.add(buffer.toString());
             if (buffer.length() > 0) {
                 Message message = null;
                 if (buffer.charAt(0) == '\\') {
                     StringTokenizer tokenizer = new StringTokenizer(buffer.toString(), " ", false);
+                    String command = null;
+                    List<String> arguments = new LinkedList<>();
                     while (tokenizer.hasMoreElements()) {
                         String element = tokenizer.nextToken();
                         if (message == null) {
-                            message = new TextMessage(element).setStyle(new MessageStyle().setColor(ChatColor.RED));
+                            command = element.substring(1);
+                            message = new TextMessage(element).setStyle(new MessageStyle().setColor(ChatColor.LIGHT_YELLOW));
                         } else {
+                            arguments.add(element);
                             message.addExtra(new TextMessage(" " + element).setStyle(
                                     new MessageStyle().setColor(ChatColor.GRAY)));
                         }
                     }
+                    if (command != null) {
+                        CommandProcessor.Result result = game.commandProcessor().execute(command, arguments);
+                        message.addExtra(new TextMessage("-"));
+                        message.addExtra(new TextMessage(result.result).setStyle(
+                                new MessageStyle().setColor(
+                                        result.isSuccess ? ChatColor.GREEN : ChatColor.RED
+                                )
+                        ));
+                    }
                 } else {
-                    message = new TextMessage(MAINE_KEY + ">")
+                    message = new TextMessage("[" + MAINE_KEY + "]")
                             .setStyle(new MessageStyle().setColor(ChatColor.DARK_RED));
                     message.addExtra(new TextMessage(buffer.toString()));
                     if (session != null) {
                         session.send(new ClientChatPacket(buffer.toString()));
                     }
-
                 }
                 if (message != null)
-                    messages.add(message);
+                    game.consoleManager().send(message);
                 buffer.setLength(0);
             }
         } else if (input.backspace.clicked && buffer.length() > 0) {
             buffer.setLength(buffer.length() - 1);
         } else if (input.character.hasCharacter()) {
-            String msg = createInputString() + MAINE_KEY;
-            if ((msg.length() * 8) + 32 >= Game.WIDTH) {
+            String msg = createInputString() + "[" + MAINE_KEY + "]";
+            if ((msg.length() * 8) + 32 >= game.width()) {
                 Sound.test.play();
             } else {
                 buffer.append(input.character.ch);
@@ -73,8 +100,9 @@ public final class ConsoleMenu extends Menu {
         ++tickCount;
     }
 
-    public void addMessage(Message message) {
-        messages.add(message);
+    private void updateHistoryBuffer() {
+        buffer.setLength(0);
+        buffer.append(history.get(historySelected));
     }
 
     private String createInputString() {
@@ -86,7 +114,7 @@ public final class ConsoleMenu extends Menu {
         renderMessages(screen);
         String msg = createInputString();
         int xx = 8;
-        int yy = (Game.HEIGHT - 2 * 8);
+        int yy = (game.height() - 2 * 8);
         int w = msg.length() + 1;
         int h = 1;
         int row = 0;
@@ -115,24 +143,25 @@ public final class ConsoleMenu extends Menu {
     }
 
     private boolean moreMessages() {
-        return messages.size() > maxMessages();
+        return game.consoleManager().countMessages() > maxMessages();
     }
 
     private int maxMessages() {
-        return (Game.HEIGHT - 8) / 8;
+        return (game.height() - 8) / 8;
     }
 
     private void renderMessages(Screen screen) {
-        if (messages.size() > 0) {
+        ConsoleManager manager = game.consoleManager();
+        if (manager.countMessages() > 0) {
             int x = 0;
             int y = 0;
 
             final List<Message> view;
             if (moreMessages()) {
-                int index = messages.size() - maxMessages();
-                view = messages.stream().skip(index).limit(messages.size() - index).collect(Collectors.toList());
+                int index = manager.countMessages() - maxMessages();
+                view = manager.stream().skip(index).limit(manager.countMessages() - index).collect(Collectors.toList());
             } else {
-                view = messages.stream().collect(Collectors.toList());
+                view = manager.stream().collect(Collectors.toList());
             }
 
             for (Message message : view) {
@@ -167,6 +196,8 @@ public final class ConsoleMenu extends Menu {
                 return Color.get(-1, 500, 000, 500);
             case DARK_BLUE:
                 return Color.get(-1, 005, 005, 005);
+            case DARK_AQUA:
+                return Color.get(-1, 45, 45, 45);
             case BLUE:
                 return Color.get(-1, 005, 055, 005);
             case DARK_GREEN:
@@ -175,6 +206,10 @@ public final class ConsoleMenu extends Menu {
                 return Color.get(-1, 333, 333, 333);
             case GRAY:
                 return Color.get(-1, 333, 333, 333);
+            case LIGHT_YELLOW:
+                return Color.get(-1, 333, 333, 440);
+            case YELLOW:
+                return Color.get(-1, 500, 500, 550);
         }
         return Color.get(0, 555, 555, 555);
     }

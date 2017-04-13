@@ -4,15 +4,20 @@ import mc.minecraft.notch.gfx.Color;
 import mc.minecraft.notch.gfx.Font;
 import mc.minecraft.notch.gfx.Screen;
 
-public class InstructionsMenu extends Menu {
-    private Menu parent;
+final class InstructionsMenu extends Menu {
+    private static final String MSG = "Move your character with the arrow keys press C to attack and X to " +
+            "open the inventory and to use items. Select an item in the inventory to equip it. Kill the air wizard" +
+            " to win the game!";
+    private final Menu parent;
 
-    public InstructionsMenu(Menu parent) {
+
+    InstructionsMenu(Menu parent) {
+        super(parent.propertyReader);
         this.parent = parent;
     }
 
     public void tick() {
-        if (input.attack.clicked || input.menu.clicked) {
+        if (input.attack.clicked || input.menu.clicked || input.escape.clicked) {
             game.setMenu(parent);
         }
     }
@@ -20,17 +25,12 @@ public class InstructionsMenu extends Menu {
     public void render(Screen screen) {
         screen.clear(0);
 
-        Font.draw("HOW TO PLAY", screen, 4 * 8 + 4, 1 * 8, Color.get(0, 555, 555, 555));
-        Font.draw("Move your character", screen, 0 * 8 + 4, 3 * 8, Color.get(0, 333, 333, 333));
-        Font.draw("with the arrow keys", screen, 0 * 8 + 4, 4 * 8, Color.get(0, 333, 333, 333));
-        Font.draw("press C to attack", screen, 0 * 8 + 4, 5 * 8, Color.get(0, 333, 333, 333));
-        Font.draw("and X to open the", screen, 0 * 8 + 4, 6 * 8, Color.get(0, 333, 333, 333));
-        Font.draw("inventory and to", screen, 0 * 8 + 4, 7 * 8, Color.get(0, 333, 333, 333));
-        Font.draw("use items.", screen, 0 * 8 + 4, 8 * 8, Color.get(0, 333, 333, 333));
-        Font.draw("Select an item in", screen, 0 * 8 + 4, 9 * 8, Color.get(0, 333, 333, 333));
-        Font.draw("the inventory to", screen, 0 * 8 + 4, 10 * 8, Color.get(0, 333, 333, 333));
-        Font.draw("equip it.", screen, 0 * 8 + 4, 11 * 8, Color.get(0, 333, 333, 333));
-        Font.draw("Kill the air wizard", screen, 0 * 8 + 4, 12 * 8, Color.get(0, 333, 333, 333));
-        Font.draw("to win the game!", screen, 0 * 8 + 4, 13 * 8, Color.get(0, 333, 333, 333));
+        String how = "HOW TO PLAY";
+        int x = 4;
+        int y = 8;
+        Font.draw(how, screen, x + ((game.width() - 16) / 2 - (how.length() * 8) / 2), y, Color.get(0, 555, 555, 555));
+        int offset = 48;
+        y = 3 * 8;
+        Font.draw(MSG, screen, x + offset, y, game.width() - offset, game.height() - 32, Color.get(0, 333, 333, 333));
     }
 }

@@ -1,12 +1,14 @@
 package mc.minecraft.notch.screen;
 
 import mc.minecraft.notch.gfx.Screen;
+import mc.minecraft.notch.property.PropertyReader;
 
 public class LevelTransitionMenu extends Menu {
     private int dir;
     private int time = 0;
 
-    public LevelTransitionMenu(int dir) {
+    public LevelTransitionMenu(int dir, PropertyReader propertyReader) {
+        super(propertyReader);
         this.dir = dir;
     }
 

@@ -10,16 +10,18 @@ import mc.minecraft.notch.item.Item;
 import mc.minecraft.notch.item.PowerGloveItem;
 import mc.minecraft.notch.level.Level;
 import mc.minecraft.notch.level.tile.Tile;
+import mc.minecraft.notch.property.PropertyReader;
 import mc.minecraft.notch.screen.InventoryMenu;
 import mc.minecraft.notch.sound.Sound;
 
 import java.util.List;
 
 public class Player extends Mob {
-    private InputHandler input;
+    private final InputHandler input;
+    public final PropertyReader propertyReader;
     private int attackTime, attackDir;
 
-    public Game game;
+    public final Game game;
     public Inventory inventory = new Inventory();
     public Item attackItem;
     public Item activeItem;
@@ -31,7 +33,8 @@ public class Player extends Mob {
     private int onStairDelay;
     public int invulnerableTime = 0;
 
-    public Player(Game game, InputHandler input) {
+    public Player(Game game, InputHandler input, PropertyReader propertyReader) {
+        this.propertyReader = propertyReader;
         this.game = game;
         this.input = input;
         x = 24;

@@ -1,11 +1,41 @@
 package mc.minecraft.notch.gfx;
 
+import java.awt.*;
+
 public class Font {
     private static final String chars = "" + //
             "ABCDEFGHIJKLMNOPQRSTUVWXYZ      " + //
-            "0123456789.,!?'\"-+=/\\%()<>:;   " + //
+            "0123456789.,!?'\"-+=/\\%()<>:;[] " + //
             "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
 
+
+    public static Point draw(String msg, Screen screen, int x, int y, int w, int h, int col) {
+        int wCount = Math.abs(w - x) / 8;
+        int hCount = Math.abs(h - y) / 8;
+        if (msg.length() > wCount) {
+            int count = msg.length() / wCount;
+            if (count > hCount) {
+                count = hCount;
+            }
+            int offset = 0;
+            for (int i = 0; i < count; ++i) {
+                offset = i * wCount;
+                int offsetEnd = wCount;
+                if (offset + offsetEnd > msg.length())
+                    offsetEnd = msg.length();
+                String partText = msg.substring(offset, offset + offsetEnd);
+                draw(partText, screen, x, y, col);
+                y += 8;
+            }
+            if (offset + wCount < msg.length()) {
+                draw(msg.substring(offset + wCount), screen, x, y, col);
+            }
+            return new Point(x, y);
+        } else {
+            draw(msg, screen, x, y, col);
+        }
+        return new Point(x, y);
+    }
 
     public static void draw(String msg, Screen screen, int x, int y, int col) {
         msg = msg.toUpperCase();

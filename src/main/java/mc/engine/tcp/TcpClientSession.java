@@ -30,6 +30,7 @@ final class TcpClientSession extends TcpSession {
     @Override
     public void connect(boolean wait) {
         if (this.disconnected) {
+            //FIXME: reconnect
             throw new IllegalStateException("Session has already been disconnected.");
         } else if (this.group != null) {
             return;
@@ -85,6 +86,7 @@ final class TcpClientSession extends TcpSession {
                     }
 
                     bootstrap.remoteAddress(host1, port1);
+                    bootstrap.validate();
 
                     ChannelFuture future = bootstrap.connect().sync();
                     if (future.isSuccess()) {

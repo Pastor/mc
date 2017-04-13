@@ -10,6 +10,7 @@ public class InventoryMenu extends Menu {
     private int selected = 0;
 
     public InventoryMenu(Player player) {
+        super(player.propertyReader);
         this.player = player;
 
         if (player.activeItem != null) {

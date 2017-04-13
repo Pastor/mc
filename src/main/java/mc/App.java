@@ -20,7 +20,8 @@ import mc.minecraft.data.status.PlayerInfo;
 import mc.minecraft.data.status.ServerStatusInfo;
 import mc.minecraft.data.status.VersionInfo;
 import mc.minecraft.data.status.handler.ServerInfoBuilder;
-import mc.minecraft.notch.Game;
+import mc.minecraft.notch.MinecraftGame;
+import mc.minecraft.notch.property.PropertyConstants;
 import mc.minecraft.packet.ingame.client.ClientChatPacket;
 import mc.minecraft.packet.ingame.server.ServerChatPacket;
 import mc.minecraft.packet.ingame.server.ServerJoinGamePacket;
@@ -35,14 +36,15 @@ public final class App {
     private static final DefaultFactory FACTORY = DefaultFactory.instance();
     private static final boolean SPAWN_SERVER = true;
     private static final boolean VERIFY_USERS = true;
-    private static final String HOST = "127.0.0.1";
-    private static final int PORT = 25565;
     private static final Proxy PROXY = Proxy.NO_PROXY;
     private static final Proxy AUTH_PROXY = Proxy.NO_PROXY;
 
     public static void main(String[] args) {
         if (SPAWN_SERVER) {
-            Server server = new DefaultServer(HOST, PORT, MinecraftProtocol.class, FACTORY.newSessionFactory(PROXY));
+            Server server = new DefaultServer(
+                    PropertyConstants.SERVER_HOSTNAME_DEFAULT,
+                    PropertyConstants.SERVER_PORT_DEFAULT,
+                    MinecraftProtocol.class, FACTORY.newSessionFactory(PROXY));
             server.setGlobalFlag(Constants.AUTH_PROXY_KEY, AUTH_PROXY);
             server.setGlobalFlag(Constants.VERIFY_USERS_KEY, VERIFY_USERS);
             server.setGlobalFlag(Constants.SERVER_INFO_BUILDER_KEY, (ServerInfoBuilder) session ->
@@ -53,9 +55,11 @@ public final class App {
             server.setGlobalFlag(Constants.SERVER_LOGIN_HANDLER_KEY,
                     (ServerLoginHandler) session -> {
                         Profile profile = session.flag(Constants.PROFILE_KEY);
-                        String text = String.format("%s join the game", profile.name);
-                        server.sendBroadcast(new ServerChatPacket(new TextMessage(text).setStyle(
-                                new MessageStyle().setColor(ChatColor.DARK_GRAY)), MessageType.CHAT), session);
+                        Message message = new TextMessage("[NOTIFY] ").setStyle(
+                                new MessageStyle().setColor(ChatColor.DARK_AQUA));
+                        message.addExtra(new TextMessage(profile.name + " joined").setStyle(
+                                new MessageStyle().setColor(ChatColor.DARK_GRAY)));
+                        server.sendBroadcast(new ServerChatPacket(message, MessageType.CHAT), session);
                         session.send(new ServerJoinGamePacket(0, false, GameMode.SURVIVAL, 0, Difficulty.PEACEFUL, 10,
                                 WorldType.DEFAULT, false));
                     });
@@ -68,8 +72,8 @@ public final class App {
                             if (event.packet() instanceof ClientChatPacket) {
                                 ClientChatPacket packet = event.asPacket();
                                 Profile profile = event.session.flag(Constants.PROFILE_KEY);
-                                Message msg = new TextMessage(String.format("%s>", profile.name)).setStyle(
-                                        new MessageStyle().setColor(ChatColor.DARK_GREEN));
+                                Message msg = new TextMessage(String.format("[%s] ", profile.name)).setStyle(
+                                        new MessageStyle().setColor(ChatColor.YELLOW));
                                 msg.addExtra(new TextMessage(packet.getMessage()));
                                 server.sendBroadcast(new ServerChatPacket(msg, MessageType.CHAT), event.session);
                                 logger.info(profile.name + ": " + packet.getMessage());
@@ -83,19 +87,22 @@ public final class App {
                     MinecraftProtocol protocol = (MinecraftProtocol) event.session.protocol();
                     if (protocol.getSub() == MinecraftProtocol.Sub.GAME) {
                         Profile profile = event.session.flag(Constants.PROFILE_KEY);
-                        String text = String.format("%s left the game", profile.name);
-                        server.sendBroadcast(new ServerChatPacket(new TextMessage(text).setStyle(
-                                new MessageStyle().setColor(ChatColor.DARK_GRAY)), MessageType.CHAT), event.session);
+
+                        Message message = new TextMessage("[NOTIFY] ").setStyle(
+                                new MessageStyle().setColor(ChatColor.DARK_AQUA));
+                        message.addExtra(new TextMessage(profile.name + " left").setStyle(
+                                new MessageStyle().setColor(ChatColor.DARK_GRAY)));
+                        server.sendBroadcast(new ServerChatPacket(message, MessageType.CHAT), event.session);
                     }
                 }
             });
             server.bind();
         }
         startGame("Pastor", "Password1");
-//        startGame("Maine", "Password2");
+        startGame("Maine", "Password2");
     }
 
     private static void startGame(String username, String password) {
-        Game.startGame(HOST, PORT, PROXY, username, password);
+        MinecraftGame.startGame(PROXY, username, password, true);
     }
 }

@@ -5,12 +5,18 @@ import mc.minecraft.notch.InputHandler;
 import mc.minecraft.notch.gfx.Color;
 import mc.minecraft.notch.gfx.Font;
 import mc.minecraft.notch.gfx.Screen;
+import mc.minecraft.notch.property.PropertyReader;
 
 import java.util.List;
 
 public class Menu {
+    public final PropertyReader propertyReader;
     protected Game game;
     protected InputHandler input;
+
+    protected Menu(PropertyReader propertyReader) {
+        this.propertyReader = propertyReader;
+    }
 
     public void init(Game game, InputHandler input) {
         this.input = input;

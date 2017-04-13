@@ -7,14 +7,15 @@ import mc.minecraft.notch.level.tile.Tile;
 
 import java.util.*;
 
-public class Level {
-    private Random random = new Random();
+public final class Level {
+    private final Random random = new Random();
 
-    public int w, h;
+    public final int w;
+    public final int h;
 
-    public byte[] tiles;
-    public byte[] data;
-    public List<Entity>[] entitiesInTiles;
+    public final byte[] tiles;
+    public final byte[] data;
+    public final List<Entity>[] entitiesInTiles;
 
     public int grassColor = 141;
     public int dirtColor = 322;
@@ -22,7 +23,7 @@ public class Level {
     private int depth;
     public int monsterDensity = 8;
 
-    public List<Entity> entities = new ArrayList<Entity>();
+    public final List<Entity> entities = new ArrayList<Entity>();
     private Comparator<Entity> spriteSorter = new Comparator<Entity>() {
         public int compare(Entity e0, Entity e1) {
             if (e1.y < e0.y) return +1;
@@ -151,8 +152,7 @@ public class Level {
             for (int x = xo - r; x <= w + xo + r; x++) {
                 if (x < 0 || y < 0 || x >= this.w || y >= this.h) continue;
                 List<Entity> entities = entitiesInTiles[x + y * this.w];
-                for (int i = 0; i < entities.size(); i++) {
-                    Entity e = entities.get(i);
+                for (Entity e : entities) {
                     // e.render(screen);
                     int lr = e.getLightRadius();
                     if (lr > 0) screen.renderLight(e.x - 1, e.y - 4, lr * 8);
@@ -170,8 +170,8 @@ public class Level {
 
     private void sortAndRender(Screen screen, List<Entity> list) {
         Collections.sort(list, spriteSorter);
-        for (int i = 0; i < list.size(); i++) {
-            list.get(i).render(screen);
+        for (Entity aList : list) {
+            aList.render(screen);
         }
     }
 
@@ -226,7 +226,7 @@ public class Level {
 
     public void trySpawn(int count) {
         for (int i = 0; i < count; i++) {
-            Mob mob;
+            final Mob mob;
 
             int minLevel = 1;
             int maxLevel = 1;
@@ -289,8 +289,7 @@ public class Level {
             for (int x = xt0; x <= xt1; x++) {
                 if (x < 0 || y < 0 || x >= w || y >= h) continue;
                 List<Entity> entities = entitiesInTiles[x + y * this.w];
-                for (int i = 0; i < entities.size(); i++) {
-                    Entity e = entities.get(i);
+                for (Entity e : entities) {
                     if (e.intersects(x0, y0, x1, y1)) result.add(e);
                 }
             }

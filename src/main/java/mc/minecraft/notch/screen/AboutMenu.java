@@ -4,29 +4,37 @@ import mc.minecraft.notch.gfx.Color;
 import mc.minecraft.notch.gfx.Font;
 import mc.minecraft.notch.gfx.Screen;
 
-public class AboutMenu extends Menu {
-    private Menu parent;
+import java.awt.*;
 
-    public AboutMenu(Menu parent) {
+final class AboutMenu extends Menu {
+    private static final String MSG = "Minicraft was made by Markus Persson For the 22'nd ludum " +
+            "dare competition in december 2011. it is dedicated to my father. <3";
+    private static final String APPENDIX = "This game was modify by Pastor in april 2017.";
+    private final Menu parent;
+
+    AboutMenu(Menu parent) {
+        super(parent.propertyReader);
         this.parent = parent;
     }
 
     public void tick() {
-        if (input.attack.clicked || input.menu.clicked) {
+        if (input.attack.clicked || input.menu.clicked || input.escape.clicked) {
             game.setMenu(parent);
         }
     }
 
     public void render(Screen screen) {
         screen.clear(0);
+        String about = "About Minicraft";
 
-        Font.draw("About Minicraft", screen, 2 * 8 + 4, 1 * 8, Color.get(0, 555, 555, 555));
-        Font.draw("Minicraft was made", screen, 0 * 8 + 4, 3 * 8, Color.get(0, 333, 333, 333));
-        Font.draw("by Markus Persson", screen, 0 * 8 + 4, 4 * 8, Color.get(0, 333, 333, 333));
-        Font.draw("For the 22'nd ludum", screen, 0 * 8 + 4, 5 * 8, Color.get(0, 333, 333, 333));
-        Font.draw("dare competition in", screen, 0 * 8 + 4, 6 * 8, Color.get(0, 333, 333, 333));
-        Font.draw("december 2011.", screen, 0 * 8 + 4, 7 * 8, Color.get(0, 333, 333, 333));
-        Font.draw("it is dedicated to", screen, 0 * 8 + 4, 9 * 8, Color.get(0, 333, 333, 333));
-        Font.draw("my father. <3", screen, 0 * 8 + 4, 10 * 8, Color.get(0, 333, 333, 333));
+        int x = 4;
+        int y = 8;
+        Font.draw(about, screen, x + ((game.width() - 16) / 2 - (about.length() * 8) / 2), y, Color.get(0, 555, 555, 555));
+
+        int offset = 48;
+        y = 3 * 8;
+        Point next = Font.draw(MSG, screen, x + offset, y, game.width() - offset, game.height() - 32, Color.get(0, 333, 333, 333));
+        y = next.y + 3 * 8;
+        Font.draw(APPENDIX, screen, x + offset, y, game.width() - offset, game.height() - 32, Color.get(0, 333, 333, 333));
     }
 }

@@ -16,6 +16,7 @@ public enum ChatColor {
     RED,
     LIGHT_PURPLE,
     YELLOW,
+    LIGHT_YELLOW,
     WHITE,
     RESET;
 

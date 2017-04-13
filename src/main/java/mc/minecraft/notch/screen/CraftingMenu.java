@@ -15,12 +15,13 @@ import java.util.Comparator;
 import java.util.List;
 
 public class CraftingMenu extends Menu {
-    private Player player;
+    private final Player player;
     private int selected = 0;
 
     private List<Recipe> recipes;
 
     public CraftingMenu(List<Recipe> recipes, Player player) {
+        super(player.propertyReader);
         this.recipes = new ArrayList<Recipe>(recipes);
         this.player = player;
 

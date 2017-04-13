@@ -1,6 +1,5 @@
 package mc.minecraft.notch.screen;
 
-import mc.minecraft.notch.Game;
 import mc.minecraft.notch.gfx.Color;
 import mc.minecraft.notch.gfx.Font;
 import mc.minecraft.notch.gfx.Screen;
@@ -18,6 +17,7 @@ public final class ColorMenu extends Menu {
     private int tickCount;
 
     ColorMenu(Menu parent) {
+        super(parent.propertyReader);
         this.parent = parent;
     }
 
@@ -38,6 +38,10 @@ public final class ColorMenu extends Menu {
             } else {
                 Sound.test.play();
             }
+        } else if (input.up.clicked) {
+            previous();
+        } else if (input.down.clicked) {
+            next();
         }
         ++tickCount;
     }
@@ -75,10 +79,10 @@ public final class ColorMenu extends Menu {
         }
 
         int color = color();
-        for (int i = 8; i < Game.WIDTH - 8; i += 8) {
-            screen.render(i, Game.HEIGHT - 24, 12 * 32, color, 0);
+        for (int i = 8; i < game.width() - 8; i += 8) {
+            screen.render(i, game.height() - 24, 12 * 32, color, 0);
         }
-        Font.draw("ABCDEFGHIJKLMNOPQRSTUVWXYZ", screen, 8, Game.HEIGHT - 16, color);
+        Font.draw("ABCDEFGHIJKLMNOPQRSTUVWXYZ", screen, 8, game.height() - 16, color);
     }
 
     private static void drawRect(Screen screen, int xx, int yy, int w, int h) {
@@ -106,12 +110,22 @@ public final class ColorMenu extends Menu {
             nextId = 0;
     }
 
+    private void previous() {
+        --nextId;
+        if (nextId < 0)
+            nextId = fields.length - 1;
+    }
+
     private int color() {
-        int a = Integer.parseInt(fields[3].value());
-        int b = Integer.parseInt(fields[0].value());
-        int c = Integer.parseInt(fields[1].value());
-        int d = Integer.parseInt(fields[2].value());
-        return Color.get(a, b, c, d);
+        try {
+            int a = Integer.parseInt(fields[3].value());
+            int b = Integer.parseInt(fields[0].value());
+            int c = Integer.parseInt(fields[1].value());
+            int d = Integer.parseInt(fields[2].value());
+            return Color.get(a, b, c, d);
+        } catch (NumberFormatException ex) {
+            return Color.get(0);
+        }
     }
 
     private static final class Field {
@@ -128,7 +142,5 @@ public final class ColorMenu extends Menu {
                 return "0";
             return value.length() == 0 ? "0" : value.toString();
         }
-
-
     }
 }
