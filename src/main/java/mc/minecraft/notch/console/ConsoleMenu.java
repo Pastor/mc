@@ -51,7 +51,7 @@ public final class ConsoleMenu extends mc.minecraft.notch.screen.Menu {
             history.add(buffer.toString());
             if (buffer.length() > 0) {
                 Message message = null;
-                if (buffer.charAt(0) == '\\') {
+                if (buffer.charAt(0) == '/') {
                     StringTokenizer tokenizer = new StringTokenizer(buffer.toString(), " ", false);
                     String command = null;
                     List<String> arguments = new LinkedList<>();
@@ -90,8 +90,7 @@ public final class ConsoleMenu extends mc.minecraft.notch.screen.Menu {
         } else if (input.backspace.clicked && buffer.length() > 0) {
             buffer.setLength(buffer.length() - 1);
         } else if (input.character.hasCharacter()) {
-            String msg = createInputString() + "[" + MAINE_KEY + "]";
-            if ((msg.length() * 8) + 32 >= game.width()) {
+            if (((buffer.toString().length() + 1 + 3 + MAINE_KEY.length()) * 8) + 32 >= game.width()) {
                 Sound.test.play();
             } else {
                 buffer.append(input.character.ch);
@@ -105,17 +104,13 @@ public final class ConsoleMenu extends mc.minecraft.notch.screen.Menu {
         buffer.append(history.get(historySelected));
     }
 
-    private String createInputString() {
-        return ">" + buffer.toString();
-    }
-
     public void render(Screen screen) {
         screen.clear(0);
         renderMessages(screen);
-        String msg = createInputString();
         int xx = 8;
         int yy = (game.height() - 2 * 8);
-        int w = msg.length() + 1;
+        int inputLength = buffer.toString().length() + 1;
+        int w = inputLength + 1;
         int h = 1;
         int row = 0;
 
@@ -134,11 +129,14 @@ public final class ConsoleMenu extends mc.minecraft.notch.screen.Menu {
             screen.render(xx + w * 8, yy + y * 8, row + 13 * 32, Color.get(-1, 1, 5, 445), 1);
         }
         int col = Color.get(5, 555, 555, 555);
-        Font.draw(msg, screen, xx, yy, col);
+        Font.draw(">", screen, xx, yy, col);
+        if (buffer.toString().startsWith("/"))
+            col = Color.get(5, 440, 440, 440);
+        Font.draw(buffer.toString(), screen, xx + 8, yy, col);
         if ((tickCount / 20) % 2 == 0) {
-            screen.render(xx + (msg.length() * 8), yy, 28 * 32, Color.get(5, 333, 333, 333), 0);
+            screen.render(xx + (inputLength * 8), yy, 28 * 32, Color.get(5, 333, 333, 333), 0);
         } else {
-            screen.render(xx + (msg.length() * 8), yy, 28 * 32, col, 0);
+            screen.render(xx + (inputLength * 8), yy, 28 * 32, col, 0);
         }
     }
 
