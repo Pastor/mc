@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public final class DefaultServer implements Server {
     private static final Logger logger = LoggerFactory.getLogger(DefaultServer.class);
@@ -128,8 +129,8 @@ public final class DefaultServer implements Server {
         }
     }
 
-    private List<Session> sessions() {
-        return new ArrayList<>(this.sessions);
+    public Stream<Session> sessions() {
+        return this.sessions.stream();
     }
 
     public void addSession(Session session) {
@@ -156,7 +157,7 @@ public final class DefaultServer implements Server {
 
     private void close(boolean wait) {
         this.callEvent(eventFactory.newServerClosingEvent(this));
-        this.sessions().stream().filter(Session::isConnected).forEach(session -> {
+        this.sessions().filter(Session::isConnected).forEach(session -> {
             session.disconnect("Server closed.");
         });
         this.listener.close(wait, () -> callEvent(eventFactory.newServerClosedEvent(DefaultServer.this)));

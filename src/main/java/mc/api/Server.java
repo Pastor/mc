@@ -1,6 +1,7 @@
 package mc.api;
 
 import java.util.Map;
+import java.util.stream.Stream;
 
 public interface Server {
 
@@ -25,6 +26,8 @@ public interface Server {
     Server bind(boolean wait);
 
     void sendBroadcast(Packet packet, Session exclude);
+
+    Stream<Session> sessions();
 
     abstract class Event extends mc.api.Event<Server.Listener> {
         public final Server server;
