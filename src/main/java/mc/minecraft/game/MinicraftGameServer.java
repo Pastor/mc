@@ -67,12 +67,18 @@ public final class MinicraftGameServer extends Server.ListenerAdapter implements
     }
 
     @Override
+    public void serverBound(Server.Event event) {
+        running.set(true);
+        new Thread(this).start();
+    }
+
+    @Override
     public void sessionAdded(Server.Event event) {
-        MinicraftStatefulPlayer engine = new MinicraftStatefulPlayer(server, container);
-        event.session.addListener(engine);
-        event.session.setFlag(Constants.GAME_ENGINE_KEY, engine);
-        states.add(engine);
-        registerPlayer(engine);
+        MinicraftStatefulPlayer statefulPlayer = new MinicraftStatefulPlayer(server, container);
+        event.session.addListener(statefulPlayer);
+        event.session.setFlag(Constants.GAME_PLAYER_KEY, statefulPlayer);
+        states.add(statefulPlayer);
+        registerPlayer(statefulPlayer);
     }
 
     @Override
@@ -85,7 +91,7 @@ public final class MinicraftGameServer extends Server.ListenerAdapter implements
             message.addExtra(new TextMessage(profile.name + " left").setStyle(
                     new MessageStyle().setColor(ChatColor.DARK_GRAY)));
             server.sendBroadcast(new ServerChatPacket(message, MessageType.CHAT), event.session);
-            StatefulPlayer engine = event.session.flag(Constants.GAME_ENGINE_KEY);
+            StatefulPlayer engine = event.session.flag(Constants.GAME_PLAYER_KEY);
             states.remove(engine);
         }
     }
@@ -169,7 +175,7 @@ public final class MinicraftGameServer extends Server.ListenerAdapter implements
 
         level = levels[startLevel];
 
-        states.stream().forEach(engine -> {
+        states.forEach(engine -> {
             engine.resetPlayer(level);
         });
 
@@ -215,7 +221,7 @@ public final class MinicraftGameServer extends Server.ListenerAdapter implements
         Tile.tickCount++;//FIXME: Wat?
 //            }
 //        }
-        states.stream().forEach(StatefulPlayer::tick);
+        states.forEach(StatefulPlayer::tick);
     }
 
     private void updateFramesInfo(int frames, int ticks) {

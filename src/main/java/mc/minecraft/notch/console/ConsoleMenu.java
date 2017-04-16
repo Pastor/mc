@@ -101,7 +101,8 @@ public final class ConsoleMenu extends mc.minecraft.notch.screen.Menu {
 
     private void updateHistoryBuffer() {
         buffer.setLength(0);
-        buffer.append(history.get(historySelected));
+        if (history.size() > historySelected)
+            buffer.append(history.get(historySelected));
     }
 
     public void render(Screen screen) {

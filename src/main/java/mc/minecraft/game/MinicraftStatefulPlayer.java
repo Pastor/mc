@@ -3,8 +3,8 @@ package mc.minecraft.game;
 import mc.api.Server;
 import mc.api.Session;
 import mc.minecraft.Constants;
-import mc.minecraft.StatefulPlayer;
 import mc.minecraft.Profile;
+import mc.minecraft.StatefulPlayer;
 import mc.minecraft.data.game.MessageType;
 import mc.minecraft.data.message.ChatColor;
 import mc.minecraft.data.message.Message;
@@ -18,11 +18,15 @@ import mc.minecraft.packet.ingame.server.ServerChatPacket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
 import java.util.Random;
+import java.util.UUID;
 
-final class MinicraftStatefulPlayer extends Session.ListenerAdapter implements StatefulPlayer {
+final class MinicraftStatefulPlayer extends Session.ListenerAdapter implements
+        StatefulPlayer, Comparable<MinicraftStatefulPlayer> {
     private static final Logger logger = LoggerFactory.getLogger(MinicraftStatefulPlayer.class);
     protected final Random random = new Random();
+    private final UUID id;
     private final PropertyContainer container;
     private long gameTime;
     private int deadTime;
@@ -36,8 +40,8 @@ final class MinicraftStatefulPlayer extends Session.ListenerAdapter implements S
 
     MinicraftStatefulPlayer(Server server, PropertyContainer container) {
         this.server = server;
-
         this.container = container;
+        this.id = UUID.randomUUID();
     }
 
     public void packetReceived(Session.Event event) {
@@ -91,5 +95,23 @@ final class MinicraftStatefulPlayer extends Session.ListenerAdapter implements S
                 return true;
             }
         }
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof MinicraftStatefulPlayer) {
+            return Objects.equals(((MinicraftStatefulPlayer) obj).id, id);
+        }
+        return this.equals(obj);
+    }
+
+    @Override
+    public int compareTo(MinicraftStatefulPlayer o) {
+        return id.compareTo(o.id);
     }
 }

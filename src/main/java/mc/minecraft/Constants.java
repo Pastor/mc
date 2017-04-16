@@ -17,5 +17,5 @@ public interface Constants {
     String SERVER_LOGIN_HANDLER_KEY = "login-handler";
     String PING_KEY = "ping";
     String SERVER_COMPRESSION_THRESHOLD = "compression-threshold";
-    String GAME_ENGINE_KEY = "game-engine-key";
+    String GAME_PLAYER_KEY = "game-player";
 }
