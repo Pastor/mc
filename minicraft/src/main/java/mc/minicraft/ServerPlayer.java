@@ -1,13 +1,13 @@
-package mc.minicraft.server;
+package mc.minicraft;
 
 import mc.api.Server;
 import mc.api.Session;
 import mc.engine.property.PropertyContainer;
-import mc.minicraft.Constants;
-import mc.minicraft.Profile;
-import mc.minicraft.StatefulPlayer;
+import mc.minicraft.component.entity.Player;
+import mc.minicraft.component.entity.PlayerHandlerAdapter;
 import mc.minicraft.component.level.Level;
 import mc.minicraft.component.level.tile.Tile;
+import mc.minicraft.component.sound.Sound;
 import mc.minicraft.data.game.MessageType;
 import mc.minicraft.data.message.ChatColor;
 import mc.minicraft.data.message.Message;
@@ -22,28 +22,31 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
 
-final class MinicraftStatefulPlayer extends Session.ListenerAdapter implements
-        StatefulPlayer, Comparable<MinicraftStatefulPlayer> {
-    private static final Logger logger = LoggerFactory.getLogger(MinicraftStatefulPlayer.class);
+public final class ServerPlayer extends Session.ListenerAdapter implements Comparable<ServerPlayer>, Sound {
+    private static final Logger logger = LoggerFactory.getLogger(ServerPlayer.class);
     protected final Random random = new Random();
+    final Server server;
     private final UUID id;
     private final PropertyContainer container;
+    public Player player;
     private long gameTime;
     private int deadTime;
     private int wonTime;
     private int currentLevel;
     private Level level;
     int pendingLevelChange;
+    int visibleDistance;
 
     public int x, y;
-    private final Server server;
 
-    MinicraftStatefulPlayer(Server server, PropertyContainer container) {
+    public ServerPlayer(Server server, PropertyContainer container) {
+        this.id = UUID.randomUUID();
         this.server = server;
         this.container = container;
-        this.id = UUID.randomUUID();
+        this.player = new Player(this, new PlayerHandlerAdapter(), container);
     }
 
+    @Override
     public void packetReceived(Session.Event event) {
         if (event.packet() instanceof ClientChatPacket) {
             ClientChatPacket packet = event.asPacket();
@@ -56,13 +59,11 @@ final class MinicraftStatefulPlayer extends Session.ListenerAdapter implements
         }
     }
 
-    @Override
     public void tick() {
         gameTime++;
     }
 
-    @Override
-    public void resetPlayer(Level level) {
+    public void removePlayer(Level level) {
         this.gameTime = 0;
         this.deadTime = 0;
         this.wonTime = 0;
@@ -70,10 +71,10 @@ final class MinicraftStatefulPlayer extends Session.ListenerAdapter implements
         registerPlayer(level);
     }
 
-    @Override
     public void registerPlayer(Level level) {
-//        level.add(this);
+        level.add(player);
         this.level = level;
+        this.findStartPos(level);
     }
 
     public void changeLevel(Level[] levels, int dir) {
@@ -84,7 +85,8 @@ final class MinicraftStatefulPlayer extends Session.ListenerAdapter implements
         y = (y >> 4) * 16 + 8;
 //        level.add(player);
     }
-//
+
+    //
     private boolean findStartPos(Level level) {
         while (true) {
             int x = random.nextInt(level.w);
@@ -104,14 +106,23 @@ final class MinicraftStatefulPlayer extends Session.ListenerAdapter implements
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof MinicraftStatefulPlayer) {
-            return Objects.equals(((MinicraftStatefulPlayer) obj).id, id);
+        if (obj instanceof ServerPlayer) {
+            return Objects.equals(((ServerPlayer) obj).id, id);
         }
         return this.equals(obj);
     }
 
     @Override
-    public int compareTo(MinicraftStatefulPlayer o) {
+    public int compareTo(ServerPlayer o) {
         return id.compareTo(o.id);
+    }
+
+    @Override
+    public void play(Type type) {
+        //TODO
+    }
+
+    void updateViewport() {
+        //FIXME: Обновляем видимое окружение
     }
 }

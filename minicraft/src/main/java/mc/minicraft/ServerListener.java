@@ -1,5 +1,6 @@
 package mc.minicraft;
 
+import mc.api.PlayerManager;
 import mc.api.Session;
 import mc.minicraft.data.message.Message;
 import mc.minicraft.data.status.PlayerInfo;
@@ -8,6 +9,7 @@ import mc.minicraft.data.status.VersionInfo;
 import mc.minicraft.data.status.handler.ServerInfoBuilder;
 import mc.minicraft.packet.HandshakePacket;
 import mc.minicraft.packet.ingame.client.ClientKeepAlivePacket;
+import mc.minicraft.packet.ingame.client.player.ClientPlayerSettings;
 import mc.minicraft.packet.ingame.server.ServerDisconnectPacket;
 import mc.minicraft.packet.ingame.server.ServerKeepAlivePacket;
 import mc.minicraft.packet.login.client.EncryptionResponsePacket;
@@ -27,9 +29,7 @@ import javax.crypto.SecretKey;
 import java.net.Proxy;
 import java.security.KeyPair;
 import java.security.PrivateKey;
-import java.util.Arrays;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 final class ServerListener extends Session.ListenerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(ServerListener.class);
@@ -41,7 +41,10 @@ final class ServerListener extends Session.ListenerAdapter {
     private long lastPingTime = 0;
     private int lastPingId = 0;
 
-    ServerListener() {
+    private final PlayerManager manager;
+
+    ServerListener(PlayerManager manager) {
+        this.manager = manager;
         new Random().nextBytes(this.verifyToken);
     }
 
@@ -78,6 +81,11 @@ final class ServerListener extends Session.ListenerAdapter {
         if (protocol.getSub() == MinicraftProtocol.Sub.LOGIN) {
             if (event.packet() instanceof LoginStartPacket) {
                 String username = event.<LoginStartPacket>asPacket().getUsername();
+                if (manager.isLoggined(username)) {
+                    event.session.disconnect("User already loggined");
+                    return;
+                }
+                manager.login(username);
                 event.session.setFlag(Constants.USERNAME_KEY, username);
                 boolean verify = event.session.hasFlag(Constants.VERIFY_USERS_KEY) ?
                         event.session.<Boolean>flag(Constants.VERIFY_USERS_KEY) : true;
@@ -123,6 +131,17 @@ final class ServerListener extends Session.ListenerAdapter {
                     long time = System.currentTimeMillis() - this.lastPingTime;
                     event.session.setFlag(Constants.PING_KEY, time);
                 }
+            } else if (event.packet() instanceof ClientPlayerSettings) {
+                ClientPlayerSettings settings = event.asPacket();
+                ServerPlayer player = event.session.flag(Constants.GAME_PLAYER_KEY);
+                player.visibleDistance = settings.visibleDistance;
+                player.updateViewport();
+
+                if (logger.isDebugEnabled()) {
+                    Profile profile = event.session.flag(Constants.PROFILE_KEY);
+                    logger.debug(String.format("For %s change visible_distance to %d",
+                            profile.name, settings.visibleDistance));
+                }
             }
         }
         logger.info("Server recv: " + event.packet());
@@ -135,12 +154,14 @@ final class ServerListener extends Session.ListenerAdapter {
 
     @Override
     public void disconnecting(Session.DisconnectEvent event) {
+        String username = event.session.flag(Constants.USERNAME_KEY);
         MinicraftProtocol protocol = (MinicraftProtocol) event.session.protocol();
         if (protocol.getSub() == MinicraftProtocol.Sub.LOGIN) {
             event.session.send(new LoginDisconnectPacket(event.reason));
         } else if (protocol.getSub() == MinicraftProtocol.Sub.GAME) {
             event.session.send(new ServerDisconnectPacket(event.reason));
         }
+        manager.remove(username);
     }
 
     private final class UserAuthTask implements Runnable {

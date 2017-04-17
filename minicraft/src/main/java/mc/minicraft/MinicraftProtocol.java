@@ -1,10 +1,6 @@
 package mc.minicraft;
 
 import mc.api.*;
-import mc.api.Client;
-import mc.api.Packet;
-import mc.api.Protocol;
-import mc.api.Session;
 import mc.engine.DefaultPacket;
 import mc.minicraft.packet.HandshakePacket;
 import mc.minicraft.packet.ingame.client.*;
@@ -15,6 +11,7 @@ import mc.minicraft.packet.ingame.server.*;
 import mc.minicraft.packet.ingame.server.entity.*;
 import mc.minicraft.packet.ingame.server.entity.player.*;
 import mc.minicraft.packet.ingame.server.entity.spawn.*;
+import mc.minicraft.packet.ingame.server.level.ServerLevelPacket;
 import mc.minicraft.packet.ingame.server.scoreboard.ServerDisplayScoreboardPacket;
 import mc.minicraft.packet.ingame.server.scoreboard.ServerScoreboardObjectivePacket;
 import mc.minicraft.packet.ingame.server.scoreboard.ServerTeamPacket;
@@ -100,6 +97,12 @@ public final class MinicraftProtocol extends Protocol {
     }
 
     @Override
+    public boolean unauthorize() {
+        profile = null;
+        return true;
+    }
+
+    @Override
     public boolean isAuthorized() {
         return profile != null;
     }
@@ -135,9 +138,9 @@ public final class MinicraftProtocol extends Protocol {
         session.addListener(new ClientListener());
     }
 
-    public void newSession(mc.api.Server server, Session session) {
+    public void newSession(mc.api.Server server, Session session, PlayerManager manager) {
         this.setSub(Sub.HANDSHAKE, false, session);
-        session.addListener(new ServerListener());
+        session.addListener(new ServerListener(manager));
     }
 
     MinicraftProtocol setSub(Sub sub, boolean client, Session session) {
@@ -284,6 +287,12 @@ public final class MinicraftProtocol extends Protocol {
         this.registerOutgoing(0x49, ServerEntityTeleportPacket.class);
         this.registerOutgoing(0x4A, ServerEntityPropertiesPacket.class);
         this.registerOutgoing(0x4B, ServerEntityEffectPacket.class);
+
+        {
+            this.registerIncoming(0xFD, ClientPlayerSettings.class);
+
+            this.registerOutgoing(0xFE, ServerLevelPacket.class);
+        }
     }
 
     private void initClientGame(Session session) {
@@ -363,6 +372,12 @@ public final class MinicraftProtocol extends Protocol {
         this.registerIncoming(0x49, ServerEntityTeleportPacket.class);
         this.registerIncoming(0x4A, ServerEntityPropertiesPacket.class);
         this.registerIncoming(0x4B, ServerEntityEffectPacket.class);
+
+        {
+            this.registerOutgoing(0xFD, ClientPlayerSettings.class);
+
+            this.registerIncoming(0xFE, ServerLevelPacket.class);
+        }
 
         this.registerOutgoing(0x00, ClientTeleportConfirmPacket.class);
         this.registerOutgoing(0x01, ClientTabCompletePacket.class);

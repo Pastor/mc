@@ -9,4 +9,6 @@ public interface Client {
 
     Session session();
 
+    void newSession();
+
 }

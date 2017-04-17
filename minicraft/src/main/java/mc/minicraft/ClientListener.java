@@ -129,4 +129,10 @@ final class ClientListener extends Session.ListenerAdapter {
             event.session.send(new StatusQueryPacket());
         }
     }
+
+    @Override
+    public void disconnected(Session.DisconnectEvent event) {
+        MinicraftProtocol protocol = (MinicraftProtocol) event.session.protocol();
+        protocol.unauthorize();
+    }
 }

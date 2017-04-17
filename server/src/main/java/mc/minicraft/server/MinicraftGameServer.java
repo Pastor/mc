@@ -24,6 +24,7 @@ import mc.minicraft.data.status.VersionInfo;
 import mc.minicraft.data.status.handler.ServerInfoBuilder;
 import mc.minicraft.packet.ingame.server.ServerChatPacket;
 import mc.minicraft.packet.ingame.server.ServerJoinGamePacket;
+import mc.minicraft.packet.ingame.server.level.ServerLevelPacket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +35,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
-public final class MinicraftGameServer extends Server.ListenerAdapter
+final class MinicraftGameServer extends Server.ListenerAdapter
         implements ServerLoginHandler, ServerInfoBuilder, GameServer, Runnable, Sound {
     private static final Logger logger = LoggerFactory.getLogger(GameServer.class);
     private static final DefaultFactory FACTORY = DefaultFactory.instance();
@@ -43,7 +44,7 @@ public final class MinicraftGameServer extends Server.ListenerAdapter
     private static final Proxy AUTH_PROXY = Proxy.NO_PROXY;
 
     private final PropertyContainer container = new DefaultPropertyContainer();
-    private final Set<StatefulPlayer> states = new ConcurrentSkipListSet<>();
+    private final Set<ServerPlayer> states = new ConcurrentSkipListSet<>();
     private final Server server;
 
     private MinicraftGameServer() {
@@ -59,7 +60,7 @@ public final class MinicraftGameServer extends Server.ListenerAdapter
         this.server.addListener(this);
     }
 
-    public static GameServer createServer() {
+    static GameServer createServer() {
         return new MinicraftGameServer();
     }
 
@@ -75,11 +76,10 @@ public final class MinicraftGameServer extends Server.ListenerAdapter
 
     @Override
     public void sessionAdded(Server.Event event) {
-        MinicraftStatefulPlayer statefulPlayer = new MinicraftStatefulPlayer(server, container);
-        event.session.addListener(statefulPlayer);
-        event.session.setFlag(Constants.GAME_PLAYER_KEY, statefulPlayer);
-        states.add(statefulPlayer);
-        registerPlayer(statefulPlayer);
+        ServerPlayer player = new ServerPlayer(server, container);
+        event.session.addListener(player);
+        event.session.setFlag(Constants.GAME_PLAYER_KEY, player);
+        states.add(player);
     }
 
     @Override
@@ -92,8 +92,9 @@ public final class MinicraftGameServer extends Server.ListenerAdapter
             message.addExtra(new TextMessage(profile.name + " left").setStyle(
                     new MessageStyle().setColor(ChatColor.DARK_GRAY)));
             server.sendBroadcast(new ServerChatPacket(message, MessageType.CHAT), event.session);
-            StatefulPlayer engine = event.session.flag(Constants.GAME_PLAYER_KEY);
-            states.remove(engine);
+            ServerPlayer player = event.session.flag(Constants.GAME_PLAYER_KEY);
+            states.remove(player);
+            player.removePlayer(level);
         }
     }
 
@@ -107,6 +108,12 @@ public final class MinicraftGameServer extends Server.ListenerAdapter
         server.sendBroadcast(new ServerChatPacket(message, MessageType.CHAT), session);
         session.send(new ServerJoinGamePacket(0, false, GameMode.SURVIVAL, 0, Difficulty.PEACEFUL, 10,
                 WorldType.DEFAULT, false));
+        ServerPlayer player = session.flag(Constants.GAME_PLAYER_KEY);
+        player.registerPlayer(level);
+        //FIXME: send entities
+        //FIXME: send players
+        //FIXME: send position
+        session.send(new ServerLevelPacket(level));
     }
 
     @Override
@@ -158,10 +165,6 @@ public final class MinicraftGameServer extends Server.ListenerAdapter
                 ticks = 0;
             }
         }
-    }
-
-    private void registerPlayer(MinicraftStatefulPlayer engine) {
-//        engine.registerPlayer(level);
     }
 
     private void resetGame() {
@@ -222,7 +225,7 @@ public final class MinicraftGameServer extends Server.ListenerAdapter
 //        Tile.tickCount++;//FIXME: Wat?
 //            }
 //        }
-        states.forEach(StatefulPlayer::tick);
+        states.forEach(ServerPlayer::tick);
     }
 
     private void updateFramesInfo(int frames, int ticks) {

@@ -25,12 +25,11 @@ public final class TitleMenu extends Menu {
     private int selected = 0;
     private static final List<Option<TitleMenu>> defaultOptions = new ArrayList<Option<TitleMenu>>(20) {
         {
-            add(OPTION_START_GAME, new Option<>("Start game", "Запуск игры", titleMenu -> {
-                Sound.test.play();
+            add(OPTION_START_GAME, new Option<>("Resume", "Возврат", titleMenu -> {
                 titleMenu.game.resetGame();
                 titleMenu.game.setMenu(null);
                 return null;
-            }, true));
+            }, false));
             add(OPTION_LOGIN, new Option<>("Connect", "Авторизация", titleMenu -> {
                 titleMenu.game.setMenu(new ConnectMenu(titleMenu));
                 return null;
@@ -96,7 +95,7 @@ public final class TitleMenu extends Menu {
         if (game != null) {
             defaultOptions.get(OPTION_LOGIN).isVisible = !game.isConnected();
             //FIXME: Изменить после отладки
-//            defaultOptions.get(OPTION_START_GAME).isVisible = game.isConnected();
+            defaultOptions.get(OPTION_START_GAME).isVisible = game.isConnected();
         }
 
         for (Option<TitleMenu> option : defaultOptions) {

@@ -21,7 +21,7 @@ public final class Level {
     public int grassColor = 141;
     public int dirtColor = 322;
     public int sandColor = 550;
-    private int depth;
+    public final int depth;
     public int monsterDensity = 8;
 
     public final List<Entity> entities = new ArrayList<Entity>();
@@ -103,6 +103,19 @@ public final class Level {
             aw.x = w * 8;
             aw.y = h * 8;
             add(aw);
+        }
+    }
+
+    public Level(Sound sound, int w, int h, int level, byte[] tiles, byte[] data) {
+        this.sound = sound;
+        this.w = w;
+        this.h = h;
+        this.tiles = tiles;
+        this.data = data;
+        this.depth = level;
+        entitiesInTiles = new ArrayList[w * h];
+        for (int i = 0; i < w * h; i++) {
+            entitiesInTiles[i] = new ArrayList<>();
         }
     }
 

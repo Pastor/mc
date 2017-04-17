@@ -10,6 +10,8 @@ public abstract class Protocol {
 
     public abstract boolean authorize(String username, String password);
 
+    public abstract boolean unauthorize();
+
     public abstract boolean isAuthorized();
 
     public abstract String prefix();
@@ -20,7 +22,7 @@ public abstract class Protocol {
 
     public abstract void newSession(Client client, Session session);
 
-    public abstract void newSession(Server server, Session session);
+    public abstract void newSession(Server server, Session session, PlayerManager manager);
 
     public final void register(int id, Class<? extends Packet> packet) {
         this.registerIncoming(id, packet);

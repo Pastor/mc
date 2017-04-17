@@ -7,7 +7,7 @@ import mc.minecraft.client.sound.Sound;
 
 final class ConnectMenu extends Menu {
     private final Widget[] lines = new Widget[]{
-            new InputText("Имя   :", 30),
+            new InputText("Имя   :", 30, "Player"),
             new InputPassword("Пароль:", 30),
             new InputText("Сервер:", 30, "127.0.0.1"),
             new Button("Вход", 4, new Runnable() {

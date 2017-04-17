@@ -346,4 +346,9 @@ abstract class TcpSession extends SimpleChannelInboundHandler<Packet> implements
                     client, proxy, factory);
         }
     }
+
+    @Override
+    public boolean isDisconnected() {
+        return disconnected;
+    }
 }

@@ -1,4 +1,4 @@
-package mc;
+package mc.minecraft.client;
 
 import mc.minecraft.client.MinicraftGame;
 

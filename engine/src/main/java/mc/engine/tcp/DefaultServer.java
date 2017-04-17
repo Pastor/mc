@@ -9,20 +9,15 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
-import mc.api.Packet;
-import mc.api.Protocol;
-import mc.api.Server;
-import mc.api.Session;
+import io.netty.util.internal.ConcurrentSet;
+import mc.api.*;
 import mc.engine.EventFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 public final class DefaultServer implements Server {
@@ -35,8 +30,9 @@ public final class DefaultServer implements Server {
     private ConnectionListener listener;
     private final List<Session> sessions = new ArrayList<Session>();
 
-    private Map<String, Object> flags = new HashMap<String, Object>();
-    private List<Server.Listener> listeners = new ArrayList<Server.Listener>();
+    private final Map<String, Object> flags = new HashMap<String, Object>();
+    private final List<Server.Listener> listeners = new ArrayList<Server.Listener>();
+    private final PlayerManager manager = new DefaultPlayerManager();
 
     public DefaultServer(String host, int port, Class<? extends Protocol> protocol, Session.Factory factory) {
         this.host = host;
@@ -165,7 +161,7 @@ public final class DefaultServer implements Server {
     }
 
     public ConnectionListener newConnectionListener() {
-        return new TcpConnectionListener(host, port, this);
+        return new TcpConnectionListener(host, port, this, manager);
     }
 
     private static final class TcpConnectionListener implements Server.ConnectionListener {
@@ -175,11 +171,13 @@ public final class DefaultServer implements Server {
 
         private EventLoopGroup group;
         private Channel channel;
+        private final PlayerManager manager;
 
-        private TcpConnectionListener(String host, int port, Server server) {
+        private TcpConnectionListener(String host, int port, Server server, PlayerManager manager) {
             this.host = host;
             this.port = port;
             this.server = server;
+            this.manager = manager;
         }
 
         public String getHost() {
@@ -217,7 +215,7 @@ public final class DefaultServer implements Server {
                             Protocol protocol = server.createProtocol();
                             TcpSession session = new TcpServerSession(
                                     address.getHostName(), address.getPort(), protocol, server);
-                            session.protocol().newSession(server, session);
+                            session.protocol().newSession(server, session, manager);
 
                             channel.config().setOption(ChannelOption.IP_TOS, 0x18);
                             channel.config().setOption(ChannelOption.TCP_NODELAY, false);
@@ -332,6 +330,26 @@ public final class DefaultServer implements Server {
                 }
                 this.group = null;
             }
+        }
+    }
+
+    private static final class DefaultPlayerManager implements PlayerManager {
+
+        private final Set<String> users = new HashSet<>();
+
+        @Override
+        public synchronized boolean isLoggined(String username) {
+            return users.contains(username);
+        }
+
+        @Override
+        public synchronized void login(String username) {
+            users.add(username);
+        }
+
+        @Override
+        public synchronized void remove(String username) {
+            users.remove(username);
         }
     }
 }

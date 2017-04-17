@@ -56,6 +56,8 @@ public interface Session {
 
     boolean isConnected();
 
+    boolean isDisconnected();
+
     void send(Packet packet);
 
     void disconnect(String reason);
