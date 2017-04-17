@@ -29,7 +29,7 @@ final class TcpClientSession extends TcpSession {
     }
 
     @Override
-    public void connect(boolean wait) {
+    public void connect(String hostname, boolean wait) {
         if (this.disconnected) {
             //FIXME: reconnect
             throw new IllegalStateException("Session has already been disconnected.");
@@ -69,7 +69,7 @@ final class TcpClientSession extends TcpSession {
 
             Runnable connectTask = () -> {
                 try {
-                    String host1 = host();
+                    String host1 = hostname;
                     int port1 = port();
 
                     try {
@@ -111,6 +111,11 @@ final class TcpClientSession extends TcpSession {
         } catch (Throwable t) {
             exceptionCaught(null, t);
         }
+    }
+
+    @Override
+    public void connect(boolean wait) {
+        connect(host(), wait);
     }
 
     @Override

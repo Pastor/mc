@@ -40,7 +40,7 @@ public interface Game {
 
     void won();
 
-    boolean connect(String username, String password);
+    boolean connect(String username, String password, String hostname);
 
     boolean isConnected();
 }

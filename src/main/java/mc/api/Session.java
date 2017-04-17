@@ -10,6 +10,8 @@ public interface Session {
 
     void connect(boolean wait);
 
+    void connect(String hostname, boolean wait);
+
     String host();
 
     int port();

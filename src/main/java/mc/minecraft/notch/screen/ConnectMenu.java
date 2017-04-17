@@ -5,18 +5,20 @@ import mc.minecraft.notch.gfx.Font;
 import mc.minecraft.notch.gfx.Screen;
 import mc.minecraft.notch.sound.Sound;
 
-final class LoginMenu extends Menu {
+final class ConnectMenu extends Menu {
     private final Widget[] lines = new Widget[]{
-            new InputText("Имя   :", 20),
-            new InputPassword("Пароль:", 20),
+            new InputText("Имя   :", 30),
+            new InputPassword("Пароль:", 30),
+            new InputText("Сервер:", 30, "127.0.0.1"),
             new Button("Вход", 4, new Runnable() {
                 @Override
                 public void run() {
-                    LoginMenu.this.game.connect(
+                    ConnectMenu.this.game.connect(
                             ((InputText) lines[0]).value.toString(),
-                            ((InputText) lines[1]).value.toString());
-                    LoginMenu.this.parent.refresh();
-                    LoginMenu.this.game.setMenu(LoginMenu.this.parent);
+                            ((InputText) lines[1]).value.toString(),
+                            ((InputText) lines[2]).value.toString());
+                    ConnectMenu.this.parent.refresh();
+                    ConnectMenu.this.game.setMenu(ConnectMenu.this.parent);
                 }
             })
     };
@@ -24,7 +26,7 @@ final class LoginMenu extends Menu {
     private int nextId = 0;
     private int tickCount;
 
-    LoginMenu(Menu parent) {
+    ConnectMenu(Menu parent) {
         super(parent.propertyReader);
         this.parent = parent;
     }
@@ -182,6 +184,12 @@ final class LoginMenu extends Menu {
             this.label = label;
         }
 
+        InputText(String label, int width, String value) {
+            super(width);
+            this.label = label;
+            this.value.append(value);
+        }
+
         void reset() {
             value.setLength(0);
         }
@@ -196,7 +204,7 @@ final class LoginMenu extends Menu {
         }
     }
 
-    static class InputPassword extends InputText {
+    private static class InputPassword extends InputText {
 
         InputPassword(String label, int width) {
             super(label, width);
@@ -212,7 +220,7 @@ final class LoginMenu extends Menu {
         }
     }
 
-    static class Button extends Widget {
+    private static class Button extends Widget {
         final String label;
 
         Button(String label, int width, Runnable action) {

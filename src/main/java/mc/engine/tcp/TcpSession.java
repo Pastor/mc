@@ -55,6 +55,10 @@ abstract class TcpSession extends SimpleChannelInboundHandler<Packet> implements
     public void connect(boolean wait) {
     }
 
+    public void connect(String hostname, boolean wait) {
+
+    }
+
     public String host() {
         return this.host;
     }
