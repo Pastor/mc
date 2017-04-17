@@ -8,9 +8,11 @@ import mc.minicraft.component.sound.Sound;
 
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 public class Entity {
     protected final Random random = new Random();
+    public final UUID id;
     public int x, y;
     public int xr = 6;
     public int yr = 6;
@@ -19,6 +21,7 @@ public class Entity {
     protected final Sound sound;
 
     public Entity(Sound sound) {
+        this.id = UUID.randomUUID();
         this.sound = sound;
     }
 

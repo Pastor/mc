@@ -28,7 +28,7 @@ public final class ServerPlayer extends Session.ListenerAdapter implements Compa
     final Server server;
     private final UUID id;
     private final PropertyContainer container;
-    public Player player;
+    private Player player;
     private long gameTime;
     private int deadTime;
     private int wonTime;
@@ -64,17 +64,16 @@ public final class ServerPlayer extends Session.ListenerAdapter implements Compa
     }
 
     public void removePlayer(Level level) {
-        this.gameTime = 0;
-        this.deadTime = 0;
-        this.wonTime = 0;
-        this.findStartPos(level);
-        registerPlayer(level);
+        level.remove(player);
     }
 
     public void registerPlayer(Level level) {
-        level.add(player);
+        this.gameTime = 0;
+        this.deadTime = 0;
+        this.wonTime = 0;
         this.level = level;
         this.findStartPos(level);
+        level.add(player);
     }
 
     public void changeLevel(Level[] levels, int dir) {
