@@ -1,11 +1,15 @@
 package mc.minicraft.component.entity;
 
+import mc.api.Buffer;
 import mc.minicraft.component.Screen;
 import mc.minicraft.component.gfx.Color;
 import mc.minicraft.component.item.Item;
-import mc.minicraft.component.sound.Sound;
+import mc.api.Sound;
+import mc.minicraft.data.game.entity.EntityType;
 
-public class ItemEntity extends Entity {
+import java.io.IOException;
+
+public final class ItemEntity extends Entity {
     private int lifeTime;
     protected int walkDist = 0;
     protected int dir = 0;
@@ -17,7 +21,7 @@ public class ItemEntity extends Entity {
     private int time = 0;
 
     public ItemEntity(Sound sound, Item item, int x, int y) {
-        super(sound);
+        super(sound, EntityType.ITEM_ENTITY);
         this.item = item;
         xx = this.x = x;
         yy = this.y = y;
@@ -30,6 +34,44 @@ public class ItemEntity extends Entity {
         za = random.nextFloat() * 0.7 + 1;
 
         lifeTime = 60 * 10 + random.nextInt(60);
+    }
+
+    @Override
+    public void write(Buffer.Output output) throws IOException {
+        super.write(output);
+        output.writeVarInt(lifeTime);
+        output.writeVarInt(walkDist);
+        output.writeVarInt(dir);
+        output.writeVarInt(hurtTime);
+        output.writeVarInt(xKnockback);
+        output.writeVarInt(yKnockback);
+        output.writeDouble(xa);
+        output.writeDouble(ya);
+        output.writeDouble(za);
+        output.writeDouble(xx);
+        output.writeDouble(yy);
+        output.writeDouble(zz);
+        //FIXME: item
+        output.writeVarInt(time);
+    }
+
+    @Override
+    protected void read(Buffer.Input input) throws IOException {
+        super.read(input);
+        lifeTime = input.readVarInt();
+        walkDist = input.readVarInt();
+        dir = input.readVarInt();
+        hurtTime = input.readVarInt();
+        xKnockback = input.readVarInt();
+        yKnockback = input.readVarInt();
+        xa = input.readDouble();
+        ya = input.readDouble();
+        za = input.readDouble();
+        xx = input.readDouble();
+        yy = input.readDouble();
+        zz = input.readDouble();
+        //FIXME: item
+        time = input.readVarInt();
     }
 
     public void tick() {

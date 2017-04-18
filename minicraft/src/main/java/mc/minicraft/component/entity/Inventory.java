@@ -7,7 +7,7 @@ import mc.minicraft.component.item.resource.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Inventory {
+public final class Inventory {
     public List<Item> items = new ArrayList<>();
 
     public void add(Item item) {

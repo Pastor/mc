@@ -1,9 +1,7 @@
 package mc.minicraft;
 
 import mc.minicraft.data.game.*;
-import mc.minicraft.data.game.entity.Effect;
-import mc.minicraft.data.game.entity.EntityStatus;
-import mc.minicraft.data.game.entity.EquipmentSlot;
+import mc.minicraft.data.game.entity.*;
 import mc.minicraft.data.game.entity.attribute.AttributeType;
 import mc.minicraft.data.game.entity.attribute.ModifierOperation;
 import mc.minicraft.data.game.entity.attribute.ModifierType;
@@ -47,6 +45,30 @@ public final class Magic {
     private static final Map<Object, List<Object>> values = new HashMap<>();
 
     static {
+
+        {
+            register(EntityType.AIR_WIZARD, 0);
+            register(EntityType.ANVIL, 1);
+            register(EntityType.CHEST, 2);
+            register(EntityType.FURNACE, 3);
+            register(EntityType.FURNITURE, 4);
+            register(EntityType.INVENTORY, 5);
+            register(EntityType.ITEM_ENTITY, 6);
+            register(EntityType.LANTERN, 7);
+            register(EntityType.OVEN, 8);
+            register(EntityType.PLAYER, 9);
+            register(EntityType.SLIME, 10);
+            register(EntityType.SPARK, 11);
+            register(EntityType.WORKBENCH, 12);
+            register(EntityType.ZOMBIE, 13);
+            register(EntityType.SMASH_PARTICLE, 14);
+            register(EntityType.TEXT_PARTICLE, 15);
+
+            register(ItemType.FURNITURE, 1);
+            register(ItemType.POWER_GLOVE, 2);
+            register(ItemType.RESOURCE_ITEM, 3);
+            register(ItemType.TOOL_ITEM, 4);
+        }
         register(AttributeType.GENERIC_MAX_HEALTH, "generic.maxHealth");
         register(AttributeType.GENERIC_FOLLOW_RANGE, "generic.followRange");
         register(AttributeType.GENERIC_KNOCKBACK_RESISTANCE, "generic.knockbackResistance");

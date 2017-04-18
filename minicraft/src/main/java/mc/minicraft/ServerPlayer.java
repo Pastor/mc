@@ -2,22 +2,27 @@ package mc.minicraft;
 
 import mc.api.Server;
 import mc.api.Session;
+import mc.api.Sound;
 import mc.engine.property.PropertyContainer;
+import mc.minicraft.component.crafting.Recipe;
+import mc.minicraft.component.entity.Inventory;
 import mc.minicraft.component.entity.Player;
-import mc.minicraft.component.entity.PlayerHandlerAdapter;
+import mc.minicraft.component.entity.PlayerHandler;
 import mc.minicraft.component.level.Level;
 import mc.minicraft.component.level.tile.Tile;
-import mc.minicraft.component.sound.Sound;
 import mc.minicraft.data.game.MessageType;
 import mc.minicraft.data.message.ChatColor;
 import mc.minicraft.data.message.Message;
 import mc.minicraft.data.message.MessageStyle;
 import mc.minicraft.data.message.TextMessage;
 import mc.minicraft.packet.ingame.client.ClientChatPacket;
+import mc.minicraft.packet.ingame.client.player.ClientPlayerUpdatePacket;
 import mc.minicraft.packet.ingame.server.ServerChatPacket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
+import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
@@ -28,22 +33,23 @@ public final class ServerPlayer extends Session.ListenerAdapter implements Compa
     final Server server;
     private final UUID id;
     private final PropertyContainer container;
-    private Player player;
+    public final Player player;
     private long gameTime;
     private int deadTime;
     private int wonTime;
     private int currentLevel;
-    private Level level;
+    public Level level;
     int pendingLevelChange;
-    int visibleDistance;
+    public int visibleDistance;
 
-    public int x, y;
+    private final PlayerState state = new PlayerState();
 
     public ServerPlayer(Server server, PropertyContainer container) {
         this.id = UUID.randomUUID();
         this.server = server;
         this.container = container;
-        this.player = new Player(this, new PlayerHandlerAdapter(), container);
+        this.player = new Player(this, state, container);
+        this.visibleDistance = 100;
     }
 
     @Override
@@ -61,6 +67,10 @@ public final class ServerPlayer extends Session.ListenerAdapter implements Compa
 
     public void tick() {
         gameTime++;
+        player.tick();
+        if (state.xa != 0 || state.ya != 0)
+            System.out.println("SERVER. X: " + player.x + ", Y: " + player.y);
+        state.reset();
     }
 
     public void removePlayer(Level level) {
@@ -76,23 +86,13 @@ public final class ServerPlayer extends Session.ListenerAdapter implements Compa
         level.add(player);
     }
 
-    public void changeLevel(Level[] levels, int dir) {
-//        level.remove(player);
-        currentLevel += dir;
-        level = levels[currentLevel];
-        x = (x >> 4) * 16 + 8;
-        y = (y >> 4) * 16 + 8;
-//        level.add(player);
-    }
-
-    //
     private boolean findStartPos(Level level) {
         while (true) {
             int x = random.nextInt(level.w);
             int y = random.nextInt(level.h);
             if (level.getTile(x, y) == Tile.grass) {
-                this.x = x * 16 + 8;
-                this.y = y * 16 + 8;
+                player.x = x * 16 + 8;
+                player.y = y * 16 + 8;
                 return true;
             }
         }
@@ -123,5 +123,72 @@ public final class ServerPlayer extends Session.ListenerAdapter implements Compa
 
     void updateViewport() {
         //FIXME: Обновляем видимое окружение
+    }
+
+    public void update(ClientPlayerUpdatePacket update) {
+        state.xa = update.xa;
+        state.ya = update.ya;
+        System.out.println("UPDATE. X: " + update.xa + ", Y: " + update.ya);
+    }
+
+    private final class PlayerState implements PlayerHandler {
+
+        int xa;
+        int ya;
+
+        void reset() {
+            xa = 0;
+            ya = 0;
+        }
+
+        @Override
+        public Point move() {
+            return new Point(xa, ya);
+        }
+
+        @Override
+        public boolean isAttacked() {
+            return false;
+        }
+
+        @Override
+        public boolean isMenuClicked() {
+            return false;
+        }
+
+        @Override
+        public boolean escapePressed() {
+            return false;
+        }
+
+        @Override
+        public void won() {
+
+        }
+
+        @Override
+        public void scheduleLevelChange(int dir) {
+
+        }
+
+        @Override
+        public void inventoryMenu(Player player) {
+
+        }
+
+        @Override
+        public void craftingMenu(Player player, List<Recipe> recipes) {
+
+        }
+
+        @Override
+        public void containerMenu(Player player, String name, Inventory inventory) {
+
+        }
+
+        @Override
+        public void titleMenu(Player player) {
+
+        }
     }
 }

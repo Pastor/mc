@@ -98,12 +98,12 @@ final class ClientListener extends Session.ListenerAdapter {
                 event.session.setCompressionThreshold(event.<ServerSetCompressionPacket>asPacket().getThreshold());
             }
         }
-        logger.info("Client recv: " + event.packet());
+//        logger.info("Client recv: " + event.packet());
     }
 
     @Override
     public void packetSent(Session.Event event) {
-        logger.info("Client sent: " + event.packet());
+//        logger.info("Client sent: " + event.packet());
     }
 
     public void connected(Session.Event event) {

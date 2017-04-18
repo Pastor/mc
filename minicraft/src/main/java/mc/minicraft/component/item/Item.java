@@ -1,20 +1,76 @@
 package mc.minicraft.component.item;
 
+import mc.api.Buffer;
+import mc.engine.property.PropertyReader;
+import mc.minicraft.Magic;
 import mc.minicraft.component.ListItem;
 import mc.minicraft.component.Screen;
-import mc.minicraft.component.entity.Entity;
-import mc.minicraft.component.entity.ItemEntity;
-import mc.minicraft.component.entity.Player;
+import mc.minicraft.component.entity.*;
+import mc.minicraft.component.item.resource.Resource;
 import mc.minicraft.component.level.Level;
 import mc.minicraft.component.level.tile.Tile;
+import mc.api.Sound;
+import mc.minicraft.data.game.entity.ItemType;
 
-public class Item implements ListItem {
+import java.io.IOException;
+
+public abstract class Item implements ListItem {
+    protected String name;
+    protected int color;
+    protected int sprite;
+    private final ItemType type;
+
+    protected Item(ItemType type) {
+        this.type = type;
+    }
+
+    public void write(Buffer.Output output) throws IOException {
+        output.writeByte(Magic.value(Integer.class, type));
+        output.writeString(name);
+        output.writeVarInt(color);
+        output.writeVarInt(sprite);
+    }
+
+    protected void read(Buffer.Input input) throws IOException {
+        name = input.readString();
+        color = input.readVarInt();
+        sprite = input.readVarInt();
+    }
+
+    private static ItemType readType(Buffer.Input in) throws IOException {
+        return Magic.key(ItemType.class, in.readByte());
+    }
+
+    public static Item readItem(Sound sound, PlayerHandler handler, PropertyReader reader, Buffer.Input input)
+            throws IOException {
+        ItemType type = readType(input);
+        final Item item;
+        switch (type) {
+            case FURNITURE:
+                item = new FurnitureItem(new Workbench(sound, handler, reader), sound, handler, reader);
+                break;
+            case POWER_GLOVE:
+                item = new PowerGloveItem();
+                break;
+            case RESOURCE_ITEM:
+                item = new ResourceItem(Resource.apple);
+                break;
+            case TOOL_ITEM:
+                item = new ToolItem(ToolType.axe, 0);
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+        item.read(input);
+        return item;
+    }
+
     public int getColor() {
-        return 0;
+        return color;
     }
 
     public int getSprite() {
-        return 0;
+        return sprite;
     }
 
     public void onTake(ItemEntity itemEntity) {
@@ -47,7 +103,7 @@ public class Item implements ListItem {
     }
 
     public String getName() {
-        return "";
+        return name;
     }
 
     public boolean matches(Item item) {

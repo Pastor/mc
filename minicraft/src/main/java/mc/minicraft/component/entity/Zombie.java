@@ -1,23 +1,45 @@
 package mc.minicraft.component.entity;
 
+import mc.api.Buffer;
 import mc.minicraft.component.Screen;
 import mc.minicraft.component.gfx.Color;
 import mc.minicraft.component.item.ResourceItem;
 import mc.minicraft.component.item.resource.Resource;
-import mc.minicraft.component.sound.Sound;
+import mc.api.Sound;
+import mc.minicraft.data.game.entity.EntityType;
 
-public class Zombie extends Mob {
+import java.io.IOException;
+
+public final class Zombie extends Mob {
     private int xa, ya;
     private int lvl;
     private int randomWalkTime = 0;
 
     public Zombie(Sound sound, int lvl) {
-        super(sound);
+        super(sound, EntityType.ZOMBIE);
         this.lvl = lvl;
         x = random.nextInt(64 * 16);
         y = random.nextInt(64 * 16);
         health = maxHealth = lvl * lvl * 10;
 
+    }
+
+    @Override
+    public void write(Buffer.Output output) throws IOException {
+        super.write(output);
+        output.writeVarInt(xa);
+        output.writeVarInt(ya);
+        output.writeVarInt(lvl);
+        output.writeVarInt(randomWalkTime);
+    }
+
+    @Override
+    protected void read(Buffer.Input input) throws IOException {
+        super.read(input);
+        xa = input.readVarInt();
+        ya = input.readVarInt();
+        lvl = input.readVarInt();
+        randomWalkTime = input.readVarInt();
     }
 
     public void tick() {

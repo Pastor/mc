@@ -1,9 +1,11 @@
 package mc.minicraft.component.entity;
 
+import mc.api.Buffer;
+import mc.api.Sound;
+import mc.engine.property.Property;
 import mc.engine.property.PropertyConstants;
 import mc.engine.property.PropertyContainer;
 import mc.engine.property.PropertyReader;
-import mc.engine.property.Property;
 import mc.minicraft.component.Screen;
 import mc.minicraft.component.entity.particle.TextParticle;
 import mc.minicraft.component.gfx.Color;
@@ -12,11 +14,13 @@ import mc.minicraft.component.item.Item;
 import mc.minicraft.component.item.PowerGloveItem;
 import mc.minicraft.component.level.Level;
 import mc.minicraft.component.level.tile.Tile;
-import mc.minicraft.component.sound.Sound;
+import mc.minicraft.data.game.entity.EntityType;
 
-import java.util.List;
+import java.awt.*;
+import java.io.IOException;
+import java.util.Set;
 
-public class Player extends Mob implements PropertyContainer.Listener {
+public final class Player extends Mob implements PropertyContainer.Listener {
     public final PropertyReader propertyReader;
     private int attackTime, attackDir;
 
@@ -33,7 +37,7 @@ public class Player extends Mob implements PropertyContainer.Listener {
     public int invulnerableTime = 0;
 
     public Player(Sound sound, PlayerHandler handler, PropertyReader propertyReader) {
-        super(sound);
+        super(sound, EntityType.PLAYER);
         this.propertyReader = propertyReader;
         this.handler = handler;
         x = 24;
@@ -41,25 +45,75 @@ public class Player extends Mob implements PropertyContainer.Listener {
         stamina = maxStamina = propertyReader.property(PropertyConstants.PLAYER_STAMINA).asValue();
         health = maxHealth = propertyReader.property(PropertyConstants.PLAYER_HEALTH).asValue();
 
-        inventory.add(new FurnitureItem(new Workbench(sound, handler)));
+        inventory.add(new FurnitureItem(new Workbench(sound, handler, propertyReader), sound, handler, propertyReader));
         inventory.add(new PowerGloveItem());
         propertyReader.addListener(this);
+    }
+
+    @Override
+    public void write(Buffer.Output output) throws IOException {
+        super.write(output);
+        output.writeVarInt(attackTime);
+        output.writeVarInt(attackDir);
+        if (attackItem != null) {
+            output.writeBoolean(true);
+            attackItem.write(output);
+        } else {
+            output.writeBoolean(false);
+        }
+        if (activeItem != null) {
+            output.writeBoolean(true);
+            activeItem.write(output);
+        } else {
+            output.writeBoolean(false);
+        }
+        output.writeVarInt(stamina);
+        output.writeVarInt(staminaRecharge);
+        output.writeVarInt(staminaRechargeDelay);
+        output.writeVarInt(score);
+        output.writeVarInt(maxHealth);
+        output.writeVarInt(onStairDelay);
+        output.writeVarInt(invulnerableTime);
+    }
+
+    @Override
+    protected void read(Buffer.Input input) throws IOException {
+        super.read(input);
+        attackTime = input.readVarInt();
+        attackDir = input.readVarInt();
+        boolean attackItemPresent = input.readBoolean();
+        if (attackItemPresent) {
+            attackItem = Item.readItem(sound, handler, propertyReader, input);
+        }
+        boolean activeItemPresent = input.readBoolean();
+        if (activeItemPresent) {
+            activeItem = Item.readItem(sound, handler, propertyReader, input);
+        }
+        stamina = input.readVarInt();
+        staminaRecharge = input.readVarInt();
+        staminaRechargeDelay = input.readVarInt();
+        score = input.readVarInt();
+        maxHealth = input.readVarInt();
+        onStairDelay = input.readVarInt();
+        invulnerableTime = input.readVarInt();
     }
 
     public void tick() {
         super.tick();
 
         if (invulnerableTime > 0) invulnerableTime--;
-        Tile onTile = level.getTile(x >> 4, y >> 4);
-        if (onTile == Tile.stairsDown || onTile == Tile.stairsUp) {
-            if (onStairDelay == 0) {
-                changeLevel((onTile == Tile.stairsUp) ? 1 : -1);
+        if (level != null) {
+            Tile onTile = level.getTile(x >> 4, y >> 4);
+            if (onTile == Tile.stairsDown || onTile == Tile.stairsUp) {
+                if (onStairDelay == 0) {
+                    changeLevel((onTile == Tile.stairsUp) ? 1 : -1);
+                    onStairDelay = 10;
+                    return;
+                }
                 onStairDelay = 10;
-                return;
+            } else {
+                if (onStairDelay > 0) onStairDelay--;
             }
-            onStairDelay = 10;
-        } else {
-            if (onStairDelay > 0) onStairDelay--;
         }
 
         if (stamina <= 0 && staminaRechargeDelay == 0 && staminaRecharge == 0) {
@@ -81,12 +135,9 @@ public class Player extends Mob implements PropertyContainer.Listener {
             }
         }
 
-        int xa = 0;
-        int ya = 0;
-        if (handler.upPressed()) ya--;
-        if (handler.downPressed()) ya++;
-        if (handler.leftPressed()) xa--;
-        if (handler.rightPressed()) xa++;
+        Point move = handler.move();
+        int xa = move.x;
+        int ya = move.y;
         if (isSwimming() && tickTime % 60 == 0) {
             if (stamina > 0) {
                 stamina--;
@@ -115,8 +166,8 @@ public class Player extends Mob implements PropertyContainer.Listener {
         } else if (handler.escapePressed()) {
             handler.titleMenu(this);
         }
-        if (attackTime > 0) attackTime--;
-
+        if (attackTime > 0)
+            attackTime--;
     }
 
     private boolean use() {
@@ -206,27 +257,24 @@ public class Player extends Mob implements PropertyContainer.Listener {
     }
 
     private boolean use(int x0, int y0, int x1, int y1) {
-        List<Entity> entities = level.getEntities(x0, y0, x1, y1);
-        for (int i = 0; i < entities.size(); i++) {
-            Entity e = entities.get(i);
+        Set<Entity> entities = level.getEntities(x0, y0, x1, y1);
+        for (Entity e : entities) {
             if (e != this) if (e.use(this, attackDir)) return true;
         }
         return false;
     }
 
     private boolean interact(int x0, int y0, int x1, int y1) {
-        List<Entity> entities = level.getEntities(x0, y0, x1, y1);
-        for (int i = 0; i < entities.size(); i++) {
-            Entity e = entities.get(i);
+        Set<Entity> entities = level.getEntities(x0, y0, x1, y1);
+        for (Entity e : entities) {
             if (e != this) if (e.interact(this, activeItem, attackDir)) return true;
         }
         return false;
     }
 
     private void hurt(int x0, int y0, int x1, int y1) {
-        List<Entity> entities = level.getEntities(x0, y0, x1, y1);
-        for (int i = 0; i < entities.size(); i++) {
-            Entity e = entities.get(i);
+        Set<Entity> entities = level.getEntities(x0, y0, x1, y1);
+        for (Entity e : entities) {
             if (e != this) e.hurt(this, getAttackDamage(e), attackDir);
         }
     }

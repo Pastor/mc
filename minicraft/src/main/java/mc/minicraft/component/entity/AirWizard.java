@@ -1,10 +1,14 @@
 package mc.minicraft.component.entity;
 
+import mc.api.Buffer;
 import mc.minicraft.component.Screen;
 import mc.minicraft.component.gfx.Color;
-import mc.minicraft.component.sound.Sound;
+import mc.api.Sound;
+import mc.minicraft.data.game.entity.EntityType;
 
-public class AirWizard extends Mob {
+import java.io.IOException;
+
+public final class AirWizard extends Mob {
     private int xa, ya;
     private int randomWalkTime = 0;
     private int attackDelay = 0;
@@ -12,10 +16,32 @@ public class AirWizard extends Mob {
     private int attackType = 0;
 
     public AirWizard(Sound sound) {
-        super(sound);
+        super(sound, EntityType.AIR_WIZARD);
         x = random.nextInt(64 * 16);
         y = random.nextInt(64 * 16);
         health = maxHealth = 2000;
+    }
+
+    @Override
+    public void write(Buffer.Output output) throws IOException {
+        super.write(output);
+        output.writeVarInt(xa);
+        output.writeVarInt(ya);
+        output.writeVarInt(randomWalkTime);
+        output.writeVarInt(attackDelay);
+        output.writeVarInt(attackTime);
+        output.writeVarInt(attackType);
+    }
+
+    @Override
+    protected void read(Buffer.Input input) throws IOException {
+        super.read(input);
+        xa = input.readVarInt();
+        ya = input.readVarInt();
+        randomWalkTime = input.readVarInt();
+        attackDelay = input.readVarInt();
+        attackTime = input.readVarInt();
+        attackType = input.readVarInt();
     }
 
     public void tick() {

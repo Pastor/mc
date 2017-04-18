@@ -1,12 +1,16 @@
 package mc.minicraft.component.entity;
 
+import mc.api.Buffer;
 import mc.minicraft.component.entity.particle.TextParticle;
 import mc.minicraft.component.gfx.Color;
 import mc.minicraft.component.level.Level;
 import mc.minicraft.component.level.tile.Tile;
-import mc.minicraft.component.sound.Sound;
+import mc.api.Sound;
+import mc.minicraft.data.game.entity.EntityType;
 
-public class Mob extends Entity {
+import java.io.IOException;
+
+public abstract class Mob extends Entity {
     protected int walkDist = 0;
     protected int dir = 0;
     public int hurtTime = 0;
@@ -16,16 +20,44 @@ public class Mob extends Entity {
     public int swimTimer = 0;
     public int tickTime = 0;
 
-    public Mob(Sound sound) {
-        super(sound);
+    public Mob(Sound sound, EntityType type) {
+        super(sound, type);
         x = y = 8;
         xr = 4;
         yr = 3;
     }
 
+    @Override
+    public void write(Buffer.Output output) throws IOException {
+        super.write(output);
+        output.writeVarInt(walkDist);
+        output.writeVarInt(dir);
+        output.writeVarInt(hurtTime);
+        output.writeVarInt(xKnockback);
+        output.writeVarInt(yKnockback);
+        output.writeVarInt(maxHealth);
+        output.writeVarInt(health);
+        output.writeVarInt(swimTimer);
+        output.writeVarInt(tickTime);
+    }
+
+    @Override
+    protected void read(Buffer.Input input) throws IOException {
+        super.read(input);
+        walkDist = input.readVarInt();
+        dir = input.readVarInt();
+        hurtTime = input.readVarInt();
+        xKnockback = input.readVarInt();
+        yKnockback = input.readVarInt();
+        maxHealth = input.readVarInt();
+        health = input.readVarInt();
+        swimTimer = input.readVarInt();
+        tickTime = input.readVarInt();
+    }
+
     public void tick() {
         tickTime++;
-        if (level.getTile(x >> 4, y >> 4) == Tile.lava) {
+        if (level != null && level.getTile(x >> 4, y >> 4) == Tile.lava) {
             hurt(this, 4, dir ^ 1);
         }
 
@@ -71,8 +103,11 @@ public class Mob extends Entity {
     }
 
     boolean isSwimming() {
-        Tile tile = level.getTile(x >> 4, y >> 4);
-        return tile == Tile.water || tile == Tile.lava;
+        if (level != null) {
+            Tile tile = level.getTile(x >> 4, y >> 4);
+            return tile == Tile.water || tile == Tile.lava;
+        }
+        return false;
     }
 
     public boolean blocks(Entity e) {

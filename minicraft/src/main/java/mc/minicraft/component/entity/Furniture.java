@@ -1,22 +1,51 @@
 package mc.minicraft.component.entity;
 
+import mc.api.Buffer;
+import mc.engine.property.PropertyReader;
 import mc.minicraft.component.Screen;
 import mc.minicraft.component.item.FurnitureItem;
 import mc.minicraft.component.item.PowerGloveItem;
-import mc.minicraft.component.sound.Sound;
+import mc.api.Sound;
+import mc.minicraft.data.game.entity.EntityType;
 
-public class Furniture extends Entity {
+import java.io.IOException;
+
+public abstract class Furniture extends Entity {
     private int pushTime = 0;
     private int pushDir = -1;
     public int col, sprite;
     public String name;
     private Player shouldTake;
+    protected final PlayerHandler handler;
+    protected final PropertyReader reader;
 
-    public Furniture(Sound sound, String name) {
-        super(sound);
+    public Furniture(Sound sound, PlayerHandler handler, PropertyReader reader, String name, EntityType type) {
+        super(sound, type);
+        this.handler = handler;
+        this.reader = reader;
         this.name = name;
         xr = 3;
         yr = 3;
+    }
+
+    @Override
+    public void write(Buffer.Output output) throws IOException {
+        super.write(output);
+        output.writeVarInt(pushTime);
+        output.writeVarInt(pushDir);
+        output.writeVarInt(col);
+        output.writeVarInt(sprite);
+        output.writeString(name);
+    }
+
+    @Override
+    public void read(Buffer.Input input) throws IOException {
+        super.read(input);
+        pushTime = input.readVarInt();
+        pushDir = input.readVarInt();
+        col = input.readVarInt();
+        sprite = input.readVarInt();
+        name = input.readString();
     }
 
     public void tick() {
@@ -24,7 +53,7 @@ public class Furniture extends Entity {
             if (shouldTake.activeItem instanceof PowerGloveItem) {
                 remove();
                 shouldTake.inventory.add(0, shouldTake.activeItem);
-                shouldTake.activeItem = new FurnitureItem(this);
+                shouldTake.activeItem = new FurnitureItem(this, sound, handler, reader);
             }
             shouldTake = null;
         }

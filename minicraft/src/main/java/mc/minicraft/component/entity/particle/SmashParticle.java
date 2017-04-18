@@ -1,15 +1,19 @@
 package mc.minicraft.component.entity.particle;
 
+import mc.api.Buffer;
 import mc.minicraft.component.Screen;
 import mc.minicraft.component.entity.Entity;
 import mc.minicraft.component.gfx.Color;
-import mc.minicraft.component.sound.Sound;
+import mc.api.Sound;
+import mc.minicraft.data.game.entity.EntityType;
 
-public class SmashParticle extends Entity {
+import java.io.IOException;
+
+public final class SmashParticle extends Entity {
     private int time = 0;
 
     public SmashParticle(Sound sound, int x, int y) {
-        super(sound);
+        super(sound, EntityType.SMASH_PARTICLE);
         this.x = x;
         this.y = y;
         sound.play(Sound.Type.MONSTER_HURT);
@@ -20,6 +24,18 @@ public class SmashParticle extends Entity {
         if (time > 10) {
             remove();
         }
+    }
+
+    @Override
+    public void write(Buffer.Output output) throws IOException {
+        super.write(output);
+        output.writeVarInt(time);
+    }
+
+    @Override
+    public void read(Buffer.Input input) throws IOException {
+        super.read(input);
+        time = input.readVarInt();
     }
 
     public void render(Screen screen) {

@@ -1,28 +1,57 @@
 package mc.minicraft.component.entity;
 
+import mc.api.Buffer;
+import mc.api.Sound;
+import mc.engine.property.PropertyReader;
+import mc.minicraft.Magic;
 import mc.minicraft.component.Screen;
+import mc.minicraft.component.entity.particle.SmashParticle;
+import mc.minicraft.component.entity.particle.TextParticle;
 import mc.minicraft.component.item.Item;
 import mc.minicraft.component.level.Level;
 import mc.minicraft.component.level.tile.Tile;
-import mc.minicraft.component.sound.Sound;
+import mc.minicraft.data.game.entity.EntityType;
 
-import java.util.List;
+import java.io.IOException;
+import java.util.Objects;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
-public class Entity {
+public abstract class Entity {
     protected final Random random = new Random();
-    public final UUID id;
+    public UUID id;
     public int x, y;
     public int xr = 6;
     public int yr = 6;
     public boolean removed;
     public Level level;
-    protected final Sound sound;
+    public final Sound sound;
+    public final EntityType type;
 
-    public Entity(Sound sound) {
+    public Entity(Sound sound, EntityType type) {
+        this.type = type;
         this.id = UUID.randomUUID();
         this.sound = sound;
+    }
+
+    public void write(Buffer.Output output) throws IOException {
+        output.writeByte(Magic.value(Integer.class, type()));
+        byte[] bytes = id.toString().getBytes("UTF-8");
+        output.writeVarInt(bytes.length);
+        output.writeBytes(bytes);
+        output.writeVarInt(x);
+        output.writeVarInt(y);
+        output.writeBoolean(removed);
+    }
+
+    protected void read(Buffer.Input input) throws IOException {
+        int length = input.readVarInt();
+        byte[] bytes = input.readBytes(length);
+        id = UUID.fromString(new String(bytes, "UTF-8"));
+        x = input.readVarInt();
+        y = input.readVarInt();
+        removed = input.readBoolean();
     }
 
     public void render(Screen screen) {
@@ -92,17 +121,15 @@ public class Entity {
             }
         if (blocked) return false;
 
-        List<Entity> wasInside = level.getEntities(x - xr, y - yr, x + xr, y + yr);
-        List<Entity> isInside = level.getEntities(x + xa - xr, y + ya - yr, x + xa + xr, y + ya + yr);
-        for (int i = 0; i < isInside.size(); i++) {
-            Entity e = isInside.get(i);
+        Set<Entity> wasInside = level.getEntities(x - xr, y - yr, x + xr, y + yr);
+        Set<Entity> isInside = level.getEntities(x + xa - xr, y + ya - yr, x + xa + xr, y + ya + yr);
+        for (Entity e : isInside) {
             if (e == this) continue;
 
             e.touchedBy(this);
         }
         isInside.removeAll(wasInside);
-        for (int i = 0; i < isInside.size(); i++) {
-            Entity e = isInside.get(i);
+        for (Entity e : isInside) {
             if (e == this) continue;
 
             if (e.blocks(this)) {
@@ -139,5 +166,84 @@ public class Entity {
 
     public int getLightRadius() {
         return 0;
+    }
+
+    public final EntityType type() {
+        return type;
+    }
+
+    private static EntityType readType(Buffer.Input in) throws IOException {
+        return Magic.key(EntityType.class, in.readByte());
+    }
+
+    public static Entity readEntity(Sound sound, PlayerHandler handler, PropertyReader reader, Buffer.Input input) throws IOException {
+        EntityType type = readType(input);
+        final Entity entity;
+        switch (type) {
+            case SMASH_PARTICLE:
+                entity = new SmashParticle(sound, 0, 0);
+                break;
+            case TEXT_PARTICLE:
+                entity = new TextParticle(sound, null, 0, 0, 0);
+                break;
+            case AIR_WIZARD:
+                entity = new AirWizard(sound);
+                break;
+            case ANVIL:
+                entity = new Anvil(sound, handler, reader);
+                break;
+            case CHEST:
+                entity = new Chest(sound, handler, reader);
+                break;
+            case FURNACE:
+                entity = new Furnace(sound, handler, reader);
+                break;
+            case LANTERN:
+                entity = new Lantern(sound, handler, reader);
+                break;
+            case OVEN:
+                entity = new Oven(sound, handler, reader);
+                break;
+            case PLAYER:
+                entity = new Player(sound, handler, reader);
+                break;
+            case SLIME:
+                entity = new Slime(sound, 0);
+                break;
+            case SPARK:
+                entity = new Spark(sound, new AirWizard(sound), 0, 0);
+                break;
+            case WORKBENCH:
+                entity = new Workbench(sound, handler, reader);
+                break;
+            case ZOMBIE:
+                entity = new Zombie(sound, 0);
+                break;
+            case ITEM_ENTITY:
+                entity = new ItemEntity(sound, null, 0, 0);
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+        entity.read(input);
+        return entity;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Entity entity = (Entity) o;
+        return Objects.equals(id, entity.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "[" + id + "]";
     }
 }

@@ -28,7 +28,7 @@
 
     <logger name="mc.minecraft.ClientListener" level="ERROR"/>
     <logger name="mc.minecraft.ServerListener" level="ERROR"/>
-    <logger name="mc.minecraft.client.App" level="INFO"/>
+    <logger name="mc.minecraft.client.App" level="ERROR"/>
 
     <logger name="io.netty.buffer" level="ERROR"/>
     <logger name="io.netty.util" level="ERROR"/>

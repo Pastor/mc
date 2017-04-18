@@ -1,13 +1,16 @@
 package mc.minicraft.component.item;
 
+import mc.api.Buffer;
 import mc.minicraft.component.Screen;
 import mc.minicraft.component.entity.Entity;
 import mc.minicraft.component.entity.ItemEntity;
 import mc.minicraft.component.gfx.Color;
+import mc.minicraft.data.game.entity.ItemType;
 
+import java.io.IOException;
 import java.util.Random;
 
-public class ToolItem extends Item {
+public final class ToolItem extends Item {
     private Random random = new Random();
 
     public static final int MAX_LEVEL = 5;
@@ -25,18 +28,31 @@ public class ToolItem extends Item {
 
     public ToolType type;
     public int level = 0;
+    public String name;
 
     public ToolItem(ToolType type, int level) {
+        super(ItemType.TOOL_ITEM);
         this.type = type;
         this.level = level;
+        this.color = LEVEL_COLORS[level];
+        this.sprite = type.sprite + 5 * 32;
+        this.name = type.name;
+        this.name = LEVEL_NAMES[level] + " " + type.name;
     }
 
-    public int getColor() {
-        return LEVEL_COLORS[level];
+    @Override
+    public void write(Buffer.Output output) throws IOException {
+        super.write(output);
+        output.writeVarInt(level);
+        output.writeString(name);
     }
 
-    public int getSprite() {
-        return type.sprite + 5 * 32;
+    @Override
+    protected void read(Buffer.Input input) throws IOException {
+        super.read(input);
+        level = input.readVarInt();
+        name = input.readString();
+        type = ToolType.find(name);
     }
 
     public void renderIcon(Screen screen, int x, int y) {
@@ -46,10 +62,6 @@ public class ToolItem extends Item {
     public void renderInventory(Screen screen, int x, int y) {
         screen.render(x, y, getSprite(), getColor(), 0);
         screen.draw(getName(), x + 8, y, Color.get(-1, 555, 555, 555));
-    }
-
-    public String getName() {
-        return LEVEL_NAMES[level] + " " + type.name;
     }
 
     public void onTake(ItemEntity itemEntity) {

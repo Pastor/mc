@@ -1,8 +1,10 @@
 package mc.minicraft.component.crafting;
 
+import mc.engine.property.PropertyReader;
 import mc.minicraft.component.entity.*;
 import mc.minicraft.component.item.ToolType;
 import mc.minicraft.component.item.resource.Resource;
+import mc.api.Sound;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,15 +15,20 @@ public final class Crafting {
     public static final List<Recipe> furnaceRecipes = new ArrayList<Recipe>();
     public static final List<Recipe> workbenchRecipes = new ArrayList<Recipe>();
 
-    static {
+    public static void init(Sound sound, PlayerHandler handler, PropertyReader reader) {
+        anvilRecipes.clear();
+        ovenRecipes.clear();
+        furnaceRecipes.clear();
+        workbenchRecipes.clear();
         try {
-            workbenchRecipes.add(new FurnitureRecipe(Lantern.class).addCost(Resource.wood, 5).addCost(Resource.slime, 10).addCost(Resource.glass, 4));
+            workbenchRecipes.add(new FurnitureRecipe(Lantern.class, sound, handler, reader)
+                    .addCost(Resource.wood, 5).addCost(Resource.slime, 10).addCost(Resource.glass, 4));
 
-            workbenchRecipes.add(new FurnitureRecipe(Oven.class).addCost(Resource.stone, 15));
-            workbenchRecipes.add(new FurnitureRecipe(Furnace.class).addCost(Resource.stone, 20));
-            workbenchRecipes.add(new FurnitureRecipe(Workbench.class).addCost(Resource.wood, 20));
-            workbenchRecipes.add(new FurnitureRecipe(Chest.class).addCost(Resource.wood, 20));
-            workbenchRecipes.add(new FurnitureRecipe(Anvil.class).addCost(Resource.ironIngot, 5));
+            workbenchRecipes.add(new FurnitureRecipe(Oven.class, sound, handler, reader).addCost(Resource.stone, 15));
+            workbenchRecipes.add(new FurnitureRecipe(Furnace.class, sound, handler, reader).addCost(Resource.stone, 20));
+            workbenchRecipes.add(new FurnitureRecipe(Workbench.class, sound, handler, reader).addCost(Resource.wood, 20));
+            workbenchRecipes.add(new FurnitureRecipe(Chest.class, sound, handler, reader).addCost(Resource.wood, 20));
+            workbenchRecipes.add(new FurnitureRecipe(Anvil.class, sound, handler, reader).addCost(Resource.ironIngot, 5));
 
             workbenchRecipes.add(new ToolRecipe(ToolType.sword, 0).addCost(Resource.wood, 5));
             workbenchRecipes.add(new ToolRecipe(ToolType.axe, 0).addCost(Resource.wood, 5));

@@ -1,22 +1,44 @@
 package mc.minicraft.component.entity;
 
+import mc.api.Buffer;
 import mc.minicraft.component.Screen;
 import mc.minicraft.component.gfx.Color;
 import mc.minicraft.component.item.ResourceItem;
 import mc.minicraft.component.item.resource.Resource;
-import mc.minicraft.component.sound.Sound;
+import mc.api.Sound;
+import mc.minicraft.data.game.entity.EntityType;
 
-public class Slime extends Mob {
+import java.io.IOException;
+
+public final class Slime extends Mob {
     private int xa, ya;
     private int jumpTime = 0;
     private int lvl;
 
     public Slime(Sound sound, int lvl) {
-        super(sound);
+        super(sound, EntityType.SLIME);
         this.lvl = lvl;
         x = random.nextInt(64 * 16);
         y = random.nextInt(64 * 16);
         health = maxHealth = lvl * lvl * 5;
+    }
+
+    @Override
+    public void write(Buffer.Output output) throws IOException {
+        super.write(output);
+        output.writeVarInt(xa);
+        output.writeVarInt(ya);
+        output.writeVarInt(jumpTime);
+        output.writeVarInt(lvl);
+    }
+
+    @Override
+    protected void read(Buffer.Input input) throws IOException {
+        super.read(input);
+        xa = input.readVarInt();
+        ya = input.readVarInt();
+        jumpTime = input.readVarInt();
+        lvl = input.readVarInt();
     }
 
     public void tick() {

@@ -1,15 +1,14 @@
 package mc.minicraft.component.entity;
 
+import mc.engine.property.PropertyReader;
 import mc.minicraft.component.crafting.Crafting;
 import mc.minicraft.component.gfx.Color;
-import mc.minicraft.component.sound.Sound;
+import mc.api.Sound;
+import mc.minicraft.data.game.entity.EntityType;
 
-public class Workbench extends Furniture {
-    private final PlayerHandler handler;
-
-    public Workbench(Sound sound, PlayerHandler handler) {
-        super(sound, "Workbench");
-        this.handler = handler;
+public final class Workbench extends Furniture {
+    public Workbench(Sound sound, PlayerHandler handler, PropertyReader reader) {
+        super(sound, handler, reader, "Workbench", EntityType.FURNITURE);
         col = Color.get(-1, 100, 321, 431);
         sprite = 4;
         xr = 3;

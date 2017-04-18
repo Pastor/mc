@@ -10,7 +10,7 @@ import mc.minicraft.component.item.ToolItem;
 import mc.minicraft.component.item.ToolType;
 import mc.minicraft.component.item.resource.Resource;
 import mc.minicraft.component.level.Level;
-import mc.minicraft.component.sound.Sound;
+import mc.api.Sound;
 
 public class DirtTile extends Tile {
     public DirtTile(int id) {

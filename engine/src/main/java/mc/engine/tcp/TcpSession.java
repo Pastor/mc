@@ -5,10 +5,7 @@ import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutException;
 import io.netty.handler.timeout.WriteTimeoutHandler;
-import mc.api.Client;
-import mc.api.Packet;
-import mc.api.Protocol;
-import mc.api.Session;
+import mc.api.*;
 import mc.engine.EventFactory;
 
 import java.net.ConnectException;
@@ -341,9 +338,9 @@ abstract class TcpSession extends SimpleChannelInboundHandler<Packet> implements
             this.factory = factory;
         }
 
-        public Session newSession(Client client) {
+        public Session newSession(Client client, PacketConstructor constructor) {
             return new TcpClientSession(client.host(), client.port(), client.protocol(),
-                    client, proxy, factory);
+                    client, proxy, factory, constructor);
         }
     }
 

@@ -1,12 +1,17 @@
 package mc.minicraft.component.level;
 
+import mc.api.Session;
+import mc.api.Sound;
+import mc.minicraft.ServerPlayer;
+import mc.minicraft.component.LevelHandler;
 import mc.minicraft.component.Screen;
 import mc.minicraft.component.entity.*;
 import mc.minicraft.component.level.levelgen.LevelGen;
 import mc.minicraft.component.level.tile.Tile;
-import mc.minicraft.component.sound.Sound;
+import mc.minicraft.packet.ingame.server.level.ServerUpdateLevelPacket;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 public final class Level {
     private final Random random = new Random();
@@ -16,7 +21,7 @@ public final class Level {
 
     public final byte[] tiles;
     public final byte[] data;
-    public final List<Entity>[] entitiesInTiles;
+    public final Set<Entity>[] entitiesInTiles;
 
     public int grassColor = 141;
     public int dirtColor = 322;
@@ -24,21 +29,20 @@ public final class Level {
     public final int depth;
     public int monsterDensity = 8;
 
-    public final List<Entity> entities = new ArrayList<Entity>();
-    private Comparator<Entity> spriteSorter = new Comparator<Entity>() {
-        public int compare(Entity e0, Entity e1) {
-            if (e1.y < e0.y) return +1;
-            if (e1.y > e0.y) return -1;
-            return 0;
-        }
-
+    private final Set<Entity> entities = new HashSet<>();
+    private Comparator<Entity> spriteSorter = (e0, e1) -> {
+        if (e1.y < e0.y) return +1;
+        if (e1.y > e0.y) return -1;
+        return 0;
     };
 
     public final Sound sound;
+    public final LevelCollector handler;
 
     @SuppressWarnings("unchecked")
     public Level(Sound sound, int w, int h, int level, Level parentLevel) {
         this.sound = sound;
+        this.handler = new LevelCollector(w, h, this);
         if (level < 0) {
             dirtColor = 222;
         }
@@ -93,9 +97,9 @@ public final class Level {
                 }
         }
 
-        entitiesInTiles = new ArrayList[w * h];
+        entitiesInTiles = new Set[w * h];
         for (int i = 0; i < w * h; i++) {
-            entitiesInTiles[i] = new ArrayList<Entity>();
+            entitiesInTiles[i] = new HashSet<>();
         }
 
         if (level == 1) {
@@ -108,14 +112,15 @@ public final class Level {
 
     public Level(Sound sound, int w, int h, int level, byte[] tiles, byte[] data) {
         this.sound = sound;
+        this.handler = new LevelCollector(w, h, this);
         this.w = w;
         this.h = h;
         this.tiles = tiles;
         this.data = data;
         this.depth = level;
-        entitiesInTiles = new ArrayList[w * h];
+        entitiesInTiles = new Set[w * h];
         for (int i = 0; i < w * h; i++) {
-            entitiesInTiles[i] = new ArrayList<>();
+            entitiesInTiles[i] = new HashSet<>();
         }
     }
 
@@ -168,11 +173,12 @@ public final class Level {
         for (int y = yo - r; y <= h + yo + r; y++) {
             for (int x = xo - r; x <= w + xo + r; x++) {
                 if (x < 0 || y < 0 || x >= this.w || y >= this.h) continue;
-                List<Entity> entities = entitiesInTiles[x + y * this.w];
+                Set<Entity> entities = entitiesInTiles[x + y * this.w];
                 for (Entity e : entities) {
                     // e.render(screen);
                     int lr = e.getLightRadius();
-                    if (lr > 0) screen.renderLight(e.x - 1, e.y - 4, lr * 8);
+                    if (lr > 0)
+                        screen.renderLight(e.x - 1, e.y - 4, lr * 8);
                 }
                 int lr = getTile(x, y).getLightRadius(this, x, y);
                 if (lr > 0) screen.renderLight(x * 16 + 8, y * 16 + 8, lr * 8);
@@ -201,6 +207,8 @@ public final class Level {
         if (x < 0 || y < 0 || x >= w || y >= h) return;
         tiles[x + y * w] = t.id;
         data[x + y * w] = (byte) dataVal;
+        handler.setTile(x, y, t.id);
+        handler.setData(x, y, dataVal);
     }
 
     public int getData(int x, int y) {
@@ -211,6 +219,7 @@ public final class Level {
     public void setData(int x, int y, int val) {
         if (x < 0 || y < 0 || x >= w || y >= h) return;
         data[x + y * w] = (byte) val;
+        handler.setData(x, y, val);
     }
 
     public void add(Entity entity) {
@@ -218,14 +227,17 @@ public final class Level {
             player = (Player) entity;
         }
         entity.removed = false;
-        entities.add(entity);
+        synchronized (entities) {
+            entities.add(entity);
+        }
         entity.init(this);
-
         insertEntity(entity.x >> 4, entity.y >> 4, entity);
     }
 
     public void remove(Entity e) {
-        entities.remove(e);
+        synchronized (entities) {
+            entities.remove(e);
+        }
         int xto = e.x >> 4;
         int yto = e.y >> 4;
         removeEntity(xto, yto, e);
@@ -234,11 +246,14 @@ public final class Level {
     private void insertEntity(int x, int y, Entity e) {
         if (x < 0 || y < 0 || x >= w || y >= h) return;
         entitiesInTiles[x + y * w].add(e);
+        handler.insertEntity(x, y, e);
     }
 
     private void removeEntity(int x, int y, Entity e) {
         if (x < 0 || y < 0 || x >= w || y >= h) return;
-        entitiesInTiles[x + y * w].remove(e);
+        Set<Entity> entities = entitiesInTiles[x + y * w];
+        entities.remove(e);
+        handler.removeEntity(x, y, e);
     }
 
     public void trySpawn(int count) {
@@ -274,30 +289,34 @@ public final class Level {
             int yt = random.nextInt(w);
             getTile(xt, yt).tick(this, xt, yt);
         }
-        for (int i = 0; i < entities.size(); i++) {
-            Entity e = entities.get(i);
-            int xto = e.x >> 4;
-            int yto = e.y >> 4;
+        synchronized (entities) {
+            for (Entity e : new HashSet<>(entities)) {
+                int xto = e.x >> 4;
+                int yto = e.y >> 4;
 
-            e.tick();
-
-            if (e.removed) {
-                entities.remove(i--);
-                removeEntity(xto, yto, e);
-            } else {
-                int xt = e.x >> 4;
-                int yt = e.y >> 4;
-
-                if (xto != xt || yto != yt) {
+                e.tick();
+                if (e.removed) {
+                    entities.remove(e);
                     removeEntity(xto, yto, e);
-                    insertEntity(xt, yt, e);
+                } else {
+                    int xt = e.x >> 4;
+                    int yt = e.y >> 4;
+
+                    if (xto != xt || yto != yt) {
+                        removeEntity(xto, yto, e);
+                        insertEntity(xt, yt, e);
+                    }
                 }
             }
         }
     }
 
-    public List<Entity> getEntities(int x0, int y0, int x1, int y1) {
-        List<Entity> result = new ArrayList<Entity>();
+    public Set<Entity> getEntities(int x0, int y0, int x1, int y1) {
+        return getEntities(entitiesInTiles, w, h, x0, y0, x1, y1);
+    }
+
+    public static Set<Entity> getEntities(Set<Entity>[] entitiesInTiles, int w, int h, int x0, int y0, int x1, int y1) {
+        Set<Entity> result = new HashSet<>();
         int xt0 = (x0 >> 4) - 1;
         int yt0 = (y0 >> 4) - 1;
         int xt1 = (x1 >> 4) + 1;
@@ -305,12 +324,98 @@ public final class Level {
         for (int y = yt0; y <= yt1; y++) {
             for (int x = xt0; x <= xt1; x++) {
                 if (x < 0 || y < 0 || x >= w || y >= h) continue;
-                List<Entity> entities = entitiesInTiles[x + y * this.w];
+                Set<Entity> entities = entitiesInTiles[x + y * w];
                 for (Entity e : entities) {
                     if (e.intersects(x0, y0, x1, y1)) result.add(e);
                 }
             }
         }
         return result;
+    }
+
+    public static final class LevelCollector implements LevelHandler {
+
+        private final Set<DataKey> datas = new HashSet<>();
+        private final Set<DataKey> tiles = new HashSet<>();
+
+        private final int w;
+        private final int h;
+        private final Set<Entity>[] insertEntities;
+        private final Set<Entity>[] removeEntities;
+
+        LevelCollector(int w, int h, Level level) {
+            this.w = w;
+            this.h = h;
+            insertEntities = new Set[w * h];
+            for (int i = 0; i < w * h; i++) {
+                insertEntities[i] = new HashSet<>();
+            }
+
+            removeEntities = new Set[w * h];
+            for (int i = 0; i < w * h; i++) {
+                removeEntities[i] = new HashSet<>();
+            }
+        }
+
+        public void reset() {
+            Stream.of(insertEntities).forEach(Set::clear);
+            Stream.of(removeEntities).forEach(Set::clear);
+            datas.clear();
+            tiles.clear();
+        }
+
+        public void process(Session session, ServerPlayer player) {
+            onViewport(w, h, player, (xStart1, yStart1, xEnd1, yEnd1) -> {
+                Set<Entity> insertEntities1 = Level.getEntities(LevelCollector.this.insertEntities, w, h,
+                        xStart1, yStart1, xEnd1, yEnd1);
+                Set<Entity> removeEntities1 = Level.getEntities(LevelCollector.this.removeEntities, w, h,
+                        xStart1, yStart1, xEnd1, yEnd1);
+                ServerUpdateLevelPacket packet = new ServerUpdateLevelPacket();
+                packet.insertEntities.addAll(insertEntities1);
+                packet.removeEntities.addAll(removeEntities1);
+                packet.datas.addAll(datas);
+                packet.tiles.addAll(tiles);
+                if (datas.size() != 0 || tiles.size() != 0 || insertEntities1.size() != 0 || removeEntities1.size() != 0) {
+                    session.send(packet);
+                }
+            });
+        }
+
+        @Override
+        public void setData(int x, int y, int data) {
+            datas.add(new DataKey(x, y, data));
+        }
+
+        @Override
+        public void setTile(int x, int y, int tile) {
+            tiles.add(new DataKey(x, y, tile));
+        }
+
+        @Override
+        public void insertEntity(int x, int y, Entity entity) {
+            insertEntities[x + y * w].add(entity);
+        }
+
+        @Override
+        public void removeEntity(int x, int y, Entity entity) {
+            removeEntities[x + y * w].add(entity);
+        }
+    }
+
+    private static void onViewport(int w, int h, ServerPlayer player, Viewport viewport) {
+        int distance = player.visibleDistance;
+        int xStart = player.player.x - distance;
+        if (xStart < 0)
+            xStart = 0;
+        int yStart = player.player.y - distance;
+        if (yStart < 0)
+            yStart = 0;
+        int xEnd = player.player.x + distance;
+        int yEnd = player.player.y + distance;
+        viewport.onRect(xStart, yStart, xEnd, yEnd);
+    }
+
+    private interface Viewport {
+        void onRect(int xStart, int yStart, int xEnd, int yEnd);
     }
 }

@@ -5,6 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
 import mc.api.Buffer;
 import mc.api.Packet;
+import mc.api.PacketConstructor;
 import mc.api.Session;
 import mc.engine.DefaultBuffer;
 import mc.engine.EventFactory;
@@ -13,11 +14,13 @@ import java.util.List;
 
 final class TcpPacketCodec extends ByteToMessageCodec<Packet> {
     private final Session session;
+    private final PacketConstructor constructor;
     private final EventFactory eventFactory = EventFactory.instance();
     private final DefaultBuffer buffer = DefaultBuffer.instance();
 
-    TcpPacketCodec(Session session) {
+    TcpPacketCodec(Session session, PacketConstructor constructor) {
         this.session = session;
+        this.constructor = constructor;
     }
 
     @Override
@@ -36,6 +39,7 @@ final class TcpPacketCodec extends ByteToMessageCodec<Packet> {
             return;
         }
         Packet packet = this.session.protocol().createIncomingPacket(id);
+        constructor.contruct(session, packet);
         packet.read(in);
         if (buf.readableBytes() > 0) {
             throw new IllegalStateException("Packet \"" + packet.getClass().getSimpleName() + "\" not fully read.");

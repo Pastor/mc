@@ -1,27 +1,45 @@
 package mc.minicraft.component.item;
 
+import mc.api.Buffer;
+import mc.engine.property.PropertyReader;
 import mc.minicraft.component.Screen;
-import mc.minicraft.component.entity.Furniture;
-import mc.minicraft.component.entity.ItemEntity;
-import mc.minicraft.component.entity.Player;
+import mc.minicraft.component.entity.*;
 import mc.minicraft.component.gfx.Color;
 import mc.minicraft.component.level.Level;
 import mc.minicraft.component.level.tile.Tile;
+import mc.api.Sound;
+import mc.minicraft.data.game.entity.ItemType;
+
+import java.io.IOException;
 
 public class FurnitureItem extends Item {
     public Furniture furniture;
+    private Sound sound;
+    private PlayerHandler handler;
+    private PropertyReader reader;
     public boolean placed = false;
 
-    public FurnitureItem(Furniture furniture) {
+    public FurnitureItem(Furniture furniture, Sound sound, PlayerHandler handler, PropertyReader reader) {
+        super(ItemType.FURNITURE);
         this.furniture = furniture;
+        this.sound = sound;
+        this.handler = handler;
+        this.reader = reader;
+        this.color = furniture.col;
+        this.sprite = furniture.sprite;
+        this.name = furniture.name;
     }
 
-    public int getColor() {
-        return furniture.col;
+    @Override
+    public void write(Buffer.Output output) throws IOException {
+        super.write(output);
+        furniture.write(output);
     }
 
-    public int getSprite() {
-        return furniture.sprite + 10 * 32;
+    @Override
+    protected void read(Buffer.Input input) throws IOException {
+        super.read(input);
+        furniture = (Furniture) Entity.readEntity(sound, handler, reader, input);
     }
 
     public void renderIcon(Screen screen, int x, int y) {
@@ -30,7 +48,7 @@ public class FurnitureItem extends Item {
 
     public void renderInventory(Screen screen, int x, int y) {
         screen.render(x, y, getSprite(), getColor(), 0);
-        screen.draw(furniture.name, x + 8, y, Color.get(-1, 555, 555, 555));
+        screen.draw(name, x + 8, y, Color.get(-1, 555, 555, 555));
     }
 
     public void onTake(ItemEntity itemEntity) {
@@ -53,9 +71,5 @@ public class FurnitureItem extends Item {
 
     public boolean isDepleted() {
         return placed;
-    }
-
-    public String getName() {
-        return furniture.name;
     }
 }

@@ -2,21 +2,16 @@ package mc.minicraft.component.entity;
 
 import mc.minicraft.component.crafting.Recipe;
 
+import java.awt.*;
 import java.util.List;
 
 public interface PlayerHandler {
 
+    Point move();
+
     boolean isAttacked();
 
     boolean isMenuClicked();
-
-    boolean upPressed();
-
-    boolean downPressed();
-
-    boolean leftPressed();
-
-    boolean rightPressed();
 
     boolean escapePressed();
 

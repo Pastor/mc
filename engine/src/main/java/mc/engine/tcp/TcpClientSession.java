@@ -7,8 +7,8 @@ import io.netty.channel.oio.OioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.Future;
 import mc.api.Client;
+import mc.api.PacketConstructor;
 import mc.api.Protocol;
-import mc.api.Provider;
 
 import javax.naming.directory.InitialDirContext;
 import java.net.Proxy;
@@ -18,14 +18,22 @@ final class TcpClientSession extends TcpSession {
     private final Client client;
     private final Proxy proxy;
     private final DefaultFactory factory;
+    private final PacketConstructor constructor;
 
     private EventLoopGroup group;
 
-    TcpClientSession(String host, int port, Protocol protocol, Client client, Proxy proxy, DefaultFactory factory) {
+    TcpClientSession(String host,
+                     int port,
+                     Protocol protocol,
+                     Client client,
+                     Proxy proxy,
+                     DefaultFactory factory,
+                     PacketConstructor constructor) {
         super(host, port, protocol);
         this.client = client;
         this.proxy = proxy;
         this.factory = factory;
+        this.constructor = constructor;
     }
 
     @Override
@@ -62,7 +70,7 @@ final class TcpClientSession extends TcpSession {
 
                     pipeline.addLast("encryption", new TcpPacketEncryptor(TcpClientSession.this));
                     pipeline.addLast("sizer", new TcpPacketSizer(TcpClientSession.this));
-                    pipeline.addLast("codec", new TcpPacketCodec(TcpClientSession.this));
+                    pipeline.addLast("codec", new TcpPacketCodec(TcpClientSession.this, constructor));
                     pipeline.addLast("manager", TcpClientSession.this);
                 }
             }).group(this.group).option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeout() * 1000);

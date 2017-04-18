@@ -1,5 +1,6 @@
 package mc.minicraft.component.item;
 
+import mc.api.Buffer;
 import mc.minicraft.component.Screen;
 import mc.minicraft.component.entity.ItemEntity;
 import mc.minicraft.component.entity.Player;
@@ -7,42 +8,54 @@ import mc.minicraft.component.gfx.Color;
 import mc.minicraft.component.item.resource.Resource;
 import mc.minicraft.component.level.Level;
 import mc.minicraft.component.level.tile.Tile;
+import mc.minicraft.data.game.entity.ItemType;
 
-public class ResourceItem extends Item {
+import java.io.IOException;
+
+public final class ResourceItem extends Item {
     public Resource resource;
     public int count = 1;
 
     public ResourceItem(Resource resource) {
+        super(ItemType.RESOURCE_ITEM);
         this.resource = resource;
+        this.color = resource.color;
+        this.sprite = resource.sprite;
+        this.name = resource.name;
     }
 
     public ResourceItem(Resource resource, int count) {
+        super(ItemType.RESOURCE_ITEM);
         this.resource = resource;
+        this.color = resource.color;
+        this.sprite = resource.sprite;
+        this.name = resource.name;
         this.count = count;
     }
 
-    public int getColor() {
-        return resource.color;
+    @Override
+    public void write(Buffer.Output output) throws IOException {
+        super.write(output);
+        output.writeVarInt(count);
     }
 
-    public int getSprite() {
-        return resource.sprite;
+    @Override
+    protected void read(Buffer.Input input) throws IOException {
+        super.read(input);
+        count = input.readVarInt();
+        resource = new Resource(name, sprite, color);
     }
 
     public void renderIcon(Screen screen, int x, int y) {
-        screen.render(x, y, resource.sprite, resource.color, 0);
+        screen.render(x, y, sprite, color, 0);
     }
 
     public void renderInventory(Screen screen, int x, int y) {
-        screen.render(x, y, resource.sprite, resource.color, 0);
-        screen.draw(resource.name, x + 32, y, Color.get(-1, 555, 555, 555));
+        screen.render(x, y, sprite, color, 0);
+        screen.draw(name, x + 32, y, Color.get(-1, 555, 555, 555));
         int cc = count;
         if (cc > 999) cc = 999;
         screen.draw("" + cc, x + 8, y, Color.get(-1, 444, 444, 444));
-    }
-
-    public String getName() {
-        return resource.name;
     }
 
     public void onTake(ItemEntity itemEntity) {

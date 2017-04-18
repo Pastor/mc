@@ -2,12 +2,14 @@ package mc.minicraft.packet.ingame.server.level;
 
 import mc.api.Buffer;
 import mc.api.Packet;
+import mc.api.Sound;
+import mc.minicraft.ServerPlayer;
 import mc.minicraft.component.level.Level;
-import mc.minicraft.component.sound.Sound;
 
 import java.io.IOException;
+import java.util.UUID;
 
-public final class ServerLevelPacket implements Packet {
+public final class ServerStartLevelPacket implements Packet {
     private int w;
     private int h;
     private int level;
@@ -15,11 +17,15 @@ public final class ServerLevelPacket implements Packet {
     private byte[] tiles;
     private byte[] data;
 
+    public int xPlayer;
+    public int yPlayer;
+    public UUID id;
+
     @SuppressWarnings("unused")
-    public ServerLevelPacket() {
+    public ServerStartLevelPacket() {
     }
 
-    private ServerLevelPacket(int w, int h, int level, byte[] tiles, byte[] data) {
+    private ServerStartLevelPacket(int w, int h, int level, byte[] tiles, byte[] data) {
         this.w = w;
         this.h = h;
         this.level = level;
@@ -27,8 +33,11 @@ public final class ServerLevelPacket implements Packet {
         this.data = data;
     }
 
-    public ServerLevelPacket(Level level) {
+    public ServerStartLevelPacket(Level level, ServerPlayer player) {
         this(level.w, level.h, level.depth, level.tiles, level.data);
+        this.xPlayer = player.player.x;
+        this.yPlayer = player.player.y;
+        this.id = player.player.id;
     }
 
     public Level readLevel(Sound sound) {
@@ -42,6 +51,9 @@ public final class ServerLevelPacket implements Packet {
         level = in.readVarInt();
         tiles = in.readBytes(in.readVarInt());
         data = in.readBytes(in.readVarInt());
+        xPlayer = in.readVarInt();
+        yPlayer = in.readVarInt();
+        id = UUID.fromString(in.readString());
     }
 
     @Override
@@ -53,6 +65,9 @@ public final class ServerLevelPacket implements Packet {
         out.writeBytes(tiles);
         out.writeVarInt(data.length);
         out.writeBytes(data);
+        out.writeVarInt(xPlayer);
+        out.writeVarInt(yPlayer);
+        out.writeString(id.toString());
     }
 
     @Override

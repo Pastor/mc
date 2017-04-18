@@ -1,15 +1,15 @@
 package mc.minicraft.component.entity;
 
+import mc.engine.property.PropertyReader;
 import mc.minicraft.component.gfx.Color;
-import mc.minicraft.component.sound.Sound;
+import mc.api.Sound;
+import mc.minicraft.data.game.entity.EntityType;
 
 public class Chest extends Furniture {
-    private final PlayerHandler handler;
     public final Inventory inventory = new Inventory();
 
-    public Chest(Sound sound, PlayerHandler handler) {
-        super(sound, "Chest");
-        this.handler = handler;
+    public Chest(Sound sound, PlayerHandler handler, PropertyReader reader) {
+        super(sound, handler, reader, "Chest", EntityType.CHEST);
         col = Color.get(-1, 110, 331, 552);
         sprite = 1;
     }

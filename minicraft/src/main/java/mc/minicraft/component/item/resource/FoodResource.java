@@ -5,7 +5,7 @@ import mc.minicraft.component.item.resource.Resource;
 import mc.minicraft.component.level.Level;
 import mc.minicraft.component.level.tile.Tile;
 
-public class FoodResource extends Resource {
+public final class FoodResource extends Resource {
     private int heal;
     private int staminaCost;
 

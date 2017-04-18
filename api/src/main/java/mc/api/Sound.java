@@ -1,4 +1,4 @@
-package mc.minicraft.component.sound;
+package mc.api;
 
 public interface Sound {
 

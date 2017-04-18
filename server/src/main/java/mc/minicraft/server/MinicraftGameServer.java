@@ -1,15 +1,16 @@
 package mc.minicraft.server;
 
-import mc.api.Server;
-import mc.api.Session;
+import mc.api.*;
 import mc.engine.property.DefaultPropertyContainer;
 import mc.engine.property.PropertyConstants;
 import mc.engine.property.PropertyContainer;
 import mc.engine.tcp.DefaultFactory;
 import mc.engine.tcp.DefaultServer;
 import mc.minicraft.*;
+import mc.minicraft.component.crafting.Crafting;
+import mc.minicraft.component.entity.PlayerHandlerAdapter;
 import mc.minicraft.component.level.Level;
-import mc.minicraft.component.sound.Sound;
+import mc.minicraft.component.level.tile.Tile;
 import mc.minicraft.data.game.MessageType;
 import mc.minicraft.data.game.entity.player.GameMode;
 import mc.minicraft.data.game.setting.Difficulty;
@@ -24,7 +25,7 @@ import mc.minicraft.data.status.VersionInfo;
 import mc.minicraft.data.status.handler.ServerInfoBuilder;
 import mc.minicraft.packet.ingame.server.ServerChatPacket;
 import mc.minicraft.packet.ingame.server.ServerJoinGamePacket;
-import mc.minicraft.packet.ingame.server.level.ServerLevelPacket;
+import mc.minicraft.packet.ingame.server.level.ServerStartLevelPacket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +37,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 final class MinicraftGameServer extends Server.ListenerAdapter
-        implements ServerLoginHandler, ServerInfoBuilder, GameServer, Runnable, Sound {
+        implements ServerLoginHandler, ServerInfoBuilder, GameServer, Runnable, Sound, PacketConstructor {
     private static final Logger logger = LoggerFactory.getLogger(GameServer.class);
     private static final DefaultFactory FACTORY = DefaultFactory.instance();
     private static final boolean VERIFY_USERS = true;
@@ -51,13 +52,18 @@ final class MinicraftGameServer extends Server.ListenerAdapter
         this.server = new DefaultServer(
                 PropertyConstants.SERVER_HOSTNAME_DEFAULT,
                 PropertyConstants.SERVER_PORT_DEFAULT,
-                MinicraftProtocol.class, FACTORY.newSessionFactory(PROXY));
+                MinicraftProtocol.class, FACTORY.newSessionFactory(PROXY),
+                this);
         this.server.setGlobalFlag(Constants.AUTH_PROXY_KEY, AUTH_PROXY);
         this.server.setGlobalFlag(Constants.VERIFY_USERS_KEY, VERIFY_USERS);
         this.server.setGlobalFlag(Constants.SERVER_INFO_BUILDER_KEY, this);
         this.server.setGlobalFlag(Constants.SERVER_LOGIN_HANDLER_KEY, this);
         this.server.setGlobalFlag(Constants.SERVER_COMPRESSION_THRESHOLD, 100);
         this.server.addListener(this);
+
+
+        Crafting.init(type -> {
+        }, new PlayerHandlerAdapter(), container);
     }
 
     static GameServer createServer() {
@@ -113,7 +119,8 @@ final class MinicraftGameServer extends Server.ListenerAdapter
         //FIXME: send entities
         //FIXME: send players
         //FIXME: send position
-        session.send(new ServerLevelPacket(level));
+        session.send(new ServerStartLevelPacket(level, player));
+        level.handler.process(session, player);
     }
 
     @Override
@@ -171,11 +178,13 @@ final class MinicraftGameServer extends Server.ListenerAdapter
         levels = new Level[5];
         int startLevel = 3;
 
-        levels[4] = new Level(this, 128, 128, 1, null);
-        levels[3] = new Level(this, 128, 128, 0, levels[4]);
-        levels[2] = new Level(this, 128, 128, -1, levels[3]);
-        levels[1] = new Level(this, 128, 128, -2, levels[2]);
-        levels[0] = new Level(this, 128, 128, -3, levels[1]);
+        int w = 128;
+        int h = 128;
+        levels[4] = new Level(this, w, h, 1, null);
+        levels[3] = new Level(this, w, h, 0, levels[4]);
+        levels[2] = new Level(this, w, h, -1, levels[3]);
+        levels[1] = new Level(this, w, h, -2, levels[2]);
+        levels[0] = new Level(this, w, h, -3, levels[1]);
 
         level = levels[startLevel];
 
@@ -219,21 +228,37 @@ final class MinicraftGameServer extends Server.ListenerAdapter
 //                        setMenu(new WonMenu(titleMenu));
 //                    }
 //                }
-        for (int i = 0; i < 5; i++) {
-            levels[i].tick();
-        }
-//        Tile.tickCount++;//FIXME: Wat?
+//        for (int i = 0; i < 5; i++) {
+//            levels[i].handler.reset();
+//            levels[i].tick();
+//        }
+        level.handler.reset();
+        level.tick();
+
+        states.forEach(ServerPlayer::tick);
+        server.sessions().forEach(session -> {
+            ServerPlayer player = session.flag(Constants.GAME_PLAYER_KEY);
+            if (player != null && player.level != null) {
+                level.handler.process(session, player);
+            }
+        });
+        Tile.tickCount++;
 //            }
 //        }
-        states.forEach(ServerPlayer::tick);
+
     }
 
     private void updateFramesInfo(int frames, int ticks) {
-        logger.debug(String.format("Ticks: %d", ticks));
+//        logger.debug(String.format("Ticks: %d", ticks));
     }
 
     @Override
     public void play(Type type) {
         //Empty
     }
+
+    @Override
+    public void contruct(Session session, Packet packet) {
+    }
+
 }

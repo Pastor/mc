@@ -2,9 +2,19 @@ package mc.minicraft.component.entity;
 
 import mc.minicraft.component.crafting.Recipe;
 
+import java.awt.*;
 import java.util.List;
 
-public class PlayerHandlerAdapter implements PlayerHandler {
+public final class PlayerHandlerAdapter implements PlayerHandler {
+
+
+    @Override
+    public Point move() {
+        int x = 0;
+        int y = 0;
+        return new Point(x, y);
+    }
+
     @Override
     public boolean isAttacked() {
         return false;
@@ -12,26 +22,6 @@ public class PlayerHandlerAdapter implements PlayerHandler {
 
     @Override
     public boolean isMenuClicked() {
-        return false;
-    }
-
-    @Override
-    public boolean upPressed() {
-        return false;
-    }
-
-    @Override
-    public boolean downPressed() {
-        return false;
-    }
-
-    @Override
-    public boolean leftPressed() {
-        return false;
-    }
-
-    @Override
-    public boolean rightPressed() {
         return false;
     }
 

@@ -11,7 +11,8 @@ import mc.minicraft.packet.ingame.server.*;
 import mc.minicraft.packet.ingame.server.entity.*;
 import mc.minicraft.packet.ingame.server.entity.player.*;
 import mc.minicraft.packet.ingame.server.entity.spawn.*;
-import mc.minicraft.packet.ingame.server.level.ServerLevelPacket;
+import mc.minicraft.packet.ingame.server.level.ServerStartLevelPacket;
+import mc.minicraft.packet.ingame.server.level.ServerUpdateLevelPacket;
 import mc.minicraft.packet.ingame.server.scoreboard.ServerDisplayScoreboardPacket;
 import mc.minicraft.packet.ingame.server.scoreboard.ServerScoreboardObjectivePacket;
 import mc.minicraft.packet.ingame.server.scoreboard.ServerTeamPacket;
@@ -43,6 +44,7 @@ public final class MinicraftProtocol extends Protocol {
     private String accessToken;
 
     public MinicraftProtocol() {
+
     }
 
     public MinicraftProtocol(Sub sub) {
@@ -290,8 +292,10 @@ public final class MinicraftProtocol extends Protocol {
 
         {
             this.registerIncoming(0xFD, ClientPlayerSettings.class);
+            this.registerIncoming(0xFB, ClientPlayerUpdatePacket.class);
 
-            this.registerOutgoing(0xFE, ServerLevelPacket.class);
+            this.registerOutgoing(0xFC, ServerUpdateLevelPacket.class);
+            this.registerOutgoing(0xFE, ServerStartLevelPacket.class);
         }
     }
 
@@ -375,8 +379,10 @@ public final class MinicraftProtocol extends Protocol {
 
         {
             this.registerOutgoing(0xFD, ClientPlayerSettings.class);
+            this.registerOutgoing(0xFB, ClientPlayerUpdatePacket.class);
 
-            this.registerIncoming(0xFE, ServerLevelPacket.class);
+            this.registerIncoming(0xFE, ServerStartLevelPacket.class);
+            this.registerIncoming(0xFC, ServerUpdateLevelPacket.class);
         }
 
         this.registerOutgoing(0x00, ClientTeleportConfirmPacket.class);

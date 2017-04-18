@@ -1,6 +1,7 @@
 package mc.engine.tcp;
 
 import mc.api.Client;
+import mc.api.PacketConstructor;
 import mc.api.Protocol;
 import mc.api.Session;
 
@@ -9,14 +10,16 @@ public final class DefaultClient implements Client {
     private final int port;
     private final Protocol protocol;
     private final Session.Factory factory;
+    private final PacketConstructor constructor;
     private Session session;
 
-    public DefaultClient(String host, int port, Protocol protocol, Session.Factory factory) {
+    public DefaultClient(String host, int port, Protocol protocol, Session.Factory factory, PacketConstructor constructor) {
         this.host = host;
         this.port = port;
         this.protocol = protocol;
         this.factory = factory;
-        this.session = factory.newSession(this);
+        this.constructor = constructor;
+        this.session = factory.newSession(this, constructor);
     }
 
     @Override
@@ -43,7 +46,7 @@ public final class DefaultClient implements Client {
 
     @Override
     public void newSession() {
-        session = factory.newSession(this);
+        session = factory.newSession(this, constructor);
     }
 
 }

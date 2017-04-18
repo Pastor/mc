@@ -8,6 +8,7 @@ import mc.minicraft.component.entity.Inventory;
 import mc.minicraft.component.entity.Player;
 import mc.minicraft.component.entity.PlayerHandler;
 
+import java.awt.*;
 import java.util.List;
 
 public final class ClientPlayerHandler implements PlayerHandler {
@@ -20,6 +21,17 @@ public final class ClientPlayerHandler implements PlayerHandler {
     }
 
     @Override
+    public Point move() {
+        int xa = 0;
+        int ya = 0;
+        if (input.up.down) ya--;
+        if (input.down.down) ya++;
+        if (input.left.down) xa--;
+        if (input.right.down) xa++;
+        return new Point(xa, ya);
+    }
+
+    @Override
     public boolean isAttacked() {
         return input.attack.clicked;
     }
@@ -27,26 +39,6 @@ public final class ClientPlayerHandler implements PlayerHandler {
     @Override
     public boolean isMenuClicked() {
         return input.menu.clicked;
-    }
-
-    @Override
-    public boolean upPressed() {
-        return input.up.down;
-    }
-
-    @Override
-    public boolean downPressed() {
-        return input.down.down;
-    }
-
-    @Override
-    public boolean leftPressed() {
-        return input.left.down;
-    }
-
-    @Override
-    public boolean rightPressed() {
-        return input.right.down;
     }
 
     @Override

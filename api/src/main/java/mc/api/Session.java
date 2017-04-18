@@ -132,6 +132,6 @@ public interface Session {
     }
 
     interface Factory {
-        Session newSession(Client client);
+        Session newSession(Client client, PacketConstructor constructor);
     }
 }

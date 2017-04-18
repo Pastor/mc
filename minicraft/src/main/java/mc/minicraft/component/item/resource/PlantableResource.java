@@ -8,7 +8,7 @@ import mc.minicraft.component.level.tile.Tile;
 import java.util.Arrays;
 import java.util.List;
 
-public class PlantableResource extends Resource {
+public final class PlantableResource extends Resource {
     private List<Tile> sourceTiles;
     private Tile targetTile;
 

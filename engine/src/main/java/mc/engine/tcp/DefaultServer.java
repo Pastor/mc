@@ -9,7 +9,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
-import io.netty.util.internal.ConcurrentSet;
 import mc.api.*;
 import mc.engine.EventFactory;
 import org.slf4j.Logger;
@@ -18,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Constructor;
 import java.net.InetSocketAddress;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Stream;
 
 public final class DefaultServer implements Server {
@@ -28,17 +28,23 @@ public final class DefaultServer implements Server {
     private Class<? extends Protocol> protocol;
     private final Session.Factory factory;
     private ConnectionListener listener;
-    private final List<Session> sessions = new ArrayList<Session>();
+    private final List<Session> sessions = new CopyOnWriteArrayList<>();
 
     private final Map<String, Object> flags = new HashMap<String, Object>();
     private final List<Server.Listener> listeners = new ArrayList<Server.Listener>();
     private final PlayerManager manager = new DefaultPlayerManager();
+    private final PacketConstructor constructor;
 
-    public DefaultServer(String host, int port, Class<? extends Protocol> protocol, Session.Factory factory) {
+    public DefaultServer(String host,
+                         int port,
+                         Class<? extends Protocol> protocol,
+                         Session.Factory factory,
+                         PacketConstructor constructor) {
         this.host = host;
         this.port = port;
         this.protocol = protocol;
         this.factory = factory;
+        this.constructor = constructor;
     }
 
     public Server bind() {
@@ -161,7 +167,7 @@ public final class DefaultServer implements Server {
     }
 
     public ConnectionListener newConnectionListener() {
-        return new TcpConnectionListener(host, port, this, manager);
+        return new TcpConnectionListener(host, port, this, manager, constructor);
     }
 
     private static final class TcpConnectionListener implements Server.ConnectionListener {
@@ -172,12 +178,15 @@ public final class DefaultServer implements Server {
         private EventLoopGroup group;
         private Channel channel;
         private final PlayerManager manager;
+        private final PacketConstructor constructor;
 
-        private TcpConnectionListener(String host, int port, Server server, PlayerManager manager) {
+        private TcpConnectionListener(String host, int port, Server server,
+                                      PlayerManager manager, PacketConstructor constructor) {
             this.host = host;
             this.port = port;
             this.server = server;
             this.manager = manager;
+            this.constructor = constructor;
         }
 
         public String getHost() {
@@ -227,7 +236,7 @@ public final class DefaultServer implements Server {
 
                             pipeline.addLast("encryption", new TcpPacketEncryptor(session));
                             pipeline.addLast("sizer", new TcpPacketSizer(session));
-                            pipeline.addLast("codec", new TcpPacketCodec(session));
+                            pipeline.addLast("codec", new TcpPacketCodec(session, constructor));
                             pipeline.addLast("manager", session);
                         }
                     }).group(this.group).localAddress(this.host, this.port).bind();

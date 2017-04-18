@@ -1,15 +1,15 @@
 package mc.minicraft.component.entity;
 
+import mc.engine.property.PropertyReader;
 import mc.minicraft.component.crafting.Crafting;
 import mc.minicraft.component.gfx.Color;
-import mc.minicraft.component.sound.Sound;
+import mc.api.Sound;
+import mc.minicraft.data.game.entity.EntityType;
 
-public class Oven extends Furniture {
-    private final PlayerHandler handler;
+public final class Oven extends Furniture {
 
-    public Oven(Sound sound, PlayerHandler handler) {
-        super(sound, "Oven");
-        this.handler = handler;
+    public Oven(Sound sound, PlayerHandler handler, PropertyReader reader) {
+        super(sound, handler, reader, "Oven", EntityType.OVEN);
         col = Color.get(-1, 000, 332, 442);
         sprite = 2;
         xr = 3;

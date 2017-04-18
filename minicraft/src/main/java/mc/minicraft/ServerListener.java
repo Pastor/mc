@@ -10,6 +10,7 @@ import mc.minicraft.data.status.handler.ServerInfoBuilder;
 import mc.minicraft.packet.HandshakePacket;
 import mc.minicraft.packet.ingame.client.ClientKeepAlivePacket;
 import mc.minicraft.packet.ingame.client.player.ClientPlayerSettings;
+import mc.minicraft.packet.ingame.client.player.ClientPlayerUpdatePacket;
 import mc.minicraft.packet.ingame.server.ServerDisconnectPacket;
 import mc.minicraft.packet.ingame.server.ServerKeepAlivePacket;
 import mc.minicraft.packet.login.client.EncryptionResponsePacket;
@@ -34,14 +35,13 @@ import java.util.*;
 final class ServerListener extends Session.ListenerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(ServerListener.class);
     private static final KeyPair KEY_PAIR = mc.minicraft.crypt.Util.generateKeyPair();
+    private static final String SERVER_ID = UUID.randomUUID().toString();
 
-    private byte verifyToken[] = new byte[4];
-    private String serverId = "";
+    private final byte verifyToken[] = new byte[4];
+    private final PlayerManager manager;
 
     private long lastPingTime = 0;
     private int lastPingId = 0;
-
-    private final PlayerManager manager;
 
     ServerListener(PlayerManager manager) {
         this.manager = manager;
@@ -90,7 +90,7 @@ final class ServerListener extends Session.ListenerAdapter {
                 boolean verify = event.session.hasFlag(Constants.VERIFY_USERS_KEY) ?
                         event.session.<Boolean>flag(Constants.VERIFY_USERS_KEY) : true;
                 if (verify) {
-                    event.session.send(new EncryptionRequestPacket(this.serverId, KEY_PAIR.getPublic(), this.verifyToken));
+                    event.session.send(new EncryptionRequestPacket(SERVER_ID, KEY_PAIR.getPublic(), this.verifyToken));
                 } else {
                     new Thread(new UserAuthTask(event.session, null)).start();
                 }
@@ -142,14 +142,19 @@ final class ServerListener extends Session.ListenerAdapter {
                     logger.debug(String.format("For %s change visible_distance to %d",
                             profile.name, settings.visibleDistance));
                 }
+            } else if (event.packet() instanceof ClientPlayerUpdatePacket) {
+                ClientPlayerUpdatePacket update = event.asPacket();
+                ServerPlayer player = event.session.flag(Constants.GAME_PLAYER_KEY);
+                player.update(update);
+//                System.out.println(String.format("x: %d, y: %d", update.xa, update.ya));
             }
         }
-        logger.info("Server recv: " + event.packet());
+//        logger.info("Server recv: " + event.packet());
     }
 
     @Override
     public void packetSent(Session.Event event) {
-        logger.info("Server sent: " + event.packet());
+//        logger.info("Server sent: " + event.packet());
     }
 
     @Override
@@ -180,13 +185,13 @@ final class ServerListener extends Session.ListenerAdapter {
 
             Profile profile;
             if (verify && this.key != null) {
-                Proxy proxy = this.session.<Proxy>flag(Constants.AUTH_PROXY_KEY);
+                Proxy proxy = this.session.flag(Constants.AUTH_PROXY_KEY);
                 if (proxy == null) {
                     proxy = Proxy.NO_PROXY;
                 }
                 profile = new Profile(UUID.randomUUID(), username);
                 /*try {
-                    profile = new SessionService(proxy).getProfileByServer(username, new BigInteger(Util.getServerIdHash(serverId, KEY_PAIR.getPublic(), this.key)).toString(16));
+                    profile = new SessionService(proxy).getProfileByServer(username, new BigInteger(Util.getServerIdHash(SERVER_ID, KEY_PAIR.getPublic(), this.key)).toString(16));
                 } catch(RequestException e) {
                     this.session.disconnect("Failed to make session service request.", e);
                     return;
