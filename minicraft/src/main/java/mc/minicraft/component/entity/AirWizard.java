@@ -71,9 +71,10 @@ public final class AirWizard extends Mob {
             return;
         }
 
-        if (level.player != null && randomWalkTime == 0) {
-            int xd = level.player.x - x;
-            int yd = level.player.y - y;
+        if (level.hasPlayer() && randomWalkTime == 0) {
+            Player player = level.player();
+            int xd = player.x - x;
+            int yd = player.y - y;
             if (xd * xd + yd * yd < 32 * 32) {
                 xa = 0;
                 ya = 0;
@@ -99,9 +100,10 @@ public final class AirWizard extends Mob {
         }
         if (randomWalkTime > 0) {
             randomWalkTime--;
-            if (level.player != null && randomWalkTime == 0) {
-                int xd = level.player.x - x;
-                int yd = level.player.y - y;
+            if (level.hasPlayer()&& randomWalkTime == 0) {
+                Player player = level.player();
+                int xd = player.x - x;
+                int yd = player.y - y;
                 if (random.nextInt(4) == 0 && xd * xd + yd * yd < 50 * 50) {
                     if (attackDelay == 0 && attackTime == 0) {
                         attackDelay = 60 * 2;
@@ -173,11 +175,12 @@ public final class AirWizard extends Mob {
 
     protected void die() {
         super.die();
-        if (level.player != null) {
-            level.player.score += 1000;
-            level.player.gameWon();
+        if (level.hasPlayer()) {
+            Player player = level.player();
+            player.score += 1000;
+            player.gameWon();
         }
-        sound.play(Sound.Type.BOSS_DEATH);
+        sound.play(x, y, Sound.Type.BOSS_DEATH);
     }
 
 }

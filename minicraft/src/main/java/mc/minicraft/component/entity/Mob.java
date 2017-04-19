@@ -1,17 +1,17 @@
 package mc.minicraft.component.entity;
 
 import mc.api.Buffer;
+import mc.api.Sound;
 import mc.minicraft.component.entity.particle.TextParticle;
 import mc.minicraft.component.gfx.Color;
 import mc.minicraft.component.level.Level;
 import mc.minicraft.component.level.tile.Tile;
-import mc.api.Sound;
 import mc.minicraft.data.game.entity.EntityType;
 
 import java.io.IOException;
 
 public abstract class Mob extends Entity {
-    protected int walkDist = 0;
+    public int walkDist = 0;
     protected int dir = 0;
     public int hurtTime = 0;
     protected int xKnockback, yKnockback;
@@ -134,11 +134,12 @@ public abstract class Mob extends Entity {
     protected void doHurt(int damage, int attackDir) {
         if (hurtTime > 0) return;
 
-        if (level.player != null) {
-            int xd = level.player.x - x;
-            int yd = level.player.y - y;
+        if (level.hasPlayer()) {
+            Player player = level.player();
+            int xd = player.x - x;
+            int yd = player.y - y;
             if (xd * xd + yd * yd < 80 * 80) {
-                sound.play(Sound.Type.MONSTER_HURT);
+                sound.play(x, y, Sound.Type.MONSTER_HURT);
             }
         }
         level.add(new TextParticle(sound, "" + damage, x, y, Color.get(-1, 500, 500, 500)));
@@ -156,9 +157,10 @@ public abstract class Mob extends Entity {
         int xx = x * 16 + 8;
         int yy = y * 16 + 8;
 
-        if (level.player != null) {
-            int xd = level.player.x - xx;
-            int yd = level.player.y - yy;
+        if (level.hasPlayer()) {
+            Player player = level.player();
+            int xd = player.x - xx;
+            int yd = player.y - yy;
             if (xd * xd + yd * yd < 80 * 80) return false;
         }
 

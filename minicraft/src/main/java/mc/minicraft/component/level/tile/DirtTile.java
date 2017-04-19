@@ -1,5 +1,6 @@
 package mc.minicraft.component.level.tile;
 
+import mc.api.Sound;
 import mc.minicraft.component.Screen;
 import mc.minicraft.component.entity.ItemEntity;
 import mc.minicraft.component.entity.Player;
@@ -10,7 +11,6 @@ import mc.minicraft.component.item.ToolItem;
 import mc.minicraft.component.item.ToolType;
 import mc.minicraft.component.item.resource.Resource;
 import mc.minicraft.component.level.Level;
-import mc.api.Sound;
 
 public class DirtTile extends Tile {
     public DirtTile(int id) {
@@ -31,18 +31,18 @@ public class DirtTile extends Tile {
             if (tool.type == ToolType.shovel) {
                 if (player.payStamina(4 - tool.level)) {
                     level.setTile(xt, yt, Tile.hole, 0);
-                    level.add(new ItemEntity(level.sound,
+                    level.add(new ItemEntity(level.sound, level.playerHandler(), level.propertyReader(),
                             new ResourceItem(Resource.dirt),
                             xt * 16 + random.nextInt(10) + 3,
                             yt * 16 + random.nextInt(10) + 3));
-                    level.sound.play(Sound.Type.MONSTER_HURT);
+                    level.sound.play(xt, yt, Sound.Type.MONSTER_HURT);
                     return true;
                 }
             }
             if (tool.type == ToolType.hoe) {
                 if (player.payStamina(4 - tool.level)) {
                     level.setTile(xt, yt, Tile.farmland, 0);
-                    level.sound.play(Sound.Type.MONSTER_HURT);
+                    level.sound.play(xt, yt, Sound.Type.MONSTER_HURT);
                     return true;
                 }
             }

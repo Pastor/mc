@@ -5,21 +5,18 @@ import mc.api.Packet;
 
 import java.io.IOException;
 
-public final class ClientPlayerPositionPacket implements Packet {
+public final class ClientPlayerAttackPacket implements Packet {
 
-    public int xa = 0;
-    public int ya = 0;
+    public boolean attack = true;
 
     @Override
     public void read(Buffer.Input in) throws IOException {
-        xa = in.readVarInt();
-        ya = in.readVarInt();
+        attack = in.readBoolean();
     }
 
     @Override
     public void write(Buffer.Output out) throws IOException {
-        out.writeVarInt(xa);
-        out.writeVarInt(ya);
+        out.writeBoolean(attack);
     }
 
     @Override

@@ -25,5 +25,5 @@ public interface PlayerHandler {
 
     void containerMenu(Player player, String name, Inventory inventory);
 
-    void titleMenu(Player player);
+    void mainMenu(Player player);
 }

@@ -3,7 +3,9 @@ package mc.minicraft.packet.ingame.server.level;
 import mc.api.Buffer;
 import mc.api.Packet;
 import mc.api.Sound;
+import mc.engine.property.PropertyReader;
 import mc.minicraft.ServerPlayer;
+import mc.minicraft.component.entity.PlayerHandler;
 import mc.minicraft.component.level.Level;
 
 import java.io.IOException;
@@ -40,8 +42,8 @@ public final class ServerStartLevelPacket implements Packet {
         this.id = player.player.id;
     }
 
-    public Level readLevel(Sound sound) {
-        return new Level(sound, w, h, level, tiles, data);
+    public Level readLevel(Sound sound, PropertyReader reader, PlayerHandler handler) {
+        return new Level(sound, w, h, level, tiles, data, reader, handler);
     }
 
     @Override

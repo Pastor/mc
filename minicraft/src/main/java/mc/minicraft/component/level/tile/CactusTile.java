@@ -36,7 +36,7 @@ public class CactusTile extends Tile {
         if (damage >= 10) {
             int count = random.nextInt(2) + 1;
             for (int i = 0; i < count; i++) {
-                level.add(new ItemEntity(level.sound,
+                level.add(new ItemEntity(level.sound, level.playerHandler(), level.propertyReader(),
                         new ResourceItem(Resource.cactusFlower),
                         x * 16 + random.nextInt(10) + 3,
                         y * 16 + random.nextInt(10) + 3));

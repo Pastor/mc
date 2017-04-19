@@ -56,7 +56,7 @@ public final class PlayerHandlerAdapter implements PlayerHandler {
     }
 
     @Override
-    public void titleMenu(Player player) {
+    public void mainMenu(Player player) {
 
     }
 }

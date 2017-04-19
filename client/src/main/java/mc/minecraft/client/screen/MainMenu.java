@@ -5,13 +5,12 @@ import mc.minecraft.client.console.ConsoleMenu;
 import mc.minicraft.component.gfx.Color;
 import mc.minecraft.client.gfx.Font;
 import mc.minecraft.client.gfx.ClientScreen;
-import mc.minecraft.client.sound.Sound;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-public final class TitleMenu extends Menu {
+public final class MainMenu extends Menu {
 
     private static final int OPTION_START_GAME = 0;
     private static final int OPTION_LOGIN = 1;
@@ -23,7 +22,7 @@ public final class TitleMenu extends Menu {
 
     public final ConsoleMenu consoleMenu;
     private int selected = 0;
-    private static final List<Option<TitleMenu>> defaultOptions = new ArrayList<Option<TitleMenu>>(20) {
+    private static final List<Option<MainMenu>> defaultOptions = new ArrayList<Option<MainMenu>>(20) {
         {
             add(OPTION_START_GAME, new Option<>("Resume", "Возврат", titleMenu -> {
                 titleMenu.game.resetGame();
@@ -59,9 +58,9 @@ public final class TitleMenu extends Menu {
         }
     };
 
-    private final List<Option<TitleMenu>> options = new ArrayList<>();
+    private final List<Option<MainMenu>> options = new ArrayList<>();
 
-    public TitleMenu(PropertyReader propertyReader) {
+    public MainMenu(PropertyReader propertyReader) {
         super(propertyReader);
         consoleMenu = new ConsoleMenu(this);
         propertyReader.addListener(value -> {
@@ -98,7 +97,7 @@ public final class TitleMenu extends Menu {
             defaultOptions.get(OPTION_START_GAME).isVisible = game.isConnected();
         }
 
-        for (Option<TitleMenu> option : defaultOptions) {
+        for (Option<MainMenu> option : defaultOptions) {
             if (option.isVisible) {
                 options.add(option);
             }
@@ -133,7 +132,7 @@ public final class TitleMenu extends Menu {
         Font.draw("(Arrow keys,X and C)", screen, 0, screen.h - 8, Color.get(0, 111, 111, 111));
     }
 
-    private Option<TitleMenu> option(int i) {
+    private Option<MainMenu> option(int i) {
         if (i < 0 || i >= options.size())
             return options.get(0);
         return options.get(i);

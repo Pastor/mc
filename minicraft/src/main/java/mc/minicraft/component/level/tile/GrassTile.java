@@ -1,5 +1,6 @@
 package mc.minicraft.component.level.tile;
 
+import mc.api.Sound;
 import mc.minicraft.component.Screen;
 import mc.minicraft.component.entity.ItemEntity;
 import mc.minicraft.component.entity.Player;
@@ -10,7 +11,6 @@ import mc.minicraft.component.item.ToolItem;
 import mc.minicraft.component.item.ToolType;
 import mc.minicraft.component.item.resource.Resource;
 import mc.minicraft.component.level.Level;
-import mc.api.Sound;
 
 public class GrassTile extends Tile {
     public GrassTile(int id) {
@@ -69,9 +69,9 @@ public class GrassTile extends Tile {
             if (tool.type == ToolType.shovel) {
                 if (player.payStamina(4 - tool.level)) {
                     level.setTile(xt, yt, Tile.dirt, 0);
-                    level.sound.play(Sound.Type.MONSTER_HURT);
+                    level.sound.play(xt, yt, Sound.Type.MONSTER_HURT);
                     if (random.nextInt(5) == 0) {
-                        level.add(new ItemEntity(level.sound,
+                        level.add(new ItemEntity(level.sound, player.handler, player.propertyReader,
                                 new ResourceItem(Resource.seeds), xt * 16 + random.nextInt(10) + 3,
                                 yt * 16 + random.nextInt(10) + 3));
                         return true;
@@ -80,9 +80,9 @@ public class GrassTile extends Tile {
             }
             if (tool.type == ToolType.hoe) {
                 if (player.payStamina(4 - tool.level)) {
-                    level.sound.play(Sound.Type.MONSTER_HURT);
+                    level.sound.play(xt, yt, Sound.Type.MONSTER_HURT);
                     if (random.nextInt(5) == 0) {
-                        level.add(new ItemEntity(level.sound,
+                        level.add(new ItemEntity(level.sound, player.handler, player.propertyReader,
                                 new ResourceItem(Resource.seeds), xt * 16 + random.nextInt(10) + 3,
                                 yt * 16 + random.nextInt(10) + 3));
                         return true;

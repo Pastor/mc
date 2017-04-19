@@ -1,11 +1,11 @@
 package mc.minicraft.component.entity;
 
 import mc.api.Buffer;
+import mc.api.Sound;
 import mc.minicraft.component.Screen;
 import mc.minicraft.component.gfx.Color;
 import mc.minicraft.component.item.ResourceItem;
 import mc.minicraft.component.item.resource.Resource;
-import mc.api.Sound;
 import mc.minicraft.data.game.entity.EntityType;
 
 import java.io.IOException;
@@ -50,9 +50,10 @@ public final class Slime extends Mob {
                 xa = (random.nextInt(3) - 1);
                 ya = (random.nextInt(3) - 1);
 
-                if (level.player != null) {
-                    int xd = level.player.x - x;
-                    int yd = level.player.y - y;
+                if (level.hasPlayer()) {
+                    Player player = level.player();
+                    int xd = player.x - x;
+                    int yd = player.y - y;
                     if (xd * xd + yd * yd < 50 * 50) {
                         if (xd < 0) xa = -1;
                         if (xd > 0) xa = +1;
@@ -78,12 +79,12 @@ public final class Slime extends Mob {
         int count = random.nextInt(2) + 1;
         for (int i = 0; i < count; i++) {
             level.add(
-                    new ItemEntity(sound,
+                    new ItemEntity(sound, level.playerHandler(), level.propertyReader(),
                             new ResourceItem(Resource.slime), x + random.nextInt(11) - 5, y + random.nextInt(11) - 5));
         }
 
-        if (level.player != null) {
-            level.player.score += 25 * lvl;
+        if (level.hasPlayer()) {
+            level.player().score += 25 * lvl;
         }
 
     }

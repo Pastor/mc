@@ -1,10 +1,8 @@
 package mc.minicraft.component.level.tile;
 
+import mc.engine.property.PropertyReader;
 import mc.minicraft.component.Screen;
-import mc.minicraft.component.entity.Entity;
-import mc.minicraft.component.entity.ItemEntity;
-import mc.minicraft.component.entity.Mob;
-import mc.minicraft.component.entity.Player;
+import mc.minicraft.component.entity.*;
 import mc.minicraft.component.entity.particle.SmashParticle;
 import mc.minicraft.component.entity.particle.TextParticle;
 import mc.minicraft.component.gfx.Color;
@@ -67,7 +65,7 @@ public class TreeTile extends Tile {
     }
 
     public void hurt(Level level, int x, int y, Mob source, int dmg, int attackDir) {
-        hurt(level, x, y, dmg);
+        hurt(level.playerHandler(), level.propertyReader(), level, x, y, dmg);
     }
 
     public boolean interact(Level level, int xt, int yt, Player player, Item item, int attackDir) {
@@ -75,7 +73,7 @@ public class TreeTile extends Tile {
             ToolItem tool = (ToolItem) item;
             if (tool.type == ToolType.axe) {
                 if (player.payStamina(4 - tool.level)) {
-                    hurt(level, xt, yt, random.nextInt(10) + (tool.level) * 5 + 10);
+                    hurt(player.handler, player.propertyReader, level, xt, yt, random.nextInt(10) + (tool.level) * 5 + 10);
                     return true;
                 }
             }
@@ -83,11 +81,12 @@ public class TreeTile extends Tile {
         return false;
     }
 
-    private void hurt(Level level, int x, int y, int dmg) {
+    private void hurt(PlayerHandler handler, PropertyReader reader, Level level, int x, int y, int dmg) {
         {
             int count = random.nextInt(10) == 0 ? 1 : 0;
             for (int i = 0; i < count; i++) {
-                level.add(new ItemEntity(level.sound, new ResourceItem(Resource.apple), x * 16 + random.nextInt(10) + 3, y * 16 + random.nextInt(10) + 3));
+                level.add(new ItemEntity(level.sound, handler, reader,
+                        new ResourceItem(Resource.apple), x * 16 + random.nextInt(10) + 3, y * 16 + random.nextInt(10) + 3));
             }
         }
         int damage = level.getData(x, y) + dmg;
@@ -96,11 +95,13 @@ public class TreeTile extends Tile {
         if (damage >= 20) {
             int count = random.nextInt(2) + 1;
             for (int i = 0; i < count; i++) {
-                level.add(new ItemEntity(level.sound, new ResourceItem(Resource.wood), x * 16 + random.nextInt(10) + 3, y * 16 + random.nextInt(10) + 3));
+                level.add(new ItemEntity(level.sound, handler, reader,
+                        new ResourceItem(Resource.wood), x * 16 + random.nextInt(10) + 3, y * 16 + random.nextInt(10) + 3));
             }
             count = random.nextInt(random.nextInt(4) + 1);
             for (int i = 0; i < count; i++) {
-                level.add(new ItemEntity(level.sound, new ResourceItem(Resource.acorn), x * 16 + random.nextInt(10) + 3, y * 16 + random.nextInt(10) + 3));
+                level.add(new ItemEntity(level.sound, handler, reader,
+                        new ResourceItem(Resource.acorn), x * 16 + random.nextInt(10) + 3, y * 16 + random.nextInt(10) + 3));
             }
             level.setTile(x, y, grass, 0);
         } else {

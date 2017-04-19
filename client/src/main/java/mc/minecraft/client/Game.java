@@ -44,5 +44,5 @@ public interface Game {
 
     boolean isConnected();
 
-    void titleMenu();
+    void mainMenu();
 }

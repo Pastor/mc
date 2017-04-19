@@ -16,7 +16,7 @@ public final class SmashParticle extends Entity {
         super(sound, EntityType.SMASH_PARTICLE);
         this.x = x;
         this.y = y;
-        sound.play(Sound.Type.MONSTER_HURT);
+        sound.play(x, y, Sound.Type.MONSTER_HURT);
     }
 
     public void tick() {

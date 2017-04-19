@@ -138,6 +138,8 @@ public final class Player extends Mob implements PropertyContainer.Listener {
         Point move = handler.move();
         int xa = move.x;
         int ya = move.y;
+
+
         if (isSwimming() && tickTime % 60 == 0) {
             if (stamina > 0) {
                 stamina--;
@@ -148,6 +150,12 @@ public final class Player extends Mob implements PropertyContainer.Listener {
 
         if (staminaRechargeDelay % 2 == 0) {
             move(xa, ya);
+        }
+
+        if (ya != 0 || xa != 0) {
+            System.out.println(
+                    String.format("Player[%20s]                , X: %5d, Y: %5d, Dist: %5d, Attack: %s",
+                            id.toString().toUpperCase(), x, y, walkDist, handler.isAttacked()));
         }
 
         if (handler.isAttacked()) {
@@ -164,7 +172,7 @@ public final class Player extends Mob implements PropertyContainer.Listener {
                 handler.inventoryMenu(this);
             }
         } else if (handler.escapePressed()) {
-            handler.titleMenu(this);
+            handler.mainMenu(this);
         }
         if (attackTime > 0)
             attackTime--;
@@ -415,7 +423,7 @@ public final class Player extends Mob implements PropertyContainer.Listener {
 
     protected void die() {
         super.die();
-        sound.play(Sound.Type.PLAYER_DEATH);
+        sound.play(x, y, Sound.Type.PLAYER_DEATH);
     }
 
     protected void touchedBy(Entity entity) {
@@ -427,7 +435,7 @@ public final class Player extends Mob implements PropertyContainer.Listener {
     protected void doHurt(int damage, int attackDir) {
         if (hurtTime > 0 || invulnerableTime > 0) return;
 
-        sound.play(Sound.Type.PLAYER_HURT);
+        sound.play(x, y, Sound.Type.PLAYER_HURT);
         level.add(new TextParticle(sound, "" + damage, x, y, Color.get(-1, 504, 504, 504)));
         health -= damage;
         if (attackDir == 0) yKnockback = +6;
@@ -439,7 +447,9 @@ public final class Player extends Mob implements PropertyContainer.Listener {
     }
 
     public void gameWon() {
-        level.player.invulnerableTime = 60 * 5;
+        if (level.hasPlayer()) {
+            level.player().invulnerableTime = 60 * 5;
+        }
         handler.won();
     }
 

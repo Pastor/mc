@@ -2,12 +2,14 @@ package mc.minicraft.component.level;
 
 import mc.api.Session;
 import mc.api.Sound;
+import mc.engine.property.PropertyReader;
 import mc.minicraft.ServerPlayer;
 import mc.minicraft.component.LevelHandler;
 import mc.minicraft.component.Screen;
 import mc.minicraft.component.entity.*;
 import mc.minicraft.component.level.levelgen.LevelGen;
 import mc.minicraft.component.level.tile.Tile;
+import mc.minicraft.packet.ingame.server.ServerSoundEffectPacket;
 import mc.minicraft.packet.ingame.server.level.ServerUpdateLevelPacket;
 
 import java.util.*;
@@ -28,8 +30,10 @@ public final class Level {
     public int sandColor = 550;
     public final int depth;
     public int monsterDensity = 8;
+    public UUID owner;
+    private final Map<UUID, Integer> entitiesIndex = new HashMap<>();
 
-    private final Set<Entity> entities = new HashSet<>();
+    private final Map<UUID, Entity> entities = new HashMap<>();
     private Comparator<Entity> spriteSorter = (e0, e1) -> {
         if (e1.y < e0.y) return +1;
         if (e1.y > e0.y) return -1;
@@ -38,10 +42,14 @@ public final class Level {
 
     public final Sound sound;
     public final LevelCollector handler;
+    public final PropertyReader reader;
+    public final PlayerHandler playerHandler;
 
     @SuppressWarnings("unchecked")
-    public Level(Sound sound, int w, int h, int level, Level parentLevel) {
+    public Level(Sound sound, PlayerHandler playerHandler, PropertyReader reader, int w, int h, int level, Level parentLevel) {
         this.sound = sound;
+        this.reader = reader;
+        this.playerHandler = playerHandler;
         this.handler = new LevelCollector(w, h, this);
         if (level < 0) {
             dirtColor = 222;
@@ -110,14 +118,16 @@ public final class Level {
         }
     }
 
-    public Level(Sound sound, int w, int h, int level, byte[] tiles, byte[] data) {
+    public Level(Sound sound, int w, int h, int level, byte[] tiles, byte[] data, PropertyReader reader, PlayerHandler playerHandler) {
         this.sound = sound;
         this.handler = new LevelCollector(w, h, this);
+        this.playerHandler = playerHandler;
         this.w = w;
         this.h = h;
         this.tiles = tiles;
         this.data = data;
         this.depth = level;
+        this.reader = reader;
         entitiesInTiles = new Set[w * h];
         for (int i = 0; i < w * h; i++) {
             entitiesInTiles[i] = new HashSet<>();
@@ -140,7 +150,13 @@ public final class Level {
 
     private List<Entity> rowSprites = new ArrayList<Entity>();
 
-    public Player player;
+    public Player player() {
+        return (Player) entities.get(owner);
+    }
+
+    public boolean hasPlayer() {
+        return entities.containsKey(owner);
+    }
 
     public void renderSprites(Screen screen, int xScroll, int yScroll) {
         int xo = xScroll >> 4;
@@ -203,7 +219,7 @@ public final class Level {
         return Tile.tiles[tiles[x + y * w]];
     }
 
-    public void setTile(int x, int y, Tile t, int dataVal) {
+    public synchronized void setTile(int x, int y, Tile t, int dataVal) {
         if (x < 0 || y < 0 || x >= w || y >= h) return;
         tiles[x + y * w] = t.id;
         data[x + y * w] = (byte) dataVal;
@@ -216,27 +232,24 @@ public final class Level {
         return data[x + y * w] & 0xff;
     }
 
-    public void setData(int x, int y, int val) {
+    public synchronized void setData(int x, int y, int val) {
         if (x < 0 || y < 0 || x >= w || y >= h) return;
         data[x + y * w] = (byte) val;
         handler.setData(x, y, val);
     }
 
-    public void add(Entity entity) {
-        if (entity instanceof Player) {
-            player = (Player) entity;
-        }
+    public synchronized void add(Entity entity) {
         entity.removed = false;
         synchronized (entities) {
-            entities.add(entity);
+            entities.put(entity.id, entity);
         }
         entity.init(this);
         insertEntity(entity.x >> 4, entity.y >> 4, entity);
     }
 
-    public void remove(Entity e) {
+    public synchronized void remove(Entity e) {
         synchronized (entities) {
-            entities.remove(e);
+            entities.remove(e.id);
         }
         int xto = e.x >> 4;
         int yto = e.y >> 4;
@@ -244,16 +257,24 @@ public final class Level {
     }
 
     private void insertEntity(int x, int y, Entity e) {
-        if (x < 0 || y < 0 || x >= w || y >= h) return;
-        entitiesInTiles[x + y * w].add(e);
+        if (x < 0 || y < 0 || x >= w || y >= h)
+            return;
+        int index = x + y * w;
+        entitiesIndex.put(e.id, index);
+        entitiesInTiles[index].add(e);
         handler.insertEntity(x, y, e);
     }
 
     private void removeEntity(int x, int y, Entity e) {
         if (x < 0 || y < 0 || x >= w || y >= h) return;
-        Set<Entity> entities = entitiesInTiles[x + y * w];
+        int i = x + y * w;
+        Set<Entity> entities = entitiesInTiles[i];
         entities.remove(e);
         handler.removeEntity(x, y, e);
+        Integer index = entitiesIndex.get(e.id);
+        if (index != null) {
+            entitiesInTiles[index].remove(e);
+        }
     }
 
     public void trySpawn(int count) {
@@ -290,19 +311,26 @@ public final class Level {
             getTile(xt, yt).tick(this, xt, yt);
         }
         synchronized (entities) {
-            for (Entity e : new HashSet<>(entities)) {
+            for (Entity e : new HashMap<>(entities).values()) {
                 int xto = e.x >> 4;
                 int yto = e.y >> 4;
+                int rxo = e.x;
+                int ryo = e.y;
 
                 e.tick();
                 if (e.removed) {
-                    entities.remove(e);
+                    entities.remove(e.id);
                     removeEntity(xto, yto, e);
                 } else {
                     int xt = e.x >> 4;
                     int yt = e.y >> 4;
+                    int rx = e.x;
+                    int ry = e.y;
 
                     if (xto != xt || yto != yt) {
+                        removeEntity(xto, yto, e);
+                        insertEntity(xt, yt, e);
+                    } else if ((rx != rxo || ry != ryo)) {
                         removeEntity(xto, yto, e);
                         insertEntity(xt, yt, e);
                     }
@@ -333,6 +361,10 @@ public final class Level {
         return result;
     }
 
+    public void clearEntities() {
+//        Stream.of(entitiesInTiles).forEach(Set::clear);
+    }
+
     public static final class LevelCollector implements LevelHandler {
 
         private final Set<DataKey> datas = new HashSet<>();
@@ -342,6 +374,7 @@ public final class Level {
         private final int h;
         private final Set<Entity>[] insertEntities;
         private final Set<Entity>[] removeEntities;
+        private final Set<Sound.Type> sounds = new HashSet<>();
 
         LevelCollector(int w, int h, Level level) {
             this.w = w;
@@ -362,6 +395,7 @@ public final class Level {
             Stream.of(removeEntities).forEach(Set::clear);
             datas.clear();
             tiles.clear();
+            sounds.clear();
         }
 
         public void process(Session session, ServerPlayer player) {
@@ -377,6 +411,13 @@ public final class Level {
                 packet.tiles.addAll(tiles);
                 if (datas.size() != 0 || tiles.size() != 0 || insertEntities1.size() != 0 || removeEntities1.size() != 0) {
                     session.send(packet);
+                }
+                if (sounds.size() > 0) {
+                    for (Sound.Type type : sounds) {
+                        ServerSoundEffectPacket effect = new ServerSoundEffectPacket();
+                        effect.type = type;
+                        session.send(effect);
+                    }
                 }
             });
         }
@@ -400,6 +441,19 @@ public final class Level {
         public void removeEntity(int x, int y, Entity entity) {
             removeEntities[x + y * w].add(entity);
         }
+
+        @Override
+        public void sound(int x, int y, Sound.Type type) {
+            sounds.add(type);
+        }
+    }
+
+    public PlayerHandler playerHandler() {
+        return playerHandler;
+    }
+
+    public PropertyReader propertyReader() {
+        return reader;
     }
 
     private static void onViewport(int w, int h, ServerPlayer player, Viewport viewport) {

@@ -1,10 +1,7 @@
 package mc.minicraft.component.level.tile;
 
 import mc.minicraft.component.Screen;
-import mc.minicraft.component.entity.Entity;
-import mc.minicraft.component.entity.ItemEntity;
-import mc.minicraft.component.entity.Mob;
-import mc.minicraft.component.entity.Player;
+import mc.minicraft.component.entity.*;
 import mc.minicraft.component.entity.particle.SmashParticle;
 import mc.minicraft.component.entity.particle.TextParticle;
 import mc.minicraft.component.gfx.Color;
@@ -67,7 +64,10 @@ public class OreTile extends Tile {
                 level.setData(x, y, damage);
             }
             for (int i = 0; i < count; i++) {
-                level.add(new ItemEntity(level.sound, new ResourceItem(toDrop), x * 16 + random.nextInt(10) + 3, y * 16 + random.nextInt(10) + 3));
+                level.add(new ItemEntity(level.sound,
+                        level.playerHandler(),
+                        level.propertyReader(),
+                        new ResourceItem(toDrop), x * 16 + random.nextInt(10) + 3, y * 16 + random.nextInt(10) + 3));
             }
         }
     }

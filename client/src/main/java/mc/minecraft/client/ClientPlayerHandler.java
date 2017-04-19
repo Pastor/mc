@@ -24,10 +24,14 @@ public final class ClientPlayerHandler implements PlayerHandler {
     public Point move() {
         int xa = 0;
         int ya = 0;
-        if (input.up.down) ya--;
-        if (input.down.down) ya++;
-        if (input.left.down) xa--;
-        if (input.right.down) xa++;
+        if (input.up.down)
+            ya--;
+        if (input.down.down)
+            ya++;
+        if (input.left.down)
+            xa--;
+        if (input.right.down)
+            xa++;
         return new Point(xa, ya);
     }
 
@@ -72,7 +76,7 @@ public final class ClientPlayerHandler implements PlayerHandler {
     }
 
     @Override
-    public void titleMenu(Player player) {
-        game.titleMenu();
+    public void mainMenu(Player player) {
+        game.mainMenu();
     }
 }

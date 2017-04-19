@@ -17,8 +17,10 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class Entity {
+    public static final AtomicLong counter = new AtomicLong(0);
     protected final Random random = new Random();
     public UUID id;
     public int x, y;
@@ -37,18 +39,14 @@ public abstract class Entity {
 
     public void write(Buffer.Output output) throws IOException {
         output.writeByte(Magic.value(Integer.class, type()));
-        byte[] bytes = id.toString().getBytes("UTF-8");
-        output.writeVarInt(bytes.length);
-        output.writeBytes(bytes);
+        output.writeString(id.toString());
         output.writeVarInt(x);
         output.writeVarInt(y);
         output.writeBoolean(removed);
     }
 
     protected void read(Buffer.Input input) throws IOException {
-        int length = input.readVarInt();
-        byte[] bytes = input.readBytes(length);
-        id = UUID.fromString(new String(bytes, "UTF-8"));
+        id = UUID.fromString(input.readString());
         x = input.readVarInt();
         y = input.readVarInt();
         removed = input.readBoolean();
@@ -220,7 +218,7 @@ public abstract class Entity {
                 entity = new Zombie(sound, 0);
                 break;
             case ITEM_ENTITY:
-                entity = new ItemEntity(sound, null, 0, 0);
+                entity = new ItemEntity(sound, handler, reader, null, 0, 0);
                 break;
             default:
                 throw new IllegalArgumentException();

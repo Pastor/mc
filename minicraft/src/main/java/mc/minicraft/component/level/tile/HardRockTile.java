@@ -1,10 +1,8 @@
 package mc.minicraft.component.level.tile;
 
+import mc.engine.property.PropertyReader;
 import mc.minicraft.component.Screen;
-import mc.minicraft.component.entity.Entity;
-import mc.minicraft.component.entity.ItemEntity;
-import mc.minicraft.component.entity.Mob;
-import mc.minicraft.component.entity.Player;
+import mc.minicraft.component.entity.*;
 import mc.minicraft.component.entity.particle.SmashParticle;
 import mc.minicraft.component.entity.particle.TextParticle;
 import mc.minicraft.component.gfx.Color;
@@ -71,7 +69,7 @@ public class HardRockTile extends Tile {
     }
 
     public void hurt(Level level, int x, int y, Mob source, int dmg, int attackDir) {
-        hurt(level, x, y, 0);
+        hurt(level.playerHandler(), level.propertyReader(), level, x, y, 0);
     }
 
     public boolean interact(Level level, int xt, int yt, Player player, Item item, int attackDir) {
@@ -79,7 +77,7 @@ public class HardRockTile extends Tile {
             ToolItem tool = (ToolItem) item;
             if (tool.type == ToolType.pickaxe && tool.level == 4) {
                 if (player.payStamina(4 - tool.level)) {
-                    hurt(level, xt, yt, random.nextInt(10) + (tool.level) * 5 + 10);
+                    hurt(player.handler, player.propertyReader, level, xt, yt, random.nextInt(10) + (tool.level) * 5 + 10);
                     return true;
                 }
             }
@@ -87,18 +85,18 @@ public class HardRockTile extends Tile {
         return false;
     }
 
-    public void hurt(Level level, int x, int y, int dmg) {
+    public void hurt(PlayerHandler handler, PropertyReader reader, Level level, int x, int y, int dmg) {
         int damage = level.getData(x, y) + dmg;
         level.add(new SmashParticle(level.sound, x * 16 + 8, y * 16 + 8));
         level.add(new TextParticle(level.sound, "" + dmg, x * 16 + 8, y * 16 + 8, Color.get(-1, 500, 500, 500)));
         if (damage >= 200) {
             int count = random.nextInt(4) + 1;
             for (int i = 0; i < count; i++) {
-                level.add(new ItemEntity(level.sound, new ResourceItem(Resource.stone), x * 16 + random.nextInt(10) + 3, y * 16 + random.nextInt(10) + 3));
+                level.add(new ItemEntity(level.sound, handler, reader, new ResourceItem(Resource.stone), x * 16 + random.nextInt(10) + 3, y * 16 + random.nextInt(10) + 3));
             }
             count = random.nextInt(2);
             for (int i = 0; i < count; i++) {
-                level.add(new ItemEntity(level.sound, new ResourceItem(Resource.coal), x * 16 + random.nextInt(10) + 3, y * 16 + random.nextInt(10) + 3));
+                level.add(new ItemEntity(level.sound, handler, reader, new ResourceItem(Resource.coal), x * 16 + random.nextInt(10) + 3, y * 16 + random.nextInt(10) + 3));
             }
             level.setTile(x, y, Tile.dirt, 0);
         } else {

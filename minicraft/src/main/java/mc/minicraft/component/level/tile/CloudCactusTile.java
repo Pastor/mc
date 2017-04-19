@@ -1,10 +1,7 @@
 package mc.minicraft.component.level.tile;
 
 import mc.minicraft.component.Screen;
-import mc.minicraft.component.entity.AirWizard;
-import mc.minicraft.component.entity.Entity;
-import mc.minicraft.component.entity.Mob;
-import mc.minicraft.component.entity.Player;
+import mc.minicraft.component.entity.*;
 import mc.minicraft.component.entity.particle.SmashParticle;
 import mc.minicraft.component.entity.particle.TextParticle;
 import mc.minicraft.component.gfx.Color;

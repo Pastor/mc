@@ -1,25 +1,24 @@
-package mc.minicraft.packet.ingame.client.player;
+package mc.minicraft.packet.ingame.server;
 
 import mc.api.Buffer;
 import mc.api.Packet;
+import mc.api.Sound;
+import mc.minicraft.Magic;
 
 import java.io.IOException;
 
-public final class ClientPlayerPositionPacket implements Packet {
+public final class ServerSoundEffectPacket implements Packet {
 
-    public int xa = 0;
-    public int ya = 0;
+    public Sound.Type type = Sound.Type.TEST;
 
     @Override
     public void read(Buffer.Input in) throws IOException {
-        xa = in.readVarInt();
-        ya = in.readVarInt();
+        type = Magic.key(Sound.Type.class, in.readByte());
     }
 
     @Override
     public void write(Buffer.Output out) throws IOException {
-        out.writeVarInt(xa);
-        out.writeVarInt(ya);
+        out.writeByte(Magic.value(Integer.class, type));
     }
 
     @Override

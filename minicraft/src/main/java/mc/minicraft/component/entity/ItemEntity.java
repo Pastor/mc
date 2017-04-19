@@ -1,10 +1,11 @@
 package mc.minicraft.component.entity;
 
 import mc.api.Buffer;
+import mc.api.Sound;
+import mc.engine.property.PropertyReader;
 import mc.minicraft.component.Screen;
 import mc.minicraft.component.gfx.Color;
 import mc.minicraft.component.item.Item;
-import mc.api.Sound;
 import mc.minicraft.data.game.entity.EntityType;
 
 import java.io.IOException;
@@ -20,8 +21,13 @@ public final class ItemEntity extends Entity {
     public Item item;
     private int time = 0;
 
-    public ItemEntity(Sound sound, Item item, int x, int y) {
+    private final PlayerHandler handler;
+    private final PropertyReader reader;
+
+    public ItemEntity(Sound sound, PlayerHandler handler, PropertyReader reader, Item item, int x, int y) {
         super(sound, EntityType.ITEM_ENTITY);
+        this.handler = handler;
+        this.reader = reader;
         this.item = item;
         xx = this.x = x;
         yy = this.y = y;
@@ -51,7 +57,12 @@ public final class ItemEntity extends Entity {
         output.writeDouble(xx);
         output.writeDouble(yy);
         output.writeDouble(zz);
-        //FIXME: item
+        if (item != null) {
+            output.writeBoolean(true);
+            item.write(output);
+        } else {
+            output.writeBoolean(false);
+        }
         output.writeVarInt(time);
     }
 
@@ -70,7 +81,10 @@ public final class ItemEntity extends Entity {
         xx = input.readDouble();
         yy = input.readDouble();
         zz = input.readDouble();
-        //FIXME: item
+        boolean itemPresent = input.readBoolean();
+        if (itemPresent) {
+            item = Item.readItem(sound, handler, reader, input);
+        }
         time = input.readVarInt();
     }
 
@@ -122,7 +136,7 @@ public final class ItemEntity extends Entity {
     }
 
     public void take(Player player) {
-        sound.play(Sound.Type.PICKUP);
+        sound.play(x, y, Sound.Type.PICKUP);
         player.score++;
         item.onTake(this);
         remove();

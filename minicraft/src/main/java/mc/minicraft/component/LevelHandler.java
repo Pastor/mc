@@ -1,5 +1,6 @@
 package mc.minicraft.component;
 
+import mc.api.Sound;
 import mc.minicraft.component.entity.Entity;
 
 import java.util.Objects;
@@ -15,6 +16,8 @@ public interface LevelHandler {
     void insertEntity(int x, int y, Entity entity);
 
     void removeEntity(int x, int y, Entity entity);
+
+    void sound(int x, int y, Sound.Type type);
 
     final class DataKey {
         public final int x;

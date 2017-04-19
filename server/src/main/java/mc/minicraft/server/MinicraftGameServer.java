@@ -25,6 +25,7 @@ import mc.minicraft.data.status.VersionInfo;
 import mc.minicraft.data.status.handler.ServerInfoBuilder;
 import mc.minicraft.packet.ingame.server.ServerChatPacket;
 import mc.minicraft.packet.ingame.server.ServerJoinGamePacket;
+import mc.minicraft.packet.ingame.server.ServerSoundEffectPacket;
 import mc.minicraft.packet.ingame.server.level.ServerStartLevelPacket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,8 +63,7 @@ final class MinicraftGameServer extends Server.ListenerAdapter
         this.server.addListener(this);
 
 
-        Crafting.init(type -> {
-        }, new PlayerHandlerAdapter(), container);
+        Crafting.init(this, new PlayerHandlerAdapter(), container);
     }
 
     static GameServer createServer() {
@@ -82,7 +82,7 @@ final class MinicraftGameServer extends Server.ListenerAdapter
 
     @Override
     public void sessionAdded(Server.Event event) {
-        ServerPlayer player = new ServerPlayer(server, container);
+        ServerPlayer player = new ServerPlayer(event.session, server, container);
         event.session.addListener(player);
         event.session.setFlag(Constants.GAME_PLAYER_KEY, player);
         states.add(player);
@@ -180,18 +180,14 @@ final class MinicraftGameServer extends Server.ListenerAdapter
 
         int w = 128;
         int h = 128;
-        levels[4] = new Level(this, w, h, 1, null);
-        levels[3] = new Level(this, w, h, 0, levels[4]);
-        levels[2] = new Level(this, w, h, -1, levels[3]);
-        levels[1] = new Level(this, w, h, -2, levels[2]);
-        levels[0] = new Level(this, w, h, -3, levels[1]);
+        PlayerHandlerAdapter handler = new PlayerHandlerAdapter();
+        levels[4] = new Level(this, handler, container, w, h, 1, null);
+        levels[3] = new Level(this, handler, container, w, h, 0, levels[4]);
+        levels[2] = new Level(this, handler, container, w, h, -1, levels[3]);
+        levels[1] = new Level(this, handler, container, w, h, -2, levels[2]);
+        levels[0] = new Level(this, handler, container, w, h, -3, levels[1]);
 
         level = levels[startLevel];
-
-//        states.forEach(engine -> {
-//            engine.resetPlayer(level);
-//        });
-
         for (int i = 0; i < 5; i++) {
             levels[i].trySpawn(5000);
         }
@@ -203,35 +199,6 @@ final class MinicraftGameServer extends Server.ListenerAdapter
 
     private void tick() {
         tickCount++;
-//        if (!hasFocus()) {
-//            input.releaseAll();
-//        } else {
-//            if (!player.removed && !hasWon) gameTime++;
-//
-//            input.tick();
-//            if (menu != null) {
-//                menu.tick();
-//            } else {
-//                if (player.removed) {
-//                    playerDeadTime++;
-//                    if (playerDeadTime > 60) {
-//                        setMenu(new DeadMenu(titleMenu));
-//                    }
-//                } else {
-//                    if (pendingLevelChange != 0) {
-//                        setMenu(new LevelTransitionMenu(pendingLevelChange, container));
-//                        pendingLevelChange = 0;
-//                    }
-//                }
-//                if (wonTimer > 0) {
-//                    if (--wonTimer == 0) {
-//                        setMenu(new WonMenu(titleMenu));
-//                    }
-//                }
-//        for (int i = 0; i < 5; i++) {
-//            levels[i].handler.reset();
-//            levels[i].tick();
-//        }
         level.handler.reset();
         level.tick();
 
@@ -243,18 +210,19 @@ final class MinicraftGameServer extends Server.ListenerAdapter
             }
         });
         Tile.tickCount++;
-//            }
-//        }
-
     }
 
     private void updateFramesInfo(int frames, int ticks) {
-//        logger.debug(String.format("Ticks: %d", ticks));
     }
 
     @Override
-    public void play(Type type) {
-        //Empty
+    public void play(int x, int y, Type type) {
+        System.out.printf("MGS\n");
+        server.sessions().forEach(session -> {
+            ServerSoundEffectPacket effectPacket = new ServerSoundEffectPacket();
+            effectPacket.type = type;
+            session.send(effectPacket);
+        });
     }
 
     @Override

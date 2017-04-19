@@ -9,8 +9,9 @@ import mc.minicraft.data.status.VersionInfo;
 import mc.minicraft.data.status.handler.ServerInfoBuilder;
 import mc.minicraft.packet.HandshakePacket;
 import mc.minicraft.packet.ingame.client.ClientKeepAlivePacket;
+import mc.minicraft.packet.ingame.client.player.ClientPlayerAttackPacket;
 import mc.minicraft.packet.ingame.client.player.ClientPlayerSettings;
-import mc.minicraft.packet.ingame.client.player.ClientPlayerUpdatePacket;
+import mc.minicraft.packet.ingame.client.player.ClientPlayerPositionPacket;
 import mc.minicraft.packet.ingame.server.ServerDisconnectPacket;
 import mc.minicraft.packet.ingame.server.ServerKeepAlivePacket;
 import mc.minicraft.packet.login.client.EncryptionResponsePacket;
@@ -142,10 +143,14 @@ final class ServerListener extends Session.ListenerAdapter {
                     logger.debug(String.format("For %s change visible_distance to %d",
                             profile.name, settings.visibleDistance));
                 }
-            } else if (event.packet() instanceof ClientPlayerUpdatePacket) {
-                ClientPlayerUpdatePacket update = event.asPacket();
+            } else if (event.packet() instanceof ClientPlayerPositionPacket) {
+                ClientPlayerPositionPacket update = event.asPacket();
                 ServerPlayer player = event.session.flag(Constants.GAME_PLAYER_KEY);
                 player.update(update);
+//                System.out.println(String.format("x: %d, y: %d", update.xa, update.ya));
+            } else if (event.packet() instanceof ClientPlayerAttackPacket) {
+                ServerPlayer player = event.session.flag(Constants.GAME_PLAYER_KEY);
+                player.attack();
 //                System.out.println(String.format("x: %d, y: %d", update.xa, update.ya));
             }
         }
@@ -154,7 +159,7 @@ final class ServerListener extends Session.ListenerAdapter {
 
     @Override
     public void packetSent(Session.Event event) {
-//        logger.info("Server sent: " + event.packet());
+
     }
 
     @Override

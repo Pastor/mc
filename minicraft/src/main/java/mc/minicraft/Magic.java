@@ -1,5 +1,6 @@
 package mc.minicraft;
 
+import mc.api.Sound;
 import mc.minicraft.data.game.*;
 import mc.minicraft.data.game.entity.*;
 import mc.minicraft.data.game.entity.attribute.AttributeType;
@@ -68,6 +69,14 @@ public final class Magic {
             register(ItemType.POWER_GLOVE, 2);
             register(ItemType.RESOURCE_ITEM, 3);
             register(ItemType.TOOL_ITEM, 4);
+
+            register(Sound.Type.BOSS_DEATH, 0);
+            register(Sound.Type.CRAFT, 1);
+            register(Sound.Type.MONSTER_HURT, 2);
+            register(Sound.Type.PICKUP, 3);
+            register(Sound.Type.PLAYER_DEATH, 4);
+            register(Sound.Type.PLAYER_HURT, 5);
+            register(Sound.Type.TEST, 6);
         }
         register(AttributeType.GENERIC_MAX_HEALTH, "generic.maxHealth");
         register(AttributeType.GENERIC_FOLLOW_RANGE, "generic.followRange");

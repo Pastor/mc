@@ -1,10 +1,8 @@
 package mc.minicraft.component.level.tile;
 
+import mc.engine.property.PropertyReader;
 import mc.minicraft.component.Screen;
-import mc.minicraft.component.entity.Entity;
-import mc.minicraft.component.entity.ItemEntity;
-import mc.minicraft.component.entity.Mob;
-import mc.minicraft.component.entity.Player;
+import mc.minicraft.component.entity.*;
 import mc.minicraft.component.gfx.Color;
 import mc.minicraft.component.item.Item;
 import mc.minicraft.component.item.ResourceItem;
@@ -59,20 +57,20 @@ public class WheatTile extends Tile {
     public void steppedOn(Level level, int xt, int yt, Entity entity) {
         if (random.nextInt(60) != 0) return;
         if (level.getData(xt, yt) < 2) return;
-        harvest(level, xt, yt);
+        harvest(level.playerHandler(), level.propertyReader(), level, xt, yt);
     }
 
     public void hurt(Level level, int x, int y, Mob source, int dmg, int attackDir) {
 
-        harvest(level, x, y);
+        harvest(level.playerHandler(), level.propertyReader(), level, x, y);
     }
 
-    private void harvest(Level level, int x, int y) {
+    private void harvest(PlayerHandler handler, PropertyReader reader, Level level, int x, int y) {
         int age = level.getData(x, y);
 
         int count = random.nextInt(2);
         for (int i = 0; i < count; i++) {
-            level.add(new ItemEntity(level.sound, new ResourceItem(Resource.seeds), x * 16 + random.nextInt(10) + 3, y * 16 + random.nextInt(10) + 3));
+            level.add(new ItemEntity(level.sound, handler, reader, new ResourceItem(Resource.seeds), x * 16 + random.nextInt(10) + 3, y * 16 + random.nextInt(10) + 3));
         }
 
         count = 0;
@@ -82,7 +80,7 @@ public class WheatTile extends Tile {
             count = random.nextInt(2) + 1;
         }
         for (int i = 0; i < count; i++) {
-            level.add(new ItemEntity(level.sound, new ResourceItem(Resource.wheat), x * 16 + random.nextInt(10) + 3, y * 16 + random.nextInt(10) + 3));
+            level.add(new ItemEntity(level.sound, handler, reader, new ResourceItem(Resource.wheat), x * 16 + random.nextInt(10) + 3, y * 16 + random.nextInt(10) + 3));
         }
 
         level.setTile(x, y, dirt, 0);

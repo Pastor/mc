@@ -16,8 +16,9 @@ import mc.minicraft.data.message.Message;
 import mc.minicraft.data.message.MessageStyle;
 import mc.minicraft.data.message.TextMessage;
 import mc.minicraft.packet.ingame.client.ClientChatPacket;
-import mc.minicraft.packet.ingame.client.player.ClientPlayerUpdatePacket;
+import mc.minicraft.packet.ingame.client.player.ClientPlayerPositionPacket;
 import mc.minicraft.packet.ingame.server.ServerChatPacket;
+import mc.minicraft.packet.ingame.server.ServerSoundEffectPacket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +32,7 @@ public final class ServerPlayer extends Session.ListenerAdapter implements Compa
     private static final Logger logger = LoggerFactory.getLogger(ServerPlayer.class);
     protected final Random random = new Random();
     final Server server;
+    final Session session;
     private final UUID id;
     private final PropertyContainer container;
     public final Player player;
@@ -44,7 +46,8 @@ public final class ServerPlayer extends Session.ListenerAdapter implements Compa
 
     private final PlayerState state = new PlayerState();
 
-    public ServerPlayer(Server server, PropertyContainer container) {
+    public ServerPlayer(Session session, Server server, PropertyContainer container) {
+        this.session = session;
         this.id = UUID.randomUUID();
         this.server = server;
         this.container = container;
@@ -68,8 +71,6 @@ public final class ServerPlayer extends Session.ListenerAdapter implements Compa
     public void tick() {
         gameTime++;
         player.tick();
-        if (state.xa != 0 || state.ya != 0)
-            System.out.println("SERVER. X: " + player.x + ", Y: " + player.y);
         state.reset();
     }
 
@@ -117,28 +118,36 @@ public final class ServerPlayer extends Session.ListenerAdapter implements Compa
     }
 
     @Override
-    public void play(Type type) {
-        //TODO
+    public void play(int x, int y, Type type) {
+        System.out.printf("SP\n");
+        ServerSoundEffectPacket packet = new ServerSoundEffectPacket();
+        packet.type = type;
+        session.send(packet);
     }
 
     void updateViewport() {
         //FIXME: Обновляем видимое окружение
     }
 
-    public void update(ClientPlayerUpdatePacket update) {
+    public void update(ClientPlayerPositionPacket update) {
         state.xa = update.xa;
         state.ya = update.ya;
-        System.out.println("UPDATE. X: " + update.xa + ", Y: " + update.ya);
+    }
+
+    public void attack() {
+        state.attack = true;
     }
 
     private final class PlayerState implements PlayerHandler {
 
         int xa;
         int ya;
+        boolean attack;
 
         void reset() {
             xa = 0;
             ya = 0;
+            attack = false;
         }
 
         @Override
@@ -148,7 +157,7 @@ public final class ServerPlayer extends Session.ListenerAdapter implements Compa
 
         @Override
         public boolean isAttacked() {
-            return false;
+            return attack;
         }
 
         @Override
@@ -187,7 +196,7 @@ public final class ServerPlayer extends Session.ListenerAdapter implements Compa
         }
 
         @Override
-        public void titleMenu(Player player) {
+        public void mainMenu(Player player) {
 
         }
     }
