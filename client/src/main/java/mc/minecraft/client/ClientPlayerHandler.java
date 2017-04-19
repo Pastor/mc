@@ -1,5 +1,6 @@
 package mc.minecraft.client;
 
+import mc.api.Client;
 import mc.minecraft.client.screen.ContainerMenu;
 import mc.minecraft.client.screen.CraftingMenu;
 import mc.minecraft.client.screen.InventoryMenu;
@@ -13,10 +14,12 @@ import java.util.List;
 
 public final class ClientPlayerHandler implements PlayerHandler {
     private final InputHandler input;
+    private final Client client;
     private final Game game;
 
-    public ClientPlayerHandler(InputHandler input, Game game) {
+    public ClientPlayerHandler(InputHandler input, Client client, Game game) {
         this.input = input;
+        this.client = client;
         this.game = game;
     }
 
@@ -62,7 +65,7 @@ public final class ClientPlayerHandler implements PlayerHandler {
 
     @Override
     public void inventoryMenu(Player player) {
-        game.setMenu(new InventoryMenu(player));
+        game.setMenu(new InventoryMenu(client, player));
     }
 
     @Override

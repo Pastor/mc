@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.Set;
 
 public final class Player extends Mob implements PropertyContainer.Listener {
-    public final PropertyReader propertyReader;
+    public final PropertyReader property;
     private int attackTime, attackDir;
 
     public final PlayerHandler handler;
@@ -35,19 +35,20 @@ public final class Player extends Mob implements PropertyContainer.Listener {
     public int maxStamina = 10;
     private int onStairDelay;
     public int invulnerableTime = 0;
+    public boolean die = false;
 
-    public Player(Sound sound, PlayerHandler handler, PropertyReader propertyReader) {
+    public Player(Sound sound, PlayerHandler handler, PropertyReader property) {
         super(sound, EntityType.PLAYER);
-        this.propertyReader = propertyReader;
+        this.property = property;
         this.handler = handler;
         x = 24;
         y = 24;
-        stamina = maxStamina = propertyReader.property(PropertyConstants.PLAYER_STAMINA).asValue();
-        health = maxHealth = propertyReader.property(PropertyConstants.PLAYER_HEALTH).asValue();
+        stamina = maxStamina = property.property(PropertyConstants.PLAYER_STAMINA).asValue();
+        health = maxHealth = property.property(PropertyConstants.PLAYER_HEALTH).asValue();
 
-        inventory.add(new FurnitureItem(new Workbench(sound, handler, propertyReader), sound, handler, propertyReader));
+        inventory.add(new FurnitureItem(new Workbench(sound, handler, property), sound, handler, property));
         inventory.add(new PowerGloveItem());
-        propertyReader.addListener(this);
+        property.addListener(this);
     }
 
     @Override
@@ -74,6 +75,8 @@ public final class Player extends Mob implements PropertyContainer.Listener {
         output.writeVarInt(maxHealth);
         output.writeVarInt(onStairDelay);
         output.writeVarInt(invulnerableTime);
+        output.writeBoolean(die);
+        inventory.write(output);
     }
 
     @Override
@@ -83,11 +86,11 @@ public final class Player extends Mob implements PropertyContainer.Listener {
         attackDir = input.readVarInt();
         boolean attackItemPresent = input.readBoolean();
         if (attackItemPresent) {
-            attackItem = Item.readItem(sound, handler, propertyReader, input);
+            attackItem = Item.readItem(sound, handler, property, input);
         }
         boolean activeItemPresent = input.readBoolean();
         if (activeItemPresent) {
-            activeItem = Item.readItem(sound, handler, propertyReader, input);
+            activeItem = Item.readItem(sound, handler, property, input);
         }
         stamina = input.readVarInt();
         staminaRecharge = input.readVarInt();
@@ -96,9 +99,15 @@ public final class Player extends Mob implements PropertyContainer.Listener {
         maxHealth = input.readVarInt();
         onStairDelay = input.readVarInt();
         invulnerableTime = input.readVarInt();
+        die = input.readBoolean();
+        inventory.read(sound, handler, property, input);
     }
 
     public void tick() {
+        if (die) {
+            remove();
+            return;
+        }
         super.tick();
 
         if (invulnerableTime > 0) invulnerableTime--;
@@ -154,8 +163,9 @@ public final class Player extends Mob implements PropertyContainer.Listener {
 
         if (ya != 0 || xa != 0) {
             System.out.println(
-                    String.format("Player[%20s]                , X: %5d, Y: %5d, Dist: %5d, Attack: %s",
-                            id.toString().toUpperCase(), x, y, walkDist, handler.isAttacked()));
+                    String.format("Player[%20s]                , X: %5d, Y: %5d, Dist: %5d, Attack: %s, Item: %10s",
+                            id.toString().toUpperCase(), x, y,
+                            walkDist, handler.isAttacked(), activeItem == null ? "none" : activeItem.getName()));
         }
 
         if (handler.isAttacked()) {
@@ -167,6 +177,11 @@ public final class Player extends Mob implements PropertyContainer.Listener {
                 attack();
             }
         }
+        if (attackTime > 0)
+            attackTime--;
+    }
+
+    public void tickMenu() {
         if (handler.isMenuClicked()) {
             if (!use()) {
                 handler.inventoryMenu(this);
@@ -174,8 +189,6 @@ public final class Player extends Mob implements PropertyContainer.Listener {
         } else if (handler.escapePressed()) {
             handler.mainMenu(this);
         }
-        if (attackTime > 0)
-            attackTime--;
     }
 
     private boolean use() {
@@ -375,7 +388,6 @@ public final class Player extends Mob implements PropertyContainer.Listener {
             furniture.x = x;
             furniture.y = yo;
             furniture.render(screen);
-
         }
     }
 
@@ -415,7 +427,8 @@ public final class Player extends Mob implements PropertyContainer.Listener {
         if (activeItem != null) {
             if (activeItem instanceof FurnitureItem) {
                 int rr = ((FurnitureItem) activeItem).furniture.getLightRadius();
-                if (rr > r) r = rr;
+                if (rr > r)
+                    r = rr;
             }
         }
         return r;
@@ -423,6 +436,7 @@ public final class Player extends Mob implements PropertyContainer.Listener {
 
     protected void die() {
         super.die();
+        die = true;
         sound.play(x, y, Sound.Type.PLAYER_DEATH);
     }
 

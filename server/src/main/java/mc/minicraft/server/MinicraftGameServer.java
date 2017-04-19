@@ -23,6 +23,7 @@ import mc.minicraft.data.status.PlayerInfo;
 import mc.minicraft.data.status.ServerStatusInfo;
 import mc.minicraft.data.status.VersionInfo;
 import mc.minicraft.data.status.handler.ServerInfoBuilder;
+import mc.minicraft.packet.ingame.client.player.ClientPlayerUpdatePacket;
 import mc.minicraft.packet.ingame.server.ServerChatPacket;
 import mc.minicraft.packet.ingame.server.ServerJoinGamePacket;
 import mc.minicraft.packet.ingame.server.ServerSoundEffectPacket;
@@ -227,6 +228,13 @@ final class MinicraftGameServer extends Server.ListenerAdapter
 
     @Override
     public void contruct(Session session, Packet packet) {
+        ServerPlayer player = session.flag(Constants.GAME_PLAYER_KEY);
+        if (packet instanceof ClientPlayerUpdatePacket) {
+            ClientPlayerUpdatePacket update = (ClientPlayerUpdatePacket) packet;
+            update.sound = player;
+            update.handler = player.player.handler;
+            update.reader = player.player.property;
+        }
     }
 
 }

@@ -73,7 +73,7 @@ public class TreeTile extends Tile {
             ToolItem tool = (ToolItem) item;
             if (tool.type == ToolType.axe) {
                 if (player.payStamina(4 - tool.level)) {
-                    hurt(player.handler, player.propertyReader, level, xt, yt, random.nextInt(10) + (tool.level) * 5 + 10);
+                    hurt(player.handler, player.property, level, xt, yt, random.nextInt(10) + (tool.level) * 5 + 10);
                     return true;
                 }
             }

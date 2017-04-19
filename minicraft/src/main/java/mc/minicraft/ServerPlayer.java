@@ -138,6 +138,12 @@ public final class ServerPlayer extends Session.ListenerAdapter implements Compa
         state.attack = true;
     }
 
+    public void update(Player player) {
+        this.player.inventory.items.clear();
+        this.player.inventory.items.addAll(player.inventory.items);
+        this.player.activeItem = player.activeItem;
+    }
+
     private final class PlayerState implements PlayerHandler {
 
         int xa;

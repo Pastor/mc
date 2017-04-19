@@ -148,7 +148,6 @@ public final class Level {
         screen.setOffset(0, 0);
     }
 
-    private List<Entity> rowSprites = new ArrayList<Entity>();
 
     public Player player() {
         return (Player) entities.get(owner);
@@ -158,7 +157,8 @@ public final class Level {
         return entities.containsKey(owner);
     }
 
-    public void renderSprites(Screen screen, int xScroll, int yScroll) {
+    public synchronized void renderSprites(Screen screen, int xScroll, int yScroll) {
+        final List<Entity> rowSprites = new ArrayList<>();
         int xo = xScroll >> 4;
         int yo = yScroll >> 4;
         int w = (screen.w() + 15) >> 4;
@@ -178,7 +178,7 @@ public final class Level {
         screen.setOffset(0, 0);
     }
 
-    public void renderLight(Screen screen, int xScroll, int yScroll) {
+    public synchronized void renderLight(Screen screen, int xScroll, int yScroll) {
         int xo = xScroll >> 4;
         int yo = yScroll >> 4;
         int w = (screen.w() + 15) >> 4;
@@ -256,7 +256,7 @@ public final class Level {
         removeEntity(xto, yto, e);
     }
 
-    private void insertEntity(int x, int y, Entity e) {
+    private synchronized void insertEntity(int x, int y, Entity e) {
         if (x < 0 || y < 0 || x >= w || y >= h)
             return;
         int index = x + y * w;
@@ -265,7 +265,7 @@ public final class Level {
         handler.insertEntity(x, y, e);
     }
 
-    private void removeEntity(int x, int y, Entity e) {
+    private synchronized void removeEntity(int x, int y, Entity e) {
         if (x < 0 || y < 0 || x >= w || y >= h) return;
         int i = x + y * w;
         Set<Entity> entities = entitiesInTiles[i];
@@ -321,6 +321,9 @@ public final class Level {
                 if (e.removed) {
                     entities.remove(e.id);
                     removeEntity(xto, yto, e);
+                    if (e instanceof Player && ((Player)e).die) {
+                        //
+                    }
                 } else {
                     int xt = e.x >> 4;
                     int yt = e.y >> 4;
@@ -339,7 +342,7 @@ public final class Level {
         }
     }
 
-    public Set<Entity> getEntities(int x0, int y0, int x1, int y1) {
+    public synchronized Set<Entity> getEntities(int x0, int y0, int x1, int y1) {
         return getEntities(entitiesInTiles, w, h, x0, y0, x1, y1);
     }
 

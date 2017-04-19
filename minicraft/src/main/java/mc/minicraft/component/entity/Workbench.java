@@ -8,7 +8,7 @@ import mc.minicraft.data.game.entity.EntityType;
 
 public final class Workbench extends Furniture {
     public Workbench(Sound sound, PlayerHandler handler, PropertyReader reader) {
-        super(sound, handler, reader, "Workbench", EntityType.FURNITURE);
+        super(sound, handler, reader, "Workbench", EntityType.WORKBENCH);
         col = Color.get(-1, 100, 321, 431);
         sprite = 4;
         xr = 3;

@@ -52,7 +52,7 @@ public final class Magic {
             register(EntityType.ANVIL, 1);
             register(EntityType.CHEST, 2);
             register(EntityType.FURNACE, 3);
-            register(EntityType.FURNITURE, 4);
+//            register(EntityType.FURNITURE, 4);
             register(EntityType.INVENTORY, 5);
             register(EntityType.ITEM_ENTITY, 6);
             register(EntityType.LANTERN, 7);

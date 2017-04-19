@@ -14,7 +14,7 @@ public class ContainerMenu extends Menu {
     private int window = 0;
 
     public ContainerMenu(Player player, String title, Inventory container) {
-        super(player.propertyReader);
+        super(player.property);
         this.player = player;
         this.title = title;
         this.container = container;

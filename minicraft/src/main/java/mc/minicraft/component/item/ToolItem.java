@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.Random;
 
 public final class ToolItem extends Item {
-    private Random random = new Random();
+    private final Random random = new Random();
 
     public static final int MAX_LEVEL = 5;
     public static final String[] LEVEL_NAMES = { //
@@ -28,7 +28,6 @@ public final class ToolItem extends Item {
 
     public ToolType type;
     public int level = 0;
-    public String name;
 
     public ToolItem(ToolType type, int level) {
         super(ItemType.TOOL_ITEM);
@@ -36,7 +35,6 @@ public final class ToolItem extends Item {
         this.level = level;
         this.color = LEVEL_COLORS[level];
         this.sprite = type.sprite + 5 * 32;
-        this.name = type.name;
         this.name = LEVEL_NAMES[level] + " " + type.name;
     }
 

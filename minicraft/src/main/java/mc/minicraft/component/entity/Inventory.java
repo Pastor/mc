@@ -1,14 +1,34 @@
 package mc.minicraft.component.entity;
 
+import mc.api.Buffer;
+import mc.api.Sound;
+import mc.engine.property.PropertyReader;
 import mc.minicraft.component.item.Item;
 import mc.minicraft.component.item.ResourceItem;
 import mc.minicraft.component.item.resource.Resource;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public final class Inventory {
     public List<Item> items = new ArrayList<>();
+
+    public void write(Buffer.Output output) throws IOException {
+        output.writeVarInt(items.size());
+        for (Item item : items) {
+            item.write(output);
+        }
+    }
+
+    protected void read(Sound sound, PlayerHandler handler, PropertyReader reader, Buffer.Input input) throws IOException {
+        int length = input.readVarInt();
+        items.clear();
+        for (int i = 0; i < length; ++i) {
+            items.add(Item.readItem(sound, handler, reader, input));
+        }
+    }
+
 
     public void add(Item item) {
         add(items.size(), item);

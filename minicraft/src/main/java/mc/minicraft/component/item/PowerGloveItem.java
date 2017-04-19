@@ -12,6 +12,7 @@ public final class PowerGloveItem extends Item {
         super(ItemType.POWER_GLOVE);
         sprite = 7 + 4 * 32;
         color = Color.get(-1, 100, 320, 430);
+        name = "Pow glove";
     }
 
     public void renderIcon(Screen screen, int x, int y) {

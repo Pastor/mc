@@ -71,7 +71,7 @@ public class GrassTile extends Tile {
                     level.setTile(xt, yt, Tile.dirt, 0);
                     level.sound.play(xt, yt, Sound.Type.MONSTER_HURT);
                     if (random.nextInt(5) == 0) {
-                        level.add(new ItemEntity(level.sound, player.handler, player.propertyReader,
+                        level.add(new ItemEntity(level.sound, player.handler, player.property,
                                 new ResourceItem(Resource.seeds), xt * 16 + random.nextInt(10) + 3,
                                 yt * 16 + random.nextInt(10) + 3));
                         return true;
@@ -82,7 +82,7 @@ public class GrassTile extends Tile {
                 if (player.payStamina(4 - tool.level)) {
                     level.sound.play(xt, yt, Sound.Type.MONSTER_HURT);
                     if (random.nextInt(5) == 0) {
-                        level.add(new ItemEntity(level.sound, player.handler, player.propertyReader,
+                        level.add(new ItemEntity(level.sound, player.handler, player.property,
                                 new ResourceItem(Resource.seeds), xt * 16 + random.nextInt(10) + 3,
                                 yt * 16 + random.nextInt(10) + 3));
                         return true;

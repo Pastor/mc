@@ -5,7 +5,6 @@ public enum EntityType {
     ANVIL,
     CHEST,
     FURNACE,
-    FURNITURE,
     INVENTORY,
     ITEM_ENTITY,
     LANTERN,
