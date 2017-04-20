@@ -412,15 +412,19 @@ public final class Level {
                 packet.removeEntities.addAll(removeEntities1);
                 packet.datas.addAll(datas);
                 packet.tiles.addAll(tiles);
-                if (datas.size() != 0 || tiles.size() != 0 || insertEntities1.size() != 0 || removeEntities1.size() != 0) {
-                    session.send(packet);
-                }
-                if (sounds.size() > 0) {
-                    for (Sound.Type type : sounds) {
-                        ServerSoundEffectPacket effect = new ServerSoundEffectPacket();
-                        effect.type = type;
-                        session.send(effect);
+                try {
+                    if (datas.size() != 0 || tiles.size() != 0 || insertEntities1.size() != 0 || removeEntities1.size() != 0) {
+                        session.send(packet);
                     }
+                    if (sounds.size() > 0) {
+                        for (Sound.Type type : sounds) {
+                            ServerSoundEffectPacket effect = new ServerSoundEffectPacket();
+                            effect.type = type;
+                            session.send(effect);
+                        }
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
             });
         }

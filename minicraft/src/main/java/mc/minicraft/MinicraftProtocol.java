@@ -12,6 +12,7 @@ import mc.minicraft.packet.ingame.client.player.ClientPlayerSettings;
 import mc.minicraft.packet.ingame.client.player.ClientPlayerPositionPacket;
 import mc.minicraft.packet.ingame.client.player.ClientPlayerUpdatePacket;
 import mc.minicraft.packet.ingame.server.*;
+import mc.minicraft.packet.ingame.server.level.ServerChangeLevelPacket;
 import mc.minicraft.packet.ingame.server.level.ServerStartLevelPacket;
 import mc.minicraft.packet.ingame.server.level.ServerUpdateLevelPacket;
 import mc.minicraft.packet.login.client.EncryptionResponsePacket;
@@ -201,6 +202,7 @@ public final class MinicraftProtocol extends Protocol {
             this.registerOutgoing(0xFC, ServerUpdateLevelPacket.class);
             this.registerOutgoing(0xFE, ServerStartLevelPacket.class);
             this.registerOutgoing(0xF9, ServerSoundEffectPacket.class);
+            this.registerOutgoing(0xF7, ServerChangeLevelPacket.class);
         }
     }
 
@@ -224,6 +226,7 @@ public final class MinicraftProtocol extends Protocol {
             this.registerIncoming(0xFE, ServerStartLevelPacket.class);
             this.registerIncoming(0xFC, ServerUpdateLevelPacket.class);
             this.registerIncoming(0xF9, ServerSoundEffectPacket.class);
+            this.registerIncoming(0xF7, ServerChangeLevelPacket.class);
         }
 
         this.registerOutgoing(0x02, ClientChatPacket.class);

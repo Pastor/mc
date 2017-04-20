@@ -41,11 +41,13 @@ import java.util.stream.Collectors;
 final class MinicraftGameServer extends Server.ListenerAdapter
         implements ServerLoginHandler, ServerInfoBuilder, GameServer, Runnable, Sound, PacketConstructor {
     private static final Logger logger = LoggerFactory.getLogger(GameServer.class);
+    private static final int START_LEVEL = 3;
     private static final DefaultFactory FACTORY = DefaultFactory.instance();
     private static final boolean VERIFY_USERS = true;
     private static final Proxy PROXY = Proxy.NO_PROXY;
     private static final Proxy AUTH_PROXY = Proxy.NO_PROXY;
 
+    private final AtomicBoolean running = new AtomicBoolean(true);
     private final PropertyContainer container = new DefaultPropertyContainer();
     private final Set<ServerPlayer> states = new ConcurrentSkipListSet<>();
     private final Server server;
@@ -83,7 +85,7 @@ final class MinicraftGameServer extends Server.ListenerAdapter
 
     @Override
     public void sessionAdded(Server.Event event) {
-        ServerPlayer player = new ServerPlayer(event.session, server, container);
+        ServerPlayer player = new ServerPlayer(event.session, server, container, levels, START_LEVEL);
         event.session.addListener(player);
         event.session.setFlag(Constants.GAME_PLAYER_KEY, player);
         states.add(player);
@@ -101,7 +103,7 @@ final class MinicraftGameServer extends Server.ListenerAdapter
             server.sendBroadcast(new ServerChatPacket(message, MessageType.CHAT), event.session);
             ServerPlayer player = event.session.flag(Constants.GAME_PLAYER_KEY);
             states.remove(player);
-            player.removePlayer(level);
+            player.removePlayer();
         }
     }
 
@@ -116,12 +118,12 @@ final class MinicraftGameServer extends Server.ListenerAdapter
         session.send(new ServerJoinGamePacket(0, false, GameMode.SURVIVAL, 0, Difficulty.PEACEFUL, 10,
                 WorldType.DEFAULT, false));
         ServerPlayer player = session.flag(Constants.GAME_PLAYER_KEY);
-        player.registerPlayer(level);
+        player.registerPlayer(levels[START_LEVEL]);
         //FIXME: send entities
         //FIXME: send players
         //FIXME: send position
-        session.send(new ServerStartLevelPacket(level, player));
-        level.handler.process(session, player);
+        session.send(new ServerStartLevelPacket(levels[START_LEVEL], player));
+//        levels[START_LEVEL].handler.process(session, player);
     }
 
     @Override
@@ -134,10 +136,8 @@ final class MinicraftGameServer extends Server.ListenerAdapter
                 new TextMessage("Hello world!"), null);
     }
 
-    private final AtomicBoolean running = new AtomicBoolean(true);
 
-    private Level level;
-    private Level[] levels = new Level[5];
+    private final Level[] levels = new Level[5];
     private int tickCount;
 
     @Override
@@ -176,9 +176,6 @@ final class MinicraftGameServer extends Server.ListenerAdapter
     }
 
     private void resetGame() {
-        levels = new Level[5];
-        int startLevel = 3;
-
         int w = 128;
         int h = 128;
         PlayerHandlerAdapter handler = new PlayerHandlerAdapter();
@@ -188,7 +185,6 @@ final class MinicraftGameServer extends Server.ListenerAdapter
         levels[1] = new Level(this, handler, container, w, h, -2, levels[2]);
         levels[0] = new Level(this, handler, container, w, h, -3, levels[1]);
 
-        level = levels[startLevel];
         for (int i = 0; i < 5; i++) {
             levels[i].trySpawn(5000);
         }
@@ -200,14 +196,18 @@ final class MinicraftGameServer extends Server.ListenerAdapter
 
     private void tick() {
         tickCount++;
-        level.handler.reset();
-        level.tick();
+
+        for (Level level : levels) {
+            level.handler.reset();
+            level.tick();
+        }
 
         states.forEach(ServerPlayer::tick);
         server.sessions().forEach(session -> {
             ServerPlayer player = session.flag(Constants.GAME_PLAYER_KEY);
-            if (player != null && player.level != null) {
-                level.handler.process(session, player);
+            MinicraftProtocol protocol = (MinicraftProtocol) session.protocol();
+            if (player != null && protocol.getSub() == MinicraftProtocol.Sub.GAME) {
+                player.process(session);
             }
         });
         Tile.tickCount++;

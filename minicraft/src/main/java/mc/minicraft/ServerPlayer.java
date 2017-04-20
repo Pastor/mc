@@ -19,6 +19,7 @@ import mc.minicraft.packet.ingame.client.ClientChatPacket;
 import mc.minicraft.packet.ingame.client.player.ClientPlayerPositionPacket;
 import mc.minicraft.packet.ingame.server.ServerChatPacket;
 import mc.minicraft.packet.ingame.server.ServerSoundEffectPacket;
+import mc.minicraft.packet.ingame.server.level.ServerChangeLevelPacket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,19 +41,23 @@ public final class ServerPlayer extends Session.ListenerAdapter implements Compa
     private int deadTime;
     private int wonTime;
     private int currentLevel;
-    public Level level;
+    private Level level;
     int pendingLevelChange;
     public int visibleDistance;
 
     private final PlayerState state = new PlayerState();
+    private final Level[] levels;
 
-    public ServerPlayer(Session session, Server server, PropertyContainer container) {
+    public ServerPlayer(Session session, Server server, PropertyContainer container, Level[] levels, int currentLevel) {
         this.session = session;
+        this.levels = levels;
+        this.currentLevel = currentLevel;
         this.id = UUID.randomUUID();
         this.server = server;
         this.container = container;
         this.player = new Player(this, state, container);
         this.visibleDistance = 100;
+        this.level = levels[currentLevel];
     }
 
     @Override
@@ -74,8 +79,9 @@ public final class ServerPlayer extends Session.ListenerAdapter implements Compa
         state.reset();
     }
 
-    public void removePlayer(Level level) {
-        level.remove(player);
+    public void removePlayer() {
+        if (level != null)
+            level.remove(player);
     }
 
     public void registerPlayer(Level level) {
@@ -144,6 +150,12 @@ public final class ServerPlayer extends Session.ListenerAdapter implements Compa
         this.player.activeItem = player.activeItem;
     }
 
+    public void process(Session session) {
+        if (level != null) {
+            level.handler.process(session, this);
+        }
+    }
+
     private final class PlayerState implements PlayerHandler {
 
         int xa;
@@ -183,7 +195,15 @@ public final class ServerPlayer extends Session.ListenerAdapter implements Compa
 
         @Override
         public void scheduleLevelChange(int dir) {
-
+            if (level != null) {
+                level.remove(player);
+                currentLevel += dir;
+                level = levels[currentLevel];
+                player.x = (player.x >> 4) * 16 + 8;
+                player.y = (player.y >> 4) * 16 + 8;
+                level.add(player);
+                session.send(new ServerChangeLevelPacket(level, ServerPlayer.this, currentLevel));
+            }
         }
 
         @Override

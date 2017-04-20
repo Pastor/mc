@@ -11,7 +11,7 @@ import mc.minicraft.component.level.Level;
 import java.io.IOException;
 import java.util.UUID;
 
-public final class ServerStartLevelPacket implements Packet {
+public class ServerStartLevelPacket implements Packet {
     private int w;
     private int h;
     private int level;

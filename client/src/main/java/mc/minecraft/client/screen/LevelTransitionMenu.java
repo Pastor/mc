@@ -3,7 +3,7 @@ package mc.minecraft.client.screen;
 import mc.engine.property.PropertyReader;
 import mc.minecraft.client.gfx.ClientScreen;
 
-public class LevelTransitionMenu extends Menu {
+public final class LevelTransitionMenu extends Menu {
     private int dir;
     private int time = 0;
 
@@ -14,8 +14,10 @@ public class LevelTransitionMenu extends Menu {
 
     public void tick() {
         time += 2;
-        if (time == 30) game.changeLevel(dir);
-        if (time == 60) game.setMenu(null);
+        if (time == 30)
+            game.changeLevel(dir);
+        if (time == 60)
+            game.setMenu(null);
     }
 
     public void render(ClientScreen screen) {
