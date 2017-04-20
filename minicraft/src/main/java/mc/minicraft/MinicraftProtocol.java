@@ -3,10 +3,7 @@ package mc.minicraft;
 import mc.api.*;
 import mc.engine.DefaultPacket;
 import mc.minicraft.packet.HandshakePacket;
-import mc.minicraft.packet.ingame.client.ClientChatPacket;
-import mc.minicraft.packet.ingame.client.ClientKeepAlivePacket;
-import mc.minicraft.packet.ingame.client.ClientRequestPacket;
-import mc.minicraft.packet.ingame.client.ClientSettingsPacket;
+import mc.minicraft.packet.ingame.client.*;
 import mc.minicraft.packet.ingame.client.player.ClientPlayerAttackPacket;
 import mc.minicraft.packet.ingame.client.player.ClientPlayerPositionPacket;
 import mc.minicraft.packet.ingame.client.player.ClientPlayerSettings;
@@ -198,11 +195,13 @@ public final class MinicraftProtocol extends Protocol {
             this.registerIncoming(0xFB, ClientPlayerPositionPacket.class);
             this.registerIncoming(0xFA, ClientPlayerAttackPacket.class);
             this.registerIncoming(0xF8, ClientPlayerUpdatePacket.class);
+            this.registerIncoming(0xF5, ClientRespawnPacket.class);
 
             this.registerOutgoing(0xFC, ServerUpdateLevelPacket.class);
             this.registerOutgoing(0xFE, ServerStartLevelPacket.class);
             this.registerOutgoing(0xF9, ServerSoundEffectPacket.class);
             this.registerOutgoing(0xF7, ServerChangeLevelPacket.class);
+            this.registerOutgoing(0xF6, ServerUpdateEntityPacket.class);
         }
     }
 
@@ -222,11 +221,13 @@ public final class MinicraftProtocol extends Protocol {
             this.registerOutgoing(0xFB, ClientPlayerPositionPacket.class);
             this.registerOutgoing(0xFA, ClientPlayerAttackPacket.class);
             this.registerOutgoing(0xF8, ClientPlayerUpdatePacket.class);
+            this.registerOutgoing(0xF5, ClientRespawnPacket.class);
 
             this.registerIncoming(0xFE, ServerStartLevelPacket.class);
             this.registerIncoming(0xFC, ServerUpdateLevelPacket.class);
             this.registerIncoming(0xF9, ServerSoundEffectPacket.class);
             this.registerIncoming(0xF7, ServerChangeLevelPacket.class);
+            this.registerIncoming(0xF6, ServerUpdateEntityPacket.class);
         }
 
         this.registerOutgoing(0x02, ClientChatPacket.class);

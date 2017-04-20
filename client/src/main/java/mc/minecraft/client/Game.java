@@ -28,6 +28,8 @@ public interface Game {
 
     void resetGame();
 
+    void respawn();
+
     Player player();
 
     int gameTime();

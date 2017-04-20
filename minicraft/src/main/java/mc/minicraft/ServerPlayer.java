@@ -19,7 +19,9 @@ import mc.minicraft.packet.ingame.client.ClientChatPacket;
 import mc.minicraft.packet.ingame.client.player.ClientPlayerPositionPacket;
 import mc.minicraft.packet.ingame.server.ServerChatPacket;
 import mc.minicraft.packet.ingame.server.ServerSoundEffectPacket;
+import mc.minicraft.packet.ingame.server.ServerUpdateEntityPacket;
 import mc.minicraft.packet.ingame.server.level.ServerChangeLevelPacket;
+import mc.minicraft.packet.ingame.server.level.ServerStartLevelPacket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +33,7 @@ import java.util.UUID;
 
 public final class ServerPlayer extends Session.ListenerAdapter implements Comparable<ServerPlayer>, Sound {
     private static final Logger logger = LoggerFactory.getLogger(ServerPlayer.class);
+    public static final int START_LEVEL = 3;
     protected final Random random = new Random();
     final Server server;
     final Session session;
@@ -153,7 +156,18 @@ public final class ServerPlayer extends Session.ListenerAdapter implements Compa
     public void process(Session session) {
         if (level != null) {
             level.process(session, this);
+            if (player.updated) {
+                ServerUpdateEntityPacket packet = new ServerUpdateEntityPacket();
+                packet.entity = player;
+                session.send(packet);
+                player.updated = false;
+            }
         }
+    }
+
+    void respawn(UUID id) {
+        registerPlayer(levels[START_LEVEL]);
+        session.send(new ServerStartLevelPacket(levels[START_LEVEL], this));
     }
 
     private final class PlayerState implements PlayerHandler {

@@ -2,9 +2,9 @@ package mc.minecraft.client.screen;
 
 import mc.engine.property.PropertyReader;
 import mc.minecraft.client.console.ConsoleMenu;
-import mc.minicraft.engine.gfx.Color;
-import mc.minecraft.client.gfx.Font;
 import mc.minecraft.client.gfx.ClientScreen;
+import mc.minecraft.client.gfx.Font;
+import mc.minicraft.engine.gfx.Color;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,20 +13,28 @@ import java.util.function.Function;
 public final class MainMenu extends Menu {
 
     private static final int OPTION_START_GAME = 0;
-    private static final int OPTION_LOGIN = 1;
-    private static final int OPTION_CONSOLE = 2;
-    private static final int OPTION_COLOR = 3;
-    private static final int OPTION_HOW_PLAY = 4;
-    private static final int OPTION_ABOUT = 5;
-    private static final int OPTION_QUIT = 6;
+    private static final int OPTION_RESPAWN = 1;
+    private static final int OPTION_LOGIN = 2;
+    private static final int OPTION_CONSOLE = 3;
+    private static final int OPTION_COLOR = 4;
+    private static final int OPTION_HOW_PLAY = 5;
+    private static final int OPTION_ABOUT = 6;
+    private static final int OPTION_QUIT = 7;
 
     public final ConsoleMenu consoleMenu;
     private int selected = 0;
+    private boolean respawn = false;
+
     private static final List<Option<MainMenu>> defaultOptions = new ArrayList<Option<MainMenu>>(20) {
         {
             add(OPTION_START_GAME, new Option<>("Resume", "Возврат", titleMenu -> {
                 titleMenu.game.resetGame();
                 titleMenu.game.setMenu(null);
+                return null;
+            }, false));
+            add(OPTION_RESPAWN, new Option<>("Respawn", "Начинаем заново", titleMenu -> {
+                titleMenu.game.setMenu(null);
+                titleMenu.game.respawn();
                 return null;
             }, false));
             add(OPTION_LOGIN, new Option<>("Connect", "Авторизация", titleMenu -> {
@@ -93,8 +101,10 @@ public final class MainMenu extends Menu {
 
         if (game != null) {
             defaultOptions.get(OPTION_LOGIN).isVisible = !game.isConnected();
-            //FIXME: Изменить после отладки
-            defaultOptions.get(OPTION_START_GAME).isVisible = game.isConnected();
+            if (game.isConnected()) {
+                defaultOptions.get(OPTION_START_GAME).isVisible = !respawn;
+                defaultOptions.get(OPTION_RESPAWN).isVisible = respawn;
+            }
         }
 
         for (Option<MainMenu> option : defaultOptions) {
@@ -102,6 +112,15 @@ public final class MainMenu extends Menu {
                 options.add(option);
             }
         }
+    }
+
+    public void respawn() {
+        respawn = true;
+        refresh();
+    }
+
+    public void resetRespawn() {
+        respawn = false;
     }
 
     public void render(ClientScreen screen) {

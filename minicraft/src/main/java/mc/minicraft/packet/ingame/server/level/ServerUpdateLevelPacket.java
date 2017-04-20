@@ -7,22 +7,19 @@ import mc.engine.property.PropertyReader;
 import mc.minicraft.engine.LevelHandler;
 import mc.minicraft.engine.entity.Entity;
 import mc.minicraft.engine.entity.PlayerHandler;
+import mc.minicraft.packet.ingame.server.GraphicsUpdatePacket;
 
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-public final class ServerUpdateLevelPacket implements Packet {
+public final class ServerUpdateLevelPacket extends GraphicsUpdatePacket {
 
     public final List<LevelHandler.DataKey> tiles = new LinkedList<>();
     public final List<LevelHandler.DataKey> datas = new LinkedList<>();
 
     public final List<Entity> insertEntities = new LinkedList<>();
     public final List<Entity> removeEntities = new LinkedList<>();
-
-    public Sound sound;
-    public PlayerHandler handler;
-    public PropertyReader propertyReader;
 
     @Override
     public void read(Buffer.Input in) throws IOException {
@@ -40,11 +37,11 @@ public final class ServerUpdateLevelPacket implements Packet {
         }
         int insertLength = in.readVarInt();
         for (int i = 0; i < insertLength; ++i) {
-            insertEntities.add(Entity.readEntity(sound, handler, propertyReader, in));
+            insertEntities.add(Entity.readEntity(sound, handler, property, in));
         }
         int removeLength = in.readVarInt();
         for (int i = 0; i < removeLength; ++i) {
-            removeEntities.add(Entity.readEntity(sound, handler, propertyReader, in));
+            removeEntities.add(Entity.readEntity(sound, handler, property, in));
         }
     }
 

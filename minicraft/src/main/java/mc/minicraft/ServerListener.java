@@ -9,6 +9,7 @@ import mc.minicraft.data.status.VersionInfo;
 import mc.minicraft.data.status.handler.ServerInfoBuilder;
 import mc.minicraft.packet.HandshakePacket;
 import mc.minicraft.packet.ingame.client.ClientKeepAlivePacket;
+import mc.minicraft.packet.ingame.client.ClientRespawnPacket;
 import mc.minicraft.packet.ingame.client.player.ClientPlayerAttackPacket;
 import mc.minicraft.packet.ingame.client.player.ClientPlayerPositionPacket;
 import mc.minicraft.packet.ingame.client.player.ClientPlayerSettings;
@@ -159,6 +160,10 @@ final class ServerListener extends Session.ListenerAdapter {
                 ClientPlayerUpdatePacket update = event.asPacket();
                 ServerPlayer player = event.session.flag(Constants.GAME_PLAYER_KEY);
                 player.update(update.player);
+            }else if (event.packet() instanceof ClientRespawnPacket) {
+                ClientRespawnPacket respawn = event.asPacket();
+                ServerPlayer player = event.session.flag(Constants.GAME_PLAYER_KEY);
+                player.respawn(respawn.id);
             }
         }
 //        logger.info("Server recv: " + event.packet());

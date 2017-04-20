@@ -28,6 +28,7 @@ public abstract class Entity {
     public BaseLevel level;
     public final Sound sound;
     public final EntityType type;
+    public boolean updated = false;
 
     public Entity(Sound sound, EntityType type) {
         this.type = type;

@@ -7,10 +7,6 @@ import mc.engine.property.PropertyContainer;
 import mc.engine.tcp.DefaultFactory;
 import mc.engine.tcp.DefaultServer;
 import mc.minicraft.*;
-import mc.minicraft.engine.crafting.Crafting;
-import mc.minicraft.engine.entity.PlayerHandlerAdapter;
-import mc.minicraft.engine.level.ServerLevel;
-import mc.minicraft.engine.level.tile.Tile;
 import mc.minicraft.data.game.MessageType;
 import mc.minicraft.data.game.entity.player.GameMode;
 import mc.minicraft.data.game.setting.Difficulty;
@@ -23,6 +19,10 @@ import mc.minicraft.data.status.PlayerInfo;
 import mc.minicraft.data.status.ServerStatusInfo;
 import mc.minicraft.data.status.VersionInfo;
 import mc.minicraft.data.status.handler.ServerInfoBuilder;
+import mc.minicraft.engine.crafting.Crafting;
+import mc.minicraft.engine.entity.PlayerHandlerAdapter;
+import mc.minicraft.engine.level.ServerLevel;
+import mc.minicraft.engine.level.tile.Tile;
 import mc.minicraft.packet.ingame.client.player.ClientPlayerUpdatePacket;
 import mc.minicraft.packet.ingame.server.ServerChatPacket;
 import mc.minicraft.packet.ingame.server.ServerJoinGamePacket;
@@ -38,10 +38,11 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
+import static mc.minicraft.ServerPlayer.START_LEVEL;
+
 final class MinicraftGameServer extends Server.ListenerAdapter
         implements ServerLoginHandler, ServerInfoBuilder, GameServer, Runnable, Sound, PacketConstructor {
     private static final Logger logger = LoggerFactory.getLogger(GameServer.class);
-    private static final int START_LEVEL = 3;
     private static final DefaultFactory FACTORY = DefaultFactory.instance();
     private static final boolean VERIFY_USERS = true;
     private static final Proxy PROXY = Proxy.NO_PROXY;

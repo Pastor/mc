@@ -23,7 +23,7 @@ final class ConnectMenu extends Menu {
             })
     };
     private final Menu parent;
-    private int nextId = 0;
+    private int nextId = 3;
     private int tickCount;
 
     ConnectMenu(Menu parent) {

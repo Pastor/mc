@@ -5,10 +5,10 @@ import mc.minecraft.client.gfx.Font;
 import mc.minecraft.client.gfx.ClientScreen;
 
 public class DeadMenu extends Menu {
-    private final Menu resetMenu;
+    private final MainMenu resetMenu;
     private int inputDelay = 60;
 
-    public DeadMenu(Menu resetMenu) {
+    public DeadMenu(MainMenu resetMenu) {
         super(resetMenu.propertyReader);
         this.resetMenu = resetMenu;
     }
@@ -17,6 +17,7 @@ public class DeadMenu extends Menu {
         if (inputDelay > 0)
             inputDelay--;
         else if (input.attack.clicked || input.menu.clicked || input.escape.clicked) {
+            resetMenu.respawn();
             game.setMenu(resetMenu);
         }
     }

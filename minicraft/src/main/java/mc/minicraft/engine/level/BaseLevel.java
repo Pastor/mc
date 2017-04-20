@@ -134,6 +134,10 @@ public abstract class BaseLevel {
         return entities.get(e.id);
     }
 
+    protected final EntityData readEntity(UUID id) {
+        return entities.get(id);
+    }
+
     public PlayerHandler playerHandler() {
         return handler;
     }
@@ -174,10 +178,10 @@ public abstract class BaseLevel {
     public abstract Set<Entity> getEntities(int x0, int y0, int x1, int y1);
 
     public static final class EntityData {
-        public final Integer index;
+        public final int index;
         public final Entity entity;
 
-        public EntityData(Integer index, Entity entity) {
+        public EntityData(int index, Entity entity) {
             this.index = index;
             this.entity = entity;
         }

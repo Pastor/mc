@@ -105,6 +105,7 @@ public final class Player extends Mob implements PropertyContainer.Listener {
     }
 
     public void tick() {
+        updated = false;
         if (die) {
             remove();
             return;
@@ -141,8 +142,10 @@ public final class Player extends Mob implements PropertyContainer.Listener {
             }
             while (staminaRecharge > 10) {
                 staminaRecharge -= 10;
-                if (stamina < maxStamina) stamina++;
+                if (stamina < maxStamina)
+                    stamina++;
             }
+            updated = true;
         }
 
         Point move = handler.move();
@@ -153,6 +156,7 @@ public final class Player extends Mob implements PropertyContainer.Listener {
         if (isSwimming() && tickTime % 60 == 0) {
             if (stamina > 0) {
                 stamina--;
+                updated = true;
             } else {
                 hurt(this, 1, dir ^ 1);
             }
@@ -177,6 +181,7 @@ public final class Player extends Mob implements PropertyContainer.Listener {
                 staminaRecharge = 0;
                 attack();
             }
+            updated = true;
         }
         if (attackTime > 0)
             attackTime--;

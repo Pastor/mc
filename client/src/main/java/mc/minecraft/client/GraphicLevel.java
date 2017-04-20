@@ -41,7 +41,9 @@ public final class GraphicLevel extends BaseLevel {
     }
 
 
-    /**TODO: Опимизировать */
+    /**
+     * TODO: Опимизировать
+     */
     public void renderSprites(Screen screen, int xScroll, int yScroll) {
         final List<Entity> rowSprites = new ArrayList<>();
         int xo = xScroll >> 4;
@@ -66,7 +68,9 @@ public final class GraphicLevel extends BaseLevel {
         screen.setOffset(0, 0);
     }
 
-    /**TODO: Опимизировать */
+    /**
+     * TODO: Опимизировать
+     */
     public void renderLight(Screen screen, int xScroll, int yScroll) {
         int xo = xScroll >> 4;
         int yo = yScroll >> 4;
@@ -125,11 +129,15 @@ public final class GraphicLevel extends BaseLevel {
         data.write(data -> data[x + y * w] = (byte) val);
     }
 
-    public void update(Entity entity) {
+    void update(Entity entity) {
         entity.removed = false;
         entity.init(this);
+        final EntityData data = readEntity(entity.id);
         int index = (entity.x >> 4) + (entity.y >> 4) * w;
         entitiesInTiles.write(entitiesInTiles -> {
+            if (data != null) {
+                entitiesInTiles[data.index].remove(entity);
+            }
             entitiesInTiles[index].remove(entity);
             entitiesInTiles[index].add(entity);
             putEntity(entity, index);
@@ -161,7 +169,7 @@ public final class GraphicLevel extends BaseLevel {
         if (x < 0 || y < 0 || x >= w || y >= h) return;
         int i = x + y * w;
         EntityData data = removeEntity(e);
-        if (data != null && data.index != null) {
+        if (data != null) {
             entitiesInTiles.write(entitiesInTiles -> entitiesInTiles[data.index].remove(e));
         }
     }

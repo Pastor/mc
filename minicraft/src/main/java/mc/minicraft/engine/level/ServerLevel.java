@@ -85,7 +85,7 @@ public final class ServerLevel extends BaseLevel {
         entitiesInTiles[i].remove(e);
         handler.removeEntity(x, y, e);
         EntityData data = removeEntity(e);
-        if (data != null && data.index != null) {
+        if (data != null) {
             entitiesInTiles[data.index].remove(e);
         }
     }
@@ -228,6 +228,10 @@ public final class ServerLevel extends BaseLevel {
                 packet.removeEntities.addAll(removeEntities1);
                 packet.datas.addAll(datas);
                 packet.tiles.addAll(tiles);
+
+                if (insertEntities1.contains(player.player)) {
+                    player.player.updated = false;
+                }
                 try {
                     if (datas.size() != 0 || tiles.size() != 0 || insertEntities1.size() != 0 || removeEntities1.size() != 0) {
                         session.send(packet);
