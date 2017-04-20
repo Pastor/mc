@@ -236,5 +236,4 @@ final class MinicraftGameServer extends Server.ListenerAdapter
             update.reader = player.player.property;
         }
     }
-
 }

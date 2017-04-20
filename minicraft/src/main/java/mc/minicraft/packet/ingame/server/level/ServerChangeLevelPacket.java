@@ -6,10 +6,11 @@ import mc.minicraft.component.level.Level;
 
 import java.io.IOException;
 
-public final class ServerChangeLevelPacket extends ServerStartLevelPacket {
+public final class ServerChangeLevelPacket extends ServerLevelPositionPacket {
 
     public int currentLevel;
 
+    @SuppressWarnings({"unused", "WeakerAccess"})
     public ServerChangeLevelPacket() {
     }
 
