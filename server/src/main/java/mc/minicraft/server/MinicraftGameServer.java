@@ -9,7 +9,7 @@ import mc.engine.tcp.DefaultServer;
 import mc.minicraft.*;
 import mc.minicraft.engine.crafting.Crafting;
 import mc.minicraft.engine.entity.PlayerHandlerAdapter;
-import mc.minicraft.engine.level.Level;
+import mc.minicraft.engine.level.ServerLevel;
 import mc.minicraft.engine.level.tile.Tile;
 import mc.minicraft.data.game.MessageType;
 import mc.minicraft.data.game.entity.player.GameMode;
@@ -137,7 +137,7 @@ final class MinicraftGameServer extends Server.ListenerAdapter
     }
 
 
-    private final Level[] levels = new Level[5];
+    private final ServerLevel[] levels = new ServerLevel[5];
     private int tickCount;
 
     @Override
@@ -181,11 +181,11 @@ final class MinicraftGameServer extends Server.ListenerAdapter
 //        int h = 40;
         int h = 128;
         PlayerHandlerAdapter handler = new PlayerHandlerAdapter();
-        levels[4] = new Level(this, handler, container, w, h, 1, null);
-        levels[3] = new Level(this, handler, container, w, h, 0, levels[4]);
-        levels[2] = new Level(this, handler, container, w, h, -1, levels[3]);
-        levels[1] = new Level(this, handler, container, w, h, -2, levels[2]);
-        levels[0] = new Level(this, handler, container, w, h, -3, levels[1]);
+        levels[4] = new ServerLevel(this, handler, container, w, h, 1, null);
+        levels[3] = new ServerLevel(this, handler, container, w, h, 0, levels[4]);
+        levels[2] = new ServerLevel(this, handler, container, w, h, -1, levels[3]);
+        levels[1] = new ServerLevel(this, handler, container, w, h, -2, levels[2]);
+        levels[0] = new ServerLevel(this, handler, container, w, h, -3, levels[1]);
 
         for (int i = 0; i < 5; i++) {
             levels[i].trySpawn(5);
@@ -199,8 +199,8 @@ final class MinicraftGameServer extends Server.ListenerAdapter
     private void tick() {
         tickCount++;
 
-        for (Level level : levels) {
-            level.handler.reset();
+        for (ServerLevel level : levels) {
+            level.resetState();
             level.tick();
         }
 

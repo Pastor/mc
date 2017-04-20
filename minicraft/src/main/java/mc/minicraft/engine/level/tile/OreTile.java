@@ -13,7 +13,7 @@ import mc.minicraft.engine.item.ResourceItem;
 import mc.minicraft.engine.item.ToolItem;
 import mc.minicraft.engine.item.ToolType;
 import mc.minicraft.engine.item.resource.Resource;
-import mc.minicraft.engine.level.Level;
+import mc.minicraft.engine.level.BaseLevel;
 
 public class OreTile extends Tile {
     private Resource toDrop;
@@ -25,7 +25,7 @@ public class OreTile extends Tile {
         this.color = toDrop.color & 0xffff00;
     }
 
-    public void render(Screen screen, Level level, int x, int y) {
+    public void render(Screen screen, BaseLevel level, int x, int y) {
         color = (toDrop.color & 0xffffff00) + Color.get(level.dirtColor);
         screen.render(x * 16 + 0, y * 16 + 0, 17 + 1 * 32, color, 0);
         screen.render(x * 16 + 8, y * 16 + 0, 18 + 1 * 32, color, 0);
@@ -33,15 +33,15 @@ public class OreTile extends Tile {
         screen.render(x * 16 + 8, y * 16 + 8, 18 + 2 * 32, color, 0);
     }
 
-    public boolean mayPass(Level level, int x, int y, Entity e) {
+    public boolean mayPass(BaseLevel level, int x, int y, Entity e) {
         return false;
     }
 
-    public void hurt(Level level, int x, int y, Mob source, int dmg, int attackDir) {
+    public void hurt(BaseLevel level, int x, int y, Mob source, int dmg, int attackDir) {
         hurt(level, x, y, 0);
     }
 
-    public boolean interact(Level level, int xt, int yt, Player player, Item item, int attackDir) {
+    public boolean interact(BaseLevel level, int xt, int yt, Player player, Item item, int attackDir) {
         if (item instanceof ToolItem) {
             ToolItem tool = (ToolItem) item;
             if (tool.type == ToolType.pickaxe) {
@@ -54,7 +54,7 @@ public class OreTile extends Tile {
         return false;
     }
 
-    public void hurt(Level level, int x, int y, int dmg) {
+    public void hurt(BaseLevel level, int x, int y, int dmg) {
         int damage = level.getData(x, y) + 1;
         level.add(new SmashParticle(level.sound, x * 16 + 8, y * 16 + 8));
         level.add(new TextParticle(level.sound, "" + dmg, x * 16 + 8, y * 16 + 8, Color.get(-1, 500, 500, 500)));
@@ -75,7 +75,7 @@ public class OreTile extends Tile {
         }
     }
 
-    public void bumpedInto(Level level, int x, int y, Entity entity) {
+    public void bumpedInto(BaseLevel level, int x, int y, Entity entity) {
         entity.hurt(this, x, y, 3);
     }
 }

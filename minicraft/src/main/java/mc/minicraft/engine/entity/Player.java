@@ -13,7 +13,7 @@ import mc.minicraft.engine.gfx.Color;
 import mc.minicraft.engine.item.FurnitureItem;
 import mc.minicraft.engine.item.Item;
 import mc.minicraft.engine.item.PowerGloveItem;
-import mc.minicraft.engine.level.Level;
+import mc.minicraft.engine.level.BaseLevel;
 import mc.minicraft.engine.level.tile.Tile;
 
 import java.awt.*;
@@ -401,7 +401,7 @@ public final class Player extends Mob implements PropertyContainer.Listener {
         return true;
     }
 
-    public boolean findStartPos(Level level) {
+    public boolean findStartPos(BaseLevel level) {
         while (true) {
             int x = random.nextInt(level.w);
             int y = random.nextInt(level.h);

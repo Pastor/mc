@@ -9,7 +9,7 @@ import mc.minicraft.engine.ListItem;
 import mc.minicraft.engine.Screen;
 import mc.minicraft.engine.entity.*;
 import mc.minicraft.engine.item.resource.Resource;
-import mc.minicraft.engine.level.Level;
+import mc.minicraft.engine.level.BaseLevel;
 import mc.minicraft.engine.level.tile.Tile;
 
 import java.io.IOException;
@@ -86,7 +86,7 @@ public abstract class Item implements ListItem {
     public void renderIcon(Screen screen, int x, int y) {
     }
 
-    public boolean interactOn(Tile tile, Level level, int xt, int yt, Player player, int attackDir) {
+    public boolean interactOn(Tile tile, BaseLevel level, int xt, int yt, Player player, int attackDir) {
         return false;
     }
 

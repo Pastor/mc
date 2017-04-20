@@ -7,7 +7,6 @@ import mc.minicraft.engine.entity.Player;
 import mc.minicraft.engine.item.Item;
 import mc.minicraft.engine.item.resource.Resource;
 import mc.minicraft.engine.level.BaseLevel;
-import mc.minicraft.engine.level.Level;
 
 import java.util.Random;
 
@@ -54,34 +53,34 @@ public class Tile {
         tiles[id] = this;
     }
 
-    public void render(Screen screen, Level level, int x, int y) {
+    public void render(Screen screen, BaseLevel level, int x, int y) {
     }
 
-    public boolean mayPass(Level level, int x, int y, Entity e) {
+    public boolean mayPass(BaseLevel level, int x, int y, Entity e) {
         return true;
     }
 
-    public int getLightRadius(Level level, int x, int y) {
+    public int getLightRadius(BaseLevel level, int x, int y) {
         return 0;
     }
 
-    public void hurt(Level level, int x, int y, Mob source, int dmg, int attackDir) {
+    public void hurt(BaseLevel level, int x, int y, Mob source, int dmg, int attackDir) {
     }
 
-    public void bumpedInto(Level level, int xt, int yt, Entity entity) {
+    public void bumpedInto(BaseLevel level, int xt, int yt, Entity entity) {
     }
 
-    public void tick(Level level, int xt, int yt) {
+    public void tick(BaseLevel level, int xt, int yt) {
     }
 
-    public void steppedOn(Level level, int xt, int yt, Entity entity) {
+    public void steppedOn(BaseLevel level, int xt, int yt, Entity entity) {
     }
 
-    public boolean interact(Level level, int xt, int yt, Player player, Item item, int attackDir) {
+    public boolean interact(BaseLevel level, int xt, int yt, Player player, Item item, int attackDir) {
         return false;
     }
 
-    public boolean use(Level level, int xt, int yt, Player player, int attackDir) {
+    public boolean use(BaseLevel level, int xt, int yt, Player player, int attackDir) {
         return false;
     }
 

@@ -13,7 +13,7 @@ import mc.minicraft.engine.crafting.Recipe;
 import mc.minicraft.engine.entity.Inventory;
 import mc.minicraft.engine.entity.Player;
 import mc.minicraft.engine.entity.PlayerHandler;
-import mc.minicraft.engine.level.Level;
+import mc.minicraft.engine.level.ServerLevel;
 import mc.minicraft.engine.level.tile.Tile;
 import mc.minicraft.packet.ingame.client.ClientChatPacket;
 import mc.minicraft.packet.ingame.client.player.ClientPlayerPositionPacket;
@@ -41,14 +41,14 @@ public final class ServerPlayer extends Session.ListenerAdapter implements Compa
     private int deadTime;
     private int wonTime;
     private int currentLevel;
-    private Level level;
+    private ServerLevel level;
     int pendingLevelChange;
     public int visibleDistance;
 
     private final PlayerState state = new PlayerState();
-    private final Level[] levels;
+    private final ServerLevel[] levels;
 
-    public ServerPlayer(Session session, Server server, PropertyContainer container, Level[] levels, int currentLevel) {
+    public ServerPlayer(Session session, Server server, PropertyContainer container, ServerLevel[] levels, int currentLevel) {
         this.session = session;
         this.levels = levels;
         this.currentLevel = currentLevel;
@@ -84,7 +84,7 @@ public final class ServerPlayer extends Session.ListenerAdapter implements Compa
             level.remove(player);
     }
 
-    public void registerPlayer(Level level) {
+    public void registerPlayer(ServerLevel level) {
         this.gameTime = 0;
         this.deadTime = 0;
         this.wonTime = 0;
@@ -93,7 +93,7 @@ public final class ServerPlayer extends Session.ListenerAdapter implements Compa
         level.add(player);
     }
 
-    private boolean findStartPos(Level level) {
+    private boolean findStartPos(ServerLevel level) {
         while (true) {
             int x = random.nextInt(level.w);
             int y = random.nextInt(level.h);
@@ -152,7 +152,7 @@ public final class ServerPlayer extends Session.ListenerAdapter implements Compa
 
     public void process(Session session) {
         if (level != null) {
-            level.handler.process(session, this);
+            level.process(session, this);
         }
     }
 

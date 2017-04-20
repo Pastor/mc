@@ -3,7 +3,7 @@ package mc.minicraft.engine.level.tile;
 import mc.minicraft.engine.Screen;
 import mc.minicraft.engine.entity.Entity;
 import mc.minicraft.engine.gfx.Color;
-import mc.minicraft.engine.level.Level;
+import mc.minicraft.engine.level.BaseLevel;
 
 import java.util.Random;
 
@@ -16,7 +16,7 @@ public class WaterTile extends Tile {
 
     private Random wRandom = new Random();
 
-    public void render(Screen screen, Level level, int x, int y) {
+    public void render(Screen screen, BaseLevel level, int x, int y) {
         wRandom.setSeed((tickCount + (x / 2 - y) * 4311) / 10 * 54687121l + x * 3271612l + y * 3412987161l);
         int col = Color.get(005, 005, 115, 115);
         int transitionColor1 = Color.get(3, 005, level.dirtColor - 111, level.dirtColor);
@@ -52,11 +52,11 @@ public class WaterTile extends Tile {
             screen.render(x * 16 + 8, y * 16 + 8, (r ? 16 : 15) + (d ? 2 : 1) * 32, (sd || sr) ? transitionColor2 : transitionColor1, 0);
     }
 
-    public boolean mayPass(Level level, int x, int y, Entity e) {
+    public boolean mayPass(BaseLevel level, int x, int y, Entity e) {
         return e.canSwim();
     }
 
-    public void tick(Level level, int xt, int yt) {
+    public void tick(BaseLevel level, int xt, int yt) {
         int xn = xt;
         int yn = yt;
 

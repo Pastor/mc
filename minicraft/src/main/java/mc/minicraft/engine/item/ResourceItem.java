@@ -7,7 +7,7 @@ import mc.minicraft.engine.entity.ItemEntity;
 import mc.minicraft.engine.entity.Player;
 import mc.minicraft.engine.gfx.Color;
 import mc.minicraft.engine.item.resource.Resource;
-import mc.minicraft.engine.level.Level;
+import mc.minicraft.engine.level.BaseLevel;
 import mc.minicraft.engine.level.tile.Tile;
 
 import java.io.IOException;
@@ -61,7 +61,7 @@ public final class ResourceItem extends Item {
     public void onTake(ItemEntity itemEntity) {
     }
 
-    public boolean interactOn(Tile tile, Level level, int xt, int yt, Player player, int attackDir) {
+    public boolean interactOn(Tile tile, BaseLevel level, int xt, int yt, Player player, int attackDir) {
         if (resource.interactOn(tile, level, xt, yt, player, attackDir)) {
             count--;
             return true;

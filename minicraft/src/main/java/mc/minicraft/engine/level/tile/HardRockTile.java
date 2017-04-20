@@ -11,14 +11,14 @@ import mc.minicraft.engine.item.ResourceItem;
 import mc.minicraft.engine.item.ToolItem;
 import mc.minicraft.engine.item.ToolType;
 import mc.minicraft.engine.item.resource.Resource;
-import mc.minicraft.engine.level.Level;
+import mc.minicraft.engine.level.BaseLevel;
 
 public class HardRockTile extends Tile {
     public HardRockTile(int id) {
         super(id);
     }
 
-    public void render(Screen screen, Level level, int x, int y) {
+    public void render(Screen screen, BaseLevel level, int x, int y) {
         int col = Color.get(334, 334, 223, 223);
         int transitionColor = Color.get(001, 334, 445, level.dirtColor);
 
@@ -64,15 +64,15 @@ public class HardRockTile extends Tile {
             screen.render(x * 16 + 8, y * 16 + 8, (r ? 4 : 5) + (d ? 0 : 1) * 32, transitionColor, 3);
     }
 
-    public boolean mayPass(Level level, int x, int y, Entity e) {
+    public boolean mayPass(BaseLevel level, int x, int y, Entity e) {
         return false;
     }
 
-    public void hurt(Level level, int x, int y, Mob source, int dmg, int attackDir) {
+    public void hurt(BaseLevel level, int x, int y, Mob source, int dmg, int attackDir) {
         hurt(level.playerHandler(), level.propertyReader(), level, x, y, 0);
     }
 
-    public boolean interact(Level level, int xt, int yt, Player player, Item item, int attackDir) {
+    public boolean interact(BaseLevel level, int xt, int yt, Player player, Item item, int attackDir) {
         if (item instanceof ToolItem) {
             ToolItem tool = (ToolItem) item;
             if (tool.type == ToolType.pickaxe && tool.level == 4) {
@@ -85,7 +85,7 @@ public class HardRockTile extends Tile {
         return false;
     }
 
-    public void hurt(PlayerHandler handler, PropertyReader reader, Level level, int x, int y, int dmg) {
+    public void hurt(PlayerHandler handler, PropertyReader reader, BaseLevel level, int x, int y, int dmg) {
         int damage = level.getData(x, y) + dmg;
         level.add(new SmashParticle(level.sound, x * 16 + 8, y * 16 + 8));
         level.add(new TextParticle(level.sound, "" + dmg, x * 16 + 8, y * 16 + 8, Color.get(-1, 500, 500, 500)));
@@ -104,7 +104,7 @@ public class HardRockTile extends Tile {
         }
     }
 
-    public void tick(Level level, int xt, int yt) {
+    public void tick(BaseLevel level, int xt, int yt) {
         int damage = level.getData(xt, yt);
         if (damage > 0) level.setData(xt, yt, damage - 1);
     }

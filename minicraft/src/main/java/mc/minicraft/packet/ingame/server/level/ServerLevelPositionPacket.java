@@ -2,22 +2,19 @@ package mc.minicraft.packet.ingame.server.level;
 
 import mc.api.Buffer;
 import mc.api.Packet;
-import mc.api.Sound;
-import mc.engine.property.PropertyReader;
 import mc.minicraft.ServerPlayer;
-import mc.minicraft.engine.entity.PlayerHandler;
-import mc.minicraft.engine.level.Level;
+import mc.minicraft.engine.level.ServerLevel;
 
 import java.io.IOException;
 import java.util.UUID;
 
 public abstract class ServerLevelPositionPacket implements Packet {
-    private int w;
-    private int h;
-    private int level;
+    public int w;
+    public int h;
+    public int level;
 
-    private byte[] tiles;
-    private byte[] data;
+    public byte[] tiles;
+    public byte[] data;
 
     public int xPlayer;
     public int yPlayer;
@@ -36,16 +33,12 @@ public abstract class ServerLevelPositionPacket implements Packet {
         this.data = data;
     }
 
-    ServerLevelPositionPacket(Level level, ServerPlayer player) {
+    ServerLevelPositionPacket(ServerLevel level, ServerPlayer player) {
         this(level.w, level.h, level.depth, level.tiles, level.data);
         this.xPlayer = player.player.x;
         this.yPlayer = player.player.y;
         this.ownerId = player.player.id;
         this.levelId = level.id;
-    }
-
-    public Level readLevel(Sound sound, PropertyReader reader, PlayerHandler handler) {
-        return new Level(sound, levelId, w, h, level, tiles, data, reader, handler);
     }
 
     @Override

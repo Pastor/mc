@@ -10,14 +10,14 @@ import mc.minicraft.engine.item.ResourceItem;
 import mc.minicraft.engine.item.ToolItem;
 import mc.minicraft.engine.item.ToolType;
 import mc.minicraft.engine.item.resource.Resource;
-import mc.minicraft.engine.level.Level;
+import mc.minicraft.engine.level.BaseLevel;
 
 public class CloudTile extends Tile {
     public CloudTile(int id) {
         super(id);
     }
 
-    public void render(Screen screen, Level level, int x, int y) {
+    public void render(Screen screen, BaseLevel level, int x, int y) {
         int col = Color.get(444, 444, 555, 555);
         int transitionColor = Color.get(333, 444, 555, -1);
 
@@ -63,11 +63,11 @@ public class CloudTile extends Tile {
             screen.render(x * 16 + 8, y * 16 + 8, (r ? 4 : 5) + (d ? 0 : 1) * 32, transitionColor, 3);
     }
 
-    public boolean mayPass(Level level, int x, int y, Entity e) {
+    public boolean mayPass(BaseLevel level, int x, int y, Entity e) {
         return true;
     }
 
-    public boolean interact(Level level, int xt, int yt, Player player, Item item, int attackDir) {
+    public boolean interact(BaseLevel level, int xt, int yt, Player player, Item item, int attackDir) {
         if (item instanceof ToolItem) {
             ToolItem tool = (ToolItem) item;
             if (tool.type == ToolType.shovel) {

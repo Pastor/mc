@@ -11,7 +11,7 @@ import mc.minicraft.engine.item.ResourceItem;
 import mc.minicraft.engine.item.ToolItem;
 import mc.minicraft.engine.item.ToolType;
 import mc.minicraft.engine.item.resource.Resource;
-import mc.minicraft.engine.level.Level;
+import mc.minicraft.engine.level.BaseLevel;
 
 public class TreeTile extends Tile {
     public TreeTile(int id) {
@@ -19,7 +19,7 @@ public class TreeTile extends Tile {
         connectsToGrass = true;
     }
 
-    public void render(Screen screen, Level level, int x, int y) {
+    public void render(Screen screen, BaseLevel level, int x, int y) {
         int col = Color.get(10, 30, 151, level.grassColor);
         int barkCol1 = Color.get(10, 30, 430, level.grassColor);
         int barkCol2 = Color.get(10, 30, 320, level.grassColor);
@@ -55,20 +55,20 @@ public class TreeTile extends Tile {
         }
     }
 
-    public void tick(Level level, int xt, int yt) {
+    public void tick(BaseLevel level, int xt, int yt) {
         int damage = level.getData(xt, yt);
         if (damage > 0) level.setData(xt, yt, damage - 1);
     }
 
-    public boolean mayPass(Level level, int x, int y, Entity e) {
+    public boolean mayPass(BaseLevel level, int x, int y, Entity e) {
         return false;
     }
 
-    public void hurt(Level level, int x, int y, Mob source, int dmg, int attackDir) {
+    public void hurt(BaseLevel level, int x, int y, Mob source, int dmg, int attackDir) {
         hurt(level.playerHandler(), level.propertyReader(), level, x, y, dmg);
     }
 
-    public boolean interact(Level level, int xt, int yt, Player player, Item item, int attackDir) {
+    public boolean interact(BaseLevel level, int xt, int yt, Player player, Item item, int attackDir) {
         if (item instanceof ToolItem) {
             ToolItem tool = (ToolItem) item;
             if (tool.type == ToolType.axe) {
@@ -81,7 +81,7 @@ public class TreeTile extends Tile {
         return false;
     }
 
-    private void hurt(PlayerHandler handler, PropertyReader reader, Level level, int x, int y, int dmg) {
+    private void hurt(PlayerHandler handler, PropertyReader reader, BaseLevel level, int x, int y, int dmg) {
         {
             int count = random.nextInt(10) == 0 ? 1 : 0;
             for (int i = 0; i < count; i++) {

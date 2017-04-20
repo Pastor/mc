@@ -1,7 +1,7 @@
 package mc.minicraft.engine.item.resource;
 
 import mc.minicraft.engine.entity.Player;
-import mc.minicraft.engine.level.Level;
+import mc.minicraft.engine.level.BaseLevel;
 import mc.minicraft.engine.level.tile.Tile;
 
 public final class FoodResource extends Resource {
@@ -14,7 +14,7 @@ public final class FoodResource extends Resource {
         this.staminaCost = staminaCost;
     }
 
-    public boolean interactOn(Tile tile, Level level, int xt, int yt, Player player, int attackDir) {
+    public boolean interactOn(Tile tile, BaseLevel level, int xt, int yt, Player player, int attackDir) {
         if (player.health < player.maxHealth && player.payStamina(staminaCost)) {
             player.heal(heal);
             return true;

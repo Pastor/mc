@@ -6,7 +6,6 @@ import mc.minicraft.data.game.entity.EntityType;
 import mc.minicraft.engine.entity.particle.TextParticle;
 import mc.minicraft.engine.gfx.Color;
 import mc.minicraft.engine.level.BaseLevel;
-import mc.minicraft.engine.level.Level;
 import mc.minicraft.engine.level.tile.Tile;
 
 import java.io.IOException;
@@ -152,7 +151,7 @@ public abstract class Mob extends Entity {
         hurtTime = 10;
     }
 
-    public boolean findStartPos(Level level) {
+    public boolean findStartPos(BaseLevel level) {
         int x = random.nextInt(level.w);
         int y = random.nextInt(level.h);
         int xx = x * 16 + 8;

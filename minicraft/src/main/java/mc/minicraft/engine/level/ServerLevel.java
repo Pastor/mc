@@ -16,20 +16,20 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 public final class ServerLevel extends BaseLevel {
-    private final byte[] tiles;
-    private final byte[] data;
+    public final byte[] tiles;
+    public final byte[] data;
     private final Set<Entity>[] entitiesInTiles;
-    private final LevelCollector handler;
+    public final LevelCollector handler;
 
     @SuppressWarnings("unchecked")
     public ServerLevel(Sound sound, PlayerHandler playerHandler, PropertyReader reader,
-                       int w, int h, int level, Level parentLevel) {
+                       int w, int h, int level, BaseLevel parentLevel) {
         super(sound, playerHandler, reader, w, h, level, parentLevel);
         this.handler = new LevelCollector(w, h, this);
+        entitiesInTiles = createEntities(w, h);
         byte[][] maps = generateMap(w, h);
         tiles = maps[0];
         data = maps[1];
-        entitiesInTiles = createEntities(w, h);
         fillParentLevel(parentLevel);
     }
 
@@ -38,7 +38,7 @@ public final class ServerLevel extends BaseLevel {
         return Tile.tiles[tiles[x + y * w]];
     }
 
-    public synchronized void setTile(int x, int y, Tile t, int dataVal) {
+    public void setTile(int x, int y, Tile t, int dataVal) {
         if (x < 0 || y < 0 || x >= w || y >= h) return;
         tiles[x + y * w] = t.id;
         data[x + y * w] = (byte) dataVal;
@@ -57,10 +57,9 @@ public final class ServerLevel extends BaseLevel {
         handler.setData(x, y, val);
     }
 
-    public synchronized void add(Entity entity) {
+    public void add(Entity entity) {
         entity.removed = false;
-//        FIXME: Раскомментарить
-//        entity.init(this);
+        entity.init(this);
         insertEntity(entity.x >> 4, entity.y >> 4, entity);
     }
 
@@ -109,10 +108,9 @@ public final class ServerLevel extends BaseLevel {
                 mob = new Slime(sound, lvl);
             else
                 mob = new Zombie(sound, lvl);
-//FIXME: Раскомментарить
-//            if (mob.findStartPos(this)) {
-//                this.add(mob);
-//            }
+            if (mob.findStartPos(this)) {
+                this.add(mob);
+            }
         }
     }
 
@@ -122,8 +120,7 @@ public final class ServerLevel extends BaseLevel {
         for (int i = 0; i < w * h / 50; i++) {
             int xt = random.nextInt(w);
             int yt = random.nextInt(w);
-            //FIXME: Раскомментарить
-//            getTile(xt, yt).tick(this, xt, yt);
+            getTile(xt, yt).tick(this, xt, yt);
         }
         synchronized (entities) {
             for (EntityData e : new HashMap<>(entities).values()) {
@@ -179,6 +176,14 @@ public final class ServerLevel extends BaseLevel {
         return result;
     }
 
+    public void process(Session session, ServerPlayer player) {
+        handler.process(session, player);
+    }
+
+    public void resetState() {
+        handler.reset();
+    }
+
     private static final class LevelCollector implements LevelHandler {
 
         private final Set<DataKey> datas = new HashSet<>();
@@ -214,9 +219,9 @@ public final class ServerLevel extends BaseLevel {
 
         public void process(Session session, ServerPlayer player) {
             onViewport(w, h, player, (xStart1, yStart1, xEnd1, yEnd1) -> {
-                Set<Entity> insertEntities1 = Level.getEntities(LevelCollector.this.insertEntities, w, h,
+                Set<Entity> insertEntities1 = ServerLevel.getEntities(LevelCollector.this.insertEntities, w, h,
                         xStart1, yStart1, xEnd1, yEnd1);
-                Set<Entity> removeEntities1 = Level.getEntities(LevelCollector.this.removeEntities, w, h,
+                Set<Entity> removeEntities1 = ServerLevel.getEntities(LevelCollector.this.removeEntities, w, h,
                         xStart1, yStart1, xEnd1, yEnd1);
                 ServerUpdateLevelPacket packet = new ServerUpdateLevelPacket();
                 packet.insertEntities.addAll(insertEntities1);
@@ -264,10 +269,6 @@ public final class ServerLevel extends BaseLevel {
         public void sound(int x, int y, Sound.Type type) {
             sounds.add(type);
         }
-    }
-
-    public PropertyReader propertyReader() {
-        return reader;
     }
 
     private static void onViewport(int w, int h, ServerPlayer player, Viewport viewport) {

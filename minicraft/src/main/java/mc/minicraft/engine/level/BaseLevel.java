@@ -39,7 +39,7 @@ public abstract class BaseLevel {
     };
 
     protected BaseLevel(Sound sound, PlayerHandler playerHandler, PropertyReader reader,
-                        int w, int h, int level, Level parentLevel) {
+                        int w, int h, int level, BaseLevel parentLevel) {
         this.id = UUID.randomUUID();
         this.sound = sound;
         this.reader = reader;
@@ -70,7 +70,7 @@ public abstract class BaseLevel {
         return result;
     }
 
-    protected final void fillParentLevel(Level parentLevel) {
+    protected final void fillParentLevel(BaseLevel parentLevel) {
         if (parentLevel != null) {
             for (int y = 0; y < h; y++)
                 for (int x = 0; x < w; x++) {
@@ -100,6 +100,12 @@ public abstract class BaseLevel {
 
                 }
         }
+        if (depth == 1) {
+            AirWizard aw = new AirWizard(sound);
+            aw.x = w * 8;
+            aw.y = h * 8;
+            add(aw);
+        }
     }
 
     final byte[][] generateMap(int w, int h) {
@@ -117,12 +123,6 @@ public abstract class BaseLevel {
             maps = LevelGen.createAndValidateSkyMap(w, h, 2000, 2); // Sky level
             monsterDensity = 4;
         }
-        if (depth == 1) {
-            AirWizard aw = new AirWizard(sound);
-            aw.x = w * 8;
-            aw.y = h * 8;
-            add(aw);
-        }
         return maps;
     }
 
@@ -132,6 +132,27 @@ public abstract class BaseLevel {
 
     protected final EntityData removeEntity(Entity e) {
         return entities.get(e.id);
+    }
+
+    public PlayerHandler playerHandler() {
+        return handler;
+    }
+
+    public PropertyReader propertyReader() {
+        return reader;
+    }
+
+    public final Player player() {
+        EntityData data = entities.get(owner);
+        if (data != null)
+            return (Player) data.entity;
+        return null;
+    }
+
+    public final boolean hasPlayer() {
+        if (owner != null)
+            return entities.containsKey(owner);
+        return false;
     }
 
     public abstract void add(Entity entity);

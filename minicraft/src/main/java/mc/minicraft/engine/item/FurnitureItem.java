@@ -7,7 +7,7 @@ import mc.minicraft.data.game.entity.ItemType;
 import mc.minicraft.engine.Screen;
 import mc.minicraft.engine.entity.*;
 import mc.minicraft.engine.gfx.Color;
-import mc.minicraft.engine.level.Level;
+import mc.minicraft.engine.level.BaseLevel;
 import mc.minicraft.engine.level.tile.Tile;
 
 import java.io.IOException;
@@ -58,7 +58,7 @@ public class FurnitureItem extends Item {
         return false;
     }
 
-    public boolean interactOn(Tile tile, Level level, int xt, int yt, Player player, int attackDir) {
+    public boolean interactOn(Tile tile, BaseLevel level, int xt, int yt, Player player, int attackDir) {
         if (tile.mayPass(level, xt, yt, furniture)) {
             furniture.x = xt * 16 + 8;
             furniture.y = yt * 16 + 8;

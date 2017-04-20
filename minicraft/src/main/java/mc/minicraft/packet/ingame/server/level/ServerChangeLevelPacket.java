@@ -2,7 +2,7 @@ package mc.minicraft.packet.ingame.server.level;
 
 import mc.api.Buffer;
 import mc.minicraft.ServerPlayer;
-import mc.minicraft.engine.level.Level;
+import mc.minicraft.engine.level.ServerLevel;
 
 import java.io.IOException;
 
@@ -14,7 +14,7 @@ public final class ServerChangeLevelPacket extends ServerLevelPositionPacket {
     public ServerChangeLevelPacket() {
     }
 
-    public ServerChangeLevelPacket(Level level, ServerPlayer player, int currentLevel) {
+    public ServerChangeLevelPacket(ServerLevel level, ServerPlayer player, int currentLevel) {
         super(level, player);
         this.currentLevel = currentLevel;
     }

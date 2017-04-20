@@ -10,7 +10,7 @@ import mc.minicraft.engine.item.ResourceItem;
 import mc.minicraft.engine.item.ToolItem;
 import mc.minicraft.engine.item.ToolType;
 import mc.minicraft.engine.item.resource.Resource;
-import mc.minicraft.engine.level.Level;
+import mc.minicraft.engine.level.BaseLevel;
 
 public class FlowerTile extends GrassTile {
     public FlowerTile(int id) {
@@ -19,7 +19,7 @@ public class FlowerTile extends GrassTile {
         connectsToGrass = true;
     }
 
-    public void render(Screen screen, Level level, int x, int y) {
+    public void render(Screen screen, BaseLevel level, int x, int y) {
         super.render(screen, level, x, y);
 
         int data = level.getData(x, y);
@@ -32,7 +32,7 @@ public class FlowerTile extends GrassTile {
         if (shape == 0) screen.render(x * 16 + 8, y * 16 + 8, 1 + 1 * 32, flowerCol, 0);
     }
 
-    public boolean interact(Level level, int x, int y, Player player, Item item, int attackDir) {
+    public boolean interact(BaseLevel level, int x, int y, Player player, Item item, int attackDir) {
         if (item instanceof ToolItem) {
             ToolItem tool = (ToolItem) item;
             if (tool.type == ToolType.shovel) {
@@ -47,7 +47,7 @@ public class FlowerTile extends GrassTile {
         return false;
     }
 
-    public void hurt(Level level, int x, int y, Mob source, int dmg, int attackDir) {
+    public void hurt(BaseLevel level, int x, int y, Mob source, int dmg, int attackDir) {
         int count = random.nextInt(2) + 1;
         for (int i = 0; i < count; i++) {
             level.add(new ItemEntity(level.sound,

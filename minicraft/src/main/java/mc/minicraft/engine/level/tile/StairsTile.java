@@ -2,7 +2,7 @@ package mc.minicraft.engine.level.tile;
 
 import mc.minicraft.engine.Screen;
 import mc.minicraft.engine.gfx.Color;
-import mc.minicraft.engine.level.Level;
+import mc.minicraft.engine.level.BaseLevel;
 
 public class StairsTile extends Tile {
     private boolean leadsUp;
@@ -12,7 +12,7 @@ public class StairsTile extends Tile {
         this.leadsUp = leadsUp;
     }
 
-    public void render(Screen screen, Level level, int x, int y) {
+    public void render(Screen screen, BaseLevel level, int x, int y) {
         int color = Color.get(level.dirtColor, 000, 333, 444);
         int xt = 0;
         if (leadsUp) xt = 2;

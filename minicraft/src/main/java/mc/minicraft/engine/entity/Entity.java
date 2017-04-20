@@ -9,7 +9,7 @@ import mc.minicraft.engine.Screen;
 import mc.minicraft.engine.entity.particle.SmashParticle;
 import mc.minicraft.engine.entity.particle.TextParticle;
 import mc.minicraft.engine.item.Item;
-import mc.minicraft.engine.level.Level;
+import mc.minicraft.engine.level.BaseLevel;
 import mc.minicraft.engine.level.tile.Tile;
 
 import java.io.IOException;
@@ -25,7 +25,7 @@ public abstract class Entity {
     public int xr = 6;
     public int yr = 6;
     public boolean removed;
-    public Level level;
+    public BaseLevel level;
     public final Sound sound;
     public final EntityType type;
 
@@ -60,7 +60,7 @@ public abstract class Entity {
         removed = true;
     }
 
-    public final void init(Level level) {
+    public final void init(BaseLevel level) {
         this.level = level;
     }
 
