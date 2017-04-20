@@ -1,12 +1,12 @@
 package mc.minecraft.client.screen;
 
-import mc.minicraft.component.crafting.Recipe;
-import mc.minicraft.component.entity.Player;
-import mc.minicraft.component.gfx.Color;
+import mc.minicraft.engine.crafting.Recipe;
+import mc.minicraft.engine.entity.Player;
+import mc.minicraft.engine.gfx.Color;
 import mc.minecraft.client.gfx.Font;
 import mc.minecraft.client.gfx.ClientScreen;
-import mc.minicraft.component.item.Item;
-import mc.minicraft.component.item.ResourceItem;
+import mc.minicraft.engine.item.Item;
+import mc.minicraft.engine.item.ResourceItem;
 import mc.minecraft.client.sound.Sound;
 
 import java.util.ArrayList;

@@ -4,9 +4,9 @@ import mc.api.Buffer;
 import mc.api.Packet;
 import mc.api.Sound;
 import mc.engine.property.PropertyReader;
-import mc.minicraft.component.entity.Entity;
-import mc.minicraft.component.entity.Player;
-import mc.minicraft.component.entity.PlayerHandler;
+import mc.minicraft.engine.entity.Entity;
+import mc.minicraft.engine.entity.Player;
+import mc.minicraft.engine.entity.PlayerHandler;
 
 import java.io.IOException;
 

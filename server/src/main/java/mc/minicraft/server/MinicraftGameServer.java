@@ -7,10 +7,10 @@ import mc.engine.property.PropertyContainer;
 import mc.engine.tcp.DefaultFactory;
 import mc.engine.tcp.DefaultServer;
 import mc.minicraft.*;
-import mc.minicraft.component.crafting.Crafting;
-import mc.minicraft.component.entity.PlayerHandlerAdapter;
-import mc.minicraft.component.level.Level;
-import mc.minicraft.component.level.tile.Tile;
+import mc.minicraft.engine.crafting.Crafting;
+import mc.minicraft.engine.entity.PlayerHandlerAdapter;
+import mc.minicraft.engine.level.Level;
+import mc.minicraft.engine.level.tile.Tile;
 import mc.minicraft.data.game.MessageType;
 import mc.minicraft.data.game.entity.player.GameMode;
 import mc.minicraft.data.game.setting.Difficulty;
@@ -176,7 +176,9 @@ final class MinicraftGameServer extends Server.ListenerAdapter
     }
 
     private void resetGame() {
+//        int w = 40;
         int w = 128;
+//        int h = 40;
         int h = 128;
         PlayerHandlerAdapter handler = new PlayerHandlerAdapter();
         levels[4] = new Level(this, handler, container, w, h, 1, null);
@@ -186,7 +188,7 @@ final class MinicraftGameServer extends Server.ListenerAdapter
         levels[0] = new Level(this, handler, container, w, h, -3, levels[1]);
 
         for (int i = 0; i < 5; i++) {
-            levels[i].trySpawn(5000);
+            levels[i].trySpawn(5);
         }
     }
 

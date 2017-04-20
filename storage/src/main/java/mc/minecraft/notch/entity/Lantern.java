@@ -1,6 +1,6 @@
-package mc.minicraft.component.entity;
+package mc.minicraft.engine.entity;
 
-import mc.minicraft.component.gfx.Color;
+import mc.minicraft.engine.gfx.Color;
 
 public class Lantern extends Furniture {
     public Lantern() {

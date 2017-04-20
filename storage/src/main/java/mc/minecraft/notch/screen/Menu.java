@@ -3,9 +3,9 @@ package mc.minecraft.client.screen;
 import mc.engine.property.PropertyReader;
 import mc.minecraft.client.Game;
 import mc.minecraft.client.InputHandler;
-import mc.minicraft.component.gfx.Color;
-import mc.minicraft.component.gfx.Font;
-import mc.minicraft.component.gfx.Screen;
+import mc.minicraft.engine.gfx.Color;
+import mc.minicraft.engine.gfx.Font;
+import mc.minicraft.engine.gfx.Screen;
 
 import java.util.List;
 

@@ -2,7 +2,7 @@ package mc.minecraft.client.screen;
 
 import mc.engine.property.PropertyReader;
 import mc.minecraft.client.console.ConsoleMenu;
-import mc.minicraft.component.gfx.Color;
+import mc.minicraft.engine.gfx.Color;
 import mc.minecraft.client.gfx.Font;
 import mc.minecraft.client.gfx.ClientScreen;
 

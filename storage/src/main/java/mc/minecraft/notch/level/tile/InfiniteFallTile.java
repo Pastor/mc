@@ -1,8 +1,8 @@
 package mc.minecraft.client.level.tile;
 
-import mc.minicraft.component.entity.AirWizard;
-import mc.minicraft.component.entity.Entity;
-import mc.minicraft.component.gfx.Screen;
+import mc.minicraft.engine.entity.AirWizard;
+import mc.minicraft.engine.entity.Entity;
+import mc.minicraft.engine.gfx.Screen;
 import mc.minecraft.client.level.Level;
 
 public class InfiniteFallTile extends Tile {

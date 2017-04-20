@@ -1,6 +1,6 @@
 package mc.minecraft.client.screen;
 
-import mc.minicraft.component.gfx.Color;
+import mc.minicraft.engine.gfx.Color;
 import mc.minecraft.client.gfx.Font;
 import mc.minecraft.client.gfx.ClientScreen;
 import mc.minecraft.client.sound.Sound;

@@ -2,7 +2,7 @@ package mc.minecraft.client;
 
 import mc.minecraft.client.console.CommandProcessor;
 import mc.minecraft.client.console.ConsoleManager;
-import mc.minicraft.component.entity.Player;
+import mc.minicraft.engine.entity.Player;
 import mc.engine.property.PropertyReader;
 import mc.minecraft.client.screen.Menu;
 
@@ -35,8 +35,6 @@ public interface Game {
     void changeLevel(int dir);
 
     void addKeyListener(InputHandler inputHandler);
-
-    void scheduleLevelChange(int dir);
 
     void won();
 

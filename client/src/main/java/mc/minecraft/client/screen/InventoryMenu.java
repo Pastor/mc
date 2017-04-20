@@ -1,10 +1,10 @@
 package mc.minecraft.client.screen;
 
 import mc.api.Client;
-import mc.minicraft.component.entity.Player;
+import mc.minicraft.engine.entity.Player;
 import mc.minecraft.client.gfx.Font;
 import mc.minecraft.client.gfx.ClientScreen;
-import mc.minicraft.component.item.Item;
+import mc.minicraft.engine.item.Item;
 import mc.minicraft.packet.ingame.client.player.ClientPlayerUpdatePacket;
 
 public final class InventoryMenu extends Menu {

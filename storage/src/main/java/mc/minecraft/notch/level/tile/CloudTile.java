@@ -1,10 +1,10 @@
 package mc.minecraft.client.level.tile;
 
-import mc.minicraft.component.entity.Entity;
-import mc.minicraft.component.entity.ItemEntity;
-import mc.minicraft.component.entity.Player;
-import mc.minicraft.component.gfx.Color;
-import mc.minicraft.component.gfx.Screen;
+import mc.minicraft.engine.entity.Entity;
+import mc.minicraft.engine.entity.ItemEntity;
+import mc.minicraft.engine.entity.Player;
+import mc.minicraft.engine.gfx.Color;
+import mc.minicraft.engine.gfx.Screen;
 import mc.minecraft.client.item.Item;
 import mc.minecraft.client.item.ResourceItem;
 import mc.minecraft.client.item.ToolItem;

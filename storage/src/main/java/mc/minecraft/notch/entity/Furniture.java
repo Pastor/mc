@@ -1,6 +1,6 @@
-package mc.minicraft.component.entity;
+package mc.minicraft.engine.entity;
 
-import mc.minicraft.component.gfx.Screen;
+import mc.minicraft.engine.gfx.Screen;
 import mc.minecraft.client.item.FurnitureItem;
 import mc.minecraft.client.item.PowerGloveItem;
 

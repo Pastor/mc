@@ -2,9 +2,9 @@ package mc.minecraft.client.screen;
 
 import mc.engine.property.PropertyReader;
 import mc.minecraft.client.console.ConsoleMenu;
-import mc.minicraft.component.gfx.Color;
-import mc.minicraft.component.gfx.Font;
-import mc.minicraft.component.gfx.Screen;
+import mc.minicraft.engine.gfx.Color;
+import mc.minicraft.engine.gfx.Font;
+import mc.minicraft.engine.gfx.Screen;
 import mc.minecraft.client.sound.Sound;
 
 import java.util.ArrayList;

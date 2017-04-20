@@ -2,11 +2,11 @@ package mc.minicraft.packet.ingame.server.level;
 
 import mc.api.Buffer;
 import mc.api.Packet;
-import mc.engine.property.PropertyReader;
-import mc.minicraft.component.LevelHandler;
-import mc.minicraft.component.entity.Entity;
-import mc.minicraft.component.entity.PlayerHandler;
 import mc.api.Sound;
+import mc.engine.property.PropertyReader;
+import mc.minicraft.engine.LevelHandler;
+import mc.minicraft.engine.entity.Entity;
+import mc.minicraft.engine.entity.PlayerHandler;
 
 import java.io.IOException;
 import java.util.LinkedList;

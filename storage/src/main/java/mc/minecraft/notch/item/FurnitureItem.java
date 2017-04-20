@@ -1,11 +1,11 @@
 package mc.minecraft.client.item;
 
-import mc.minicraft.component.entity.Furniture;
-import mc.minicraft.component.entity.ItemEntity;
-import mc.minicraft.component.entity.Player;
-import mc.minicraft.component.gfx.Color;
-import mc.minicraft.component.gfx.Font;
-import mc.minicraft.component.gfx.Screen;
+import mc.minicraft.engine.entity.Furniture;
+import mc.minicraft.engine.entity.ItemEntity;
+import mc.minicraft.engine.entity.Player;
+import mc.minicraft.engine.gfx.Color;
+import mc.minicraft.engine.gfx.Font;
+import mc.minicraft.engine.gfx.Screen;
 import mc.minecraft.client.level.Level;
 import mc.minecraft.client.level.tile.Tile;
 

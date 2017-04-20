@@ -1,4 +1,4 @@
-package mc.minicraft.component.gfx;
+package mc.minicraft.engine.gfx;
 
 public class Screen {
     /*

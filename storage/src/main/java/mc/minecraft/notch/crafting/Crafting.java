@@ -1,6 +1,6 @@
 package mc.minecraft.client.crafting;
 
-import mc.minicraft.component.entity.*;
+import mc.minicraft.engine.entity.*;
 import mc.minecraft.client.item.ToolType;
 import mc.minecraft.client.item.resource.Resource;
 

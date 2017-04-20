@@ -1,9 +1,9 @@
 package mc.minecraft.client.screen;
 
-import mc.minicraft.component.entity.Inventory;
-import mc.minicraft.component.entity.Player;
-import mc.minicraft.component.gfx.Font;
-import mc.minicraft.component.gfx.Screen;
+import mc.minicraft.engine.entity.Inventory;
+import mc.minicraft.engine.entity.Player;
+import mc.minicraft.engine.gfx.Font;
+import mc.minicraft.engine.gfx.Screen;
 
 public class ContainerMenu extends Menu {
     private Player player;

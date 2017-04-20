@@ -4,10 +4,10 @@ import mc.api.Client;
 import mc.minecraft.client.screen.ContainerMenu;
 import mc.minecraft.client.screen.CraftingMenu;
 import mc.minecraft.client.screen.InventoryMenu;
-import mc.minicraft.component.crafting.Recipe;
-import mc.minicraft.component.entity.Inventory;
-import mc.minicraft.component.entity.Player;
-import mc.minicraft.component.entity.PlayerHandler;
+import mc.minicraft.engine.crafting.Recipe;
+import mc.minicraft.engine.entity.Inventory;
+import mc.minicraft.engine.entity.Player;
+import mc.minicraft.engine.entity.PlayerHandler;
 
 import java.awt.*;
 import java.util.List;
@@ -60,7 +60,6 @@ public final class ClientPlayerHandler implements PlayerHandler {
 
     @Override
     public void scheduleLevelChange(int dir) {
-        game.scheduleLevelChange(dir);
     }
 
     @Override

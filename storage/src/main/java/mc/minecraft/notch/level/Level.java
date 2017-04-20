@@ -1,7 +1,7 @@
 package mc.minecraft.client.level;
 
-import mc.minicraft.component.entity.*;
-import mc.minicraft.component.gfx.Screen;
+import mc.minicraft.engine.entity.*;
+import mc.minicraft.engine.gfx.Screen;
 import mc.minecraft.client.level.levelgen.LevelGen;
 import mc.minecraft.client.level.tile.Tile;
 

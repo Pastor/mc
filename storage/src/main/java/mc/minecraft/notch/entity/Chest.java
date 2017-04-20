@@ -1,6 +1,6 @@
-package mc.minicraft.component.entity;
+package mc.minicraft.engine.entity;
 
-import mc.minicraft.component.gfx.Color;
+import mc.minicraft.engine.gfx.Color;
 import mc.minecraft.client.screen.ContainerMenu;
 
 public class Chest extends Furniture {

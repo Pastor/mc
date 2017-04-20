@@ -4,17 +4,17 @@ import mc.api.Server;
 import mc.api.Session;
 import mc.api.Sound;
 import mc.engine.property.PropertyContainer;
-import mc.minicraft.component.crafting.Recipe;
-import mc.minicraft.component.entity.Inventory;
-import mc.minicraft.component.entity.Player;
-import mc.minicraft.component.entity.PlayerHandler;
-import mc.minicraft.component.level.Level;
-import mc.minicraft.component.level.tile.Tile;
 import mc.minicraft.data.game.MessageType;
 import mc.minicraft.data.message.ChatColor;
 import mc.minicraft.data.message.Message;
 import mc.minicraft.data.message.MessageStyle;
 import mc.minicraft.data.message.TextMessage;
+import mc.minicraft.engine.crafting.Recipe;
+import mc.minicraft.engine.entity.Inventory;
+import mc.minicraft.engine.entity.Player;
+import mc.minicraft.engine.entity.PlayerHandler;
+import mc.minicraft.engine.level.Level;
+import mc.minicraft.engine.level.tile.Tile;
 import mc.minicraft.packet.ingame.client.ClientChatPacket;
 import mc.minicraft.packet.ingame.client.player.ClientPlayerPositionPacket;
 import mc.minicraft.packet.ingame.server.ServerChatPacket;
@@ -196,9 +196,11 @@ public final class ServerPlayer extends Session.ListenerAdapter implements Compa
         @Override
         public void scheduleLevelChange(int dir) {
             if (level != null) {
+                UUID ido = level.id;
                 level.remove(player);
                 currentLevel += dir;
                 level = levels[currentLevel];
+                System.out.printf("%s -> %s\n", ido, level.id);
                 player.x = (player.x >> 4) * 16 + 8;
                 player.y = (player.y >> 4) * 16 + 8;
                 level.add(player);

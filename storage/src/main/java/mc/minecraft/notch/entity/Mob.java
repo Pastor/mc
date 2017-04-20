@@ -1,7 +1,7 @@
-package mc.minicraft.component.entity;
+package mc.minicraft.engine.entity;
 
-import mc.minicraft.component.entity.particle.TextParticle;
-import mc.minicraft.component.gfx.Color;
+import mc.minicraft.engine.entity.particle.TextParticle;
+import mc.minicraft.engine.gfx.Color;
 import mc.minecraft.client.level.Level;
 import mc.minecraft.client.level.tile.Tile;
 import mc.minecraft.client.sound.Sound;

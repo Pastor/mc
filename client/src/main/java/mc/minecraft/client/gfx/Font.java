@@ -1,10 +1,8 @@
 package mc.minecraft.client.gfx;
 
-import mc.minicraft.component.Screen;
-import mc.minicraft.component.gfx.*;
+import mc.minicraft.engine.Screen;
 
 import java.awt.*;
-import java.awt.Color;
 
 public class Font {
     private static final String chars = "" + //
@@ -56,27 +54,27 @@ public class Font {
         for (int y = y0; y <= y1; y++) {
             for (int x = x0; x <= x1; x++) {
                 if (x == x0 && y == y0)
-                    screen.render(x * 8, y * 8, 0 + 13 * 32, mc.minicraft.component.gfx.Color.get(-1, 1, 5, 445), 0);
+                    screen.render(x * 8, y * 8, 0 + 13 * 32, mc.minicraft.engine.gfx.Color.get(-1, 1, 5, 445), 0);
                 else if (x == x1 && y == y0)
-                    screen.render(x * 8, y * 8, 0 + 13 * 32, mc.minicraft.component.gfx.Color.get(-1, 1, 5, 445), 1);
+                    screen.render(x * 8, y * 8, 0 + 13 * 32, mc.minicraft.engine.gfx.Color.get(-1, 1, 5, 445), 1);
                 else if (x == x0 && y == y1)
-                    screen.render(x * 8, y * 8, 0 + 13 * 32, mc.minicraft.component.gfx.Color.get(-1, 1, 5, 445), 2);
+                    screen.render(x * 8, y * 8, 0 + 13 * 32, mc.minicraft.engine.gfx.Color.get(-1, 1, 5, 445), 2);
                 else if (x == x1 && y == y1)
-                    screen.render(x * 8, y * 8, 0 + 13 * 32, mc.minicraft.component.gfx.Color.get(-1, 1, 5, 445), 3);
+                    screen.render(x * 8, y * 8, 0 + 13 * 32, mc.minicraft.engine.gfx.Color.get(-1, 1, 5, 445), 3);
                 else if (y == y0)
-                    screen.render(x * 8, y * 8, 1 + 13 * 32, mc.minicraft.component.gfx.Color.get(-1, 1, 5, 445), 0);
+                    screen.render(x * 8, y * 8, 1 + 13 * 32, mc.minicraft.engine.gfx.Color.get(-1, 1, 5, 445), 0);
                 else if (y == y1)
-                    screen.render(x * 8, y * 8, 1 + 13 * 32, mc.minicraft.component.gfx.Color.get(-1, 1, 5, 445), 2);
+                    screen.render(x * 8, y * 8, 1 + 13 * 32, mc.minicraft.engine.gfx.Color.get(-1, 1, 5, 445), 2);
                 else if (x == x0)
-                    screen.render(x * 8, y * 8, 2 + 13 * 32, mc.minicraft.component.gfx.Color.get(-1, 1, 5, 445), 0);
+                    screen.render(x * 8, y * 8, 2 + 13 * 32, mc.minicraft.engine.gfx.Color.get(-1, 1, 5, 445), 0);
                 else if (x == x1)
-                    screen.render(x * 8, y * 8, 2 + 13 * 32, mc.minicraft.component.gfx.Color.get(-1, 1, 5, 445), 1);
+                    screen.render(x * 8, y * 8, 2 + 13 * 32, mc.minicraft.engine.gfx.Color.get(-1, 1, 5, 445), 1);
                 else
-                    screen.render(x * 8, y * 8, 2 + 13 * 32, mc.minicraft.component.gfx.Color.get(5, 5, 5, 5), 1);
+                    screen.render(x * 8, y * 8, 2 + 13 * 32, mc.minicraft.engine.gfx.Color.get(5, 5, 5, 5), 1);
             }
         }
 
-        draw(title, screen, x0 * 8 + 8, y0 * 8, mc.minicraft.component.gfx.Color.get(5, 5, 5, 550));
+        draw(title, screen, x0 * 8 + 8, y0 * 8, mc.minicraft.engine.gfx.Color.get(5, 5, 5, 550));
 
     }
 }

@@ -1,9 +1,9 @@
-package mc.minicraft.component.entity.particle;
+package mc.minicraft.engine.entity.particle;
 
-import mc.minicraft.component.entity.Entity;
-import mc.minicraft.component.gfx.Color;
-import mc.minicraft.component.gfx.Font;
-import mc.minicraft.component.gfx.Screen;
+import mc.minicraft.engine.entity.Entity;
+import mc.minicraft.engine.gfx.Color;
+import mc.minicraft.engine.gfx.Font;
+import mc.minicraft.engine.gfx.Screen;
 
 public class TextParticle extends Entity {
     private String msg;

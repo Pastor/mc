@@ -1,10 +1,10 @@
-package mc.minicraft.component.entity;
+package mc.minicraft.engine.entity;
 
 import mc.minecraft.client.Game;
 import mc.minecraft.client.InputHandler;
-import mc.minicraft.component.entity.particle.TextParticle;
-import mc.minicraft.component.gfx.Color;
-import mc.minicraft.component.gfx.Screen;
+import mc.minicraft.engine.entity.particle.TextParticle;
+import mc.minicraft.engine.gfx.Color;
+import mc.minicraft.engine.gfx.Screen;
 import mc.minecraft.client.item.FurnitureItem;
 import mc.minecraft.client.item.Item;
 import mc.minecraft.client.item.PowerGloveItem;

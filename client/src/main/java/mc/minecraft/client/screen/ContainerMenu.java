@@ -1,7 +1,7 @@
 package mc.minecraft.client.screen;
 
-import mc.minicraft.component.entity.Inventory;
-import mc.minicraft.component.entity.Player;
+import mc.minicraft.engine.entity.Inventory;
+import mc.minicraft.engine.entity.Player;
 import mc.minecraft.client.gfx.Font;
 import mc.minecraft.client.gfx.ClientScreen;
 

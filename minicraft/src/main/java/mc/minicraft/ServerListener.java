@@ -10,8 +10,8 @@ import mc.minicraft.data.status.handler.ServerInfoBuilder;
 import mc.minicraft.packet.HandshakePacket;
 import mc.minicraft.packet.ingame.client.ClientKeepAlivePacket;
 import mc.minicraft.packet.ingame.client.player.ClientPlayerAttackPacket;
-import mc.minicraft.packet.ingame.client.player.ClientPlayerSettings;
 import mc.minicraft.packet.ingame.client.player.ClientPlayerPositionPacket;
+import mc.minicraft.packet.ingame.client.player.ClientPlayerSettings;
 import mc.minicraft.packet.ingame.client.player.ClientPlayerUpdatePacket;
 import mc.minicraft.packet.ingame.server.ServerDisconnectPacket;
 import mc.minicraft.packet.ingame.server.ServerKeepAlivePacket;
@@ -32,7 +32,9 @@ import javax.crypto.SecretKey;
 import java.net.Proxy;
 import java.security.KeyPair;
 import java.security.PrivateKey;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Random;
+import java.util.UUID;
 
 final class ServerListener extends Session.ListenerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(ServerListener.class);

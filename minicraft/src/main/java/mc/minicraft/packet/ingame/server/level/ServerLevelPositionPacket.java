@@ -5,8 +5,8 @@ import mc.api.Packet;
 import mc.api.Sound;
 import mc.engine.property.PropertyReader;
 import mc.minicraft.ServerPlayer;
-import mc.minicraft.component.entity.PlayerHandler;
-import mc.minicraft.component.level.Level;
+import mc.minicraft.engine.entity.PlayerHandler;
+import mc.minicraft.engine.level.Level;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -21,7 +21,8 @@ public abstract class ServerLevelPositionPacket implements Packet {
 
     public int xPlayer;
     public int yPlayer;
-    public UUID id;
+    public UUID ownerId;
+    public UUID levelId;
 
     @SuppressWarnings({"unused", "WeakerAccess"})
     public ServerLevelPositionPacket() {
@@ -39,11 +40,12 @@ public abstract class ServerLevelPositionPacket implements Packet {
         this(level.w, level.h, level.depth, level.tiles, level.data);
         this.xPlayer = player.player.x;
         this.yPlayer = player.player.y;
-        this.id = player.player.id;
+        this.ownerId = player.player.id;
+        this.levelId = level.id;
     }
 
     public Level readLevel(Sound sound, PropertyReader reader, PlayerHandler handler) {
-        return new Level(sound, w, h, level, tiles, data, reader, handler);
+        return new Level(sound, levelId, w, h, level, tiles, data, reader, handler);
     }
 
     @Override
@@ -55,7 +57,8 @@ public abstract class ServerLevelPositionPacket implements Packet {
         data = in.readBytes(in.readVarInt());
         xPlayer = in.readVarInt();
         yPlayer = in.readVarInt();
-        id = UUID.fromString(in.readString());
+        ownerId = UUID.fromString(in.readString());
+        levelId = UUID.fromString(in.readString());
     }
 
     @Override
@@ -69,7 +72,8 @@ public abstract class ServerLevelPositionPacket implements Packet {
         out.writeBytes(data);
         out.writeVarInt(xPlayer);
         out.writeVarInt(yPlayer);
-        out.writeString(id.toString());
+        out.writeString(ownerId.toString());
+        out.writeString(levelId.toString());
     }
 
     @Override

@@ -1,9 +1,9 @@
 package mc.minecraft.client.item;
 
-import mc.minicraft.component.entity.Entity;
-import mc.minicraft.component.entity.ItemEntity;
-import mc.minicraft.component.entity.Player;
-import mc.minicraft.component.gfx.Screen;
+import mc.minicraft.engine.entity.Entity;
+import mc.minicraft.engine.entity.ItemEntity;
+import mc.minicraft.engine.entity.Player;
+import mc.minicraft.engine.gfx.Screen;
 import mc.minecraft.client.level.Level;
 import mc.minecraft.client.level.tile.Tile;
 import mc.minecraft.client.screen.ListItem;

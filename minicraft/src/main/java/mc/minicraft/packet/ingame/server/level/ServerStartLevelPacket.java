@@ -1,7 +1,7 @@
 package mc.minicraft.packet.ingame.server.level;
 
 import mc.minicraft.ServerPlayer;
-import mc.minicraft.component.level.Level;
+import mc.minicraft.engine.level.Level;
 
 public final class ServerStartLevelPacket extends ServerLevelPositionPacket {
     @SuppressWarnings({"unused", "WeakerAccess"})

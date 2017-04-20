@@ -1,9 +1,9 @@
 package mc.minecraft.client.crafting;
 
-import mc.minicraft.component.entity.Player;
-import mc.minicraft.component.gfx.Color;
-import mc.minicraft.component.gfx.Font;
-import mc.minicraft.component.gfx.Screen;
+import mc.minicraft.engine.entity.Player;
+import mc.minicraft.engine.gfx.Color;
+import mc.minicraft.engine.gfx.Font;
+import mc.minicraft.engine.gfx.Screen;
 import mc.minecraft.client.item.Item;
 import mc.minecraft.client.item.ResourceItem;
 import mc.minecraft.client.item.resource.Resource;

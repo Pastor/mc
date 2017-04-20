@@ -5,7 +5,7 @@ import mc.minicraft.data.message.ChatColor;
 import mc.minicraft.data.message.Message;
 import mc.minicraft.data.message.MessageStyle;
 import mc.minicraft.data.message.TextMessage;
-import mc.minicraft.component.gfx.Color;
+import mc.minicraft.engine.gfx.Color;
 import mc.minecraft.client.gfx.Font;
 import mc.minecraft.client.gfx.ClientScreen;
 import mc.minecraft.client.sound.Sound;

@@ -1,8 +1,8 @@
 package mc.minecraft.client.screen;
 
-import mc.minicraft.component.entity.Player;
-import mc.minicraft.component.gfx.Font;
-import mc.minicraft.component.gfx.Screen;
+import mc.minicraft.engine.entity.Player;
+import mc.minicraft.engine.gfx.Font;
+import mc.minicraft.engine.gfx.Screen;
 import mc.minecraft.client.item.Item;
 
 public class InventoryMenu extends Menu {

@@ -2,7 +2,7 @@ package mc.minicraft.packet.ingame.server.level;
 
 import mc.api.Buffer;
 import mc.minicraft.ServerPlayer;
-import mc.minicraft.component.level.Level;
+import mc.minicraft.engine.level.Level;
 
 import java.io.IOException;
 

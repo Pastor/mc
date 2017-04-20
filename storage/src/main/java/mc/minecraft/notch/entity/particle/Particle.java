@@ -1,6 +1,6 @@
-package mc.minicraft.component.entity.particle;
+package mc.minicraft.engine.entity.particle;
 
-import mc.minicraft.component.entity.Entity;
+import mc.minicraft.engine.entity.Entity;
 
 public class Particle extends Entity {
     public Particle() {

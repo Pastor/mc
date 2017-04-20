@@ -1,7 +1,7 @@
-package mc.minicraft.component.entity;
+package mc.minicraft.engine.entity;
 
 import mc.minecraft.client.crafting.Crafting;
-import mc.minicraft.component.gfx.Color;
+import mc.minicraft.engine.gfx.Color;
 import mc.minecraft.client.screen.CraftingMenu;
 
 public class Anvil extends Furniture {

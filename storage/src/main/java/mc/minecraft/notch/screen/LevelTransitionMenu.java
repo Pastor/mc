@@ -1,7 +1,7 @@
 package mc.minecraft.client.screen;
 
 import mc.engine.property.PropertyReader;
-import mc.minicraft.component.gfx.Screen;
+import mc.minicraft.engine.gfx.Screen;
 
 public class LevelTransitionMenu extends Menu {
     private int dir;

@@ -1,7 +1,6 @@
 package mc.minecraft.client.gfx;
 
-import mc.minicraft.component.Screen;
-import mc.minicraft.component.gfx.Color;
+import mc.minicraft.engine.Screen;
 
 public final class ClientScreen implements Screen {
     /*

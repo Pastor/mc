@@ -1,4 +1,4 @@
-package mc.minicraft.component.entity;
+package mc.minicraft.engine.entity;
 
 import mc.minecraft.client.item.Item;
 import mc.minecraft.client.item.ResourceItem;

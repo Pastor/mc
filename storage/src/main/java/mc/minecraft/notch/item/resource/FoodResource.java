@@ -1,6 +1,6 @@
 package mc.minecraft.client.item.resource;
 
-import mc.minicraft.component.entity.Player;
+import mc.minicraft.engine.entity.Player;
 import mc.minecraft.client.level.Level;
 import mc.minecraft.client.level.tile.Tile;
 

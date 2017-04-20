@@ -1,8 +1,8 @@
-package mc.minicraft.component.entity.particle;
+package mc.minicraft.engine.entity.particle;
 
-import mc.minicraft.component.entity.Entity;
-import mc.minicraft.component.gfx.Color;
-import mc.minicraft.component.gfx.Screen;
+import mc.minicraft.engine.entity.Entity;
+import mc.minicraft.engine.gfx.Color;
+import mc.minicraft.engine.gfx.Screen;
 import mc.minecraft.client.sound.Sound;
 
 public class SmashParticle extends Entity {
