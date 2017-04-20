@@ -472,14 +472,14 @@ public final class Level {
 
     private static void onViewport(int w, int h, ServerPlayer player, Viewport viewport) {
         int distance = player.visibleDistance;
-        int xStart = player.player.x - distance;
+        int xStart = player.player.x - (distance << 4);
         if (xStart < 0)
             xStart = 0;
-        int yStart = player.player.y - distance;
+        int yStart = player.player.y - (distance << 4);
         if (yStart < 0)
             yStart = 0;
-        int xEnd = player.player.x + distance;
-        int yEnd = player.player.y + distance;
+        int xEnd = player.player.x + (distance << 4);
+        int yEnd = player.player.y + (distance << 4);
         viewport.onRect(xStart, yStart, xEnd, yEnd);
     }
 

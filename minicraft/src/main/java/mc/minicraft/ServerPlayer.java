@@ -56,7 +56,7 @@ public final class ServerPlayer extends Session.ListenerAdapter implements Compa
         this.server = server;
         this.container = container;
         this.player = new Player(this, state, container);
-        this.visibleDistance = 100;
+        this.visibleDistance = 10;
         this.level = levels[currentLevel];
     }
 
