@@ -13,6 +13,7 @@ import mc.minicraft.packet.ingame.server.ServerSoundEffectPacket;
 import mc.minicraft.packet.ingame.server.level.ServerUpdateLevelPacket;
 
 import java.util.*;
+import java.util.concurrent.locks.ReadWriteLock;
 import java.util.stream.Stream;
 
 public final class Level {
@@ -263,7 +264,7 @@ public final class Level {
         removeEntity(xto, yto, e);
     }
 
-    private synchronized void insertEntity(int x, int y, Entity e) {
+    protected void insertEntity(int x, int y, Entity e) {
         if (x < 0 || y < 0 || x >= w || y >= h)
             return;
         int index = x + y * w;
@@ -272,11 +273,10 @@ public final class Level {
         handler.insertEntity(x, y, e);
     }
 
-    private synchronized void removeEntity(int x, int y, Entity e) {
+    protected void removeEntity(int x, int y, Entity e) {
         if (x < 0 || y < 0 || x >= w || y >= h) return;
         int i = x + y * w;
-        Set<Entity> entities = entitiesInTiles[i];
-        entities.remove(e);
+        entitiesInTiles[i].remove(e);
         handler.removeEntity(x, y, e);
         Integer index = entitiesIndex.get(e.id);
         if (index != null) {
@@ -369,10 +369,6 @@ public final class Level {
             }
         }
         return result;
-    }
-
-    public void clearEntities() {
-//        Stream.of(entitiesInTiles).forEach(Set::clear);
     }
 
     public static final class LevelCollector implements LevelHandler {

@@ -5,6 +5,7 @@ import mc.api.Sound;
 import mc.minicraft.data.game.entity.EntityType;
 import mc.minicraft.engine.entity.particle.TextParticle;
 import mc.minicraft.engine.gfx.Color;
+import mc.minicraft.engine.level.BaseLevel;
 import mc.minicraft.engine.level.Level;
 import mc.minicraft.engine.level.tile.Tile;
 

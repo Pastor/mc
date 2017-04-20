@@ -17,10 +17,8 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class Entity {
-    public static final AtomicLong counter = new AtomicLong(0);
     protected final Random random = new Random();
     public UUID id;
     public int x, y;
