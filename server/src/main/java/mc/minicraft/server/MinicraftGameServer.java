@@ -189,7 +189,7 @@ final class MinicraftGameServer extends Server.ListenerAdapter
         levels[0] = new ServerLevel(this, handler, container, w, h, -3, levels[1]);
 
         for (int i = 0; i < 5; i++) {
-            levels[i].trySpawn(5);
+            levels[i].trySpawn(500);
         }
     }
 

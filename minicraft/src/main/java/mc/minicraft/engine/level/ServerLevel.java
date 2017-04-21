@@ -115,7 +115,8 @@ public final class ServerLevel extends BaseLevel {
     }
 
     public void tick() {
-        trySpawn(1);
+        if (Tile.tickCount % 1000 == 0)
+            trySpawn(1);
 
         for (int i = 0; i < w * h / 50; i++) {
             int xt = random.nextInt(w);
